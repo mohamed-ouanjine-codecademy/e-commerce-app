@@ -1,0 +1,271 @@
+openapi: 3.0.1
+info:
+  title: e-commerce API
+  version: 1.0.0
+  description: A basic API for an e-commerce app
+paths:
+  /signup:
+    post:
+      summary: Create new user
+      description: Create a new user with a POST request
+      operationId: signup
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - Users
+  /signin:
+    post:
+      summary: Login to the app
+      description: login an existing user to the app
+      operationId: signin
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - Users
+  /users:
+    get:
+      summary: Get all users
+      description: Get all users from database
+      operationId: users
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - Users
+  /users/{userId}:
+    get:
+      summary: Get all users
+      description: Get all users from database
+      operationId: get_user
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user to retrive.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - Users
+    put:
+      summary: Update a user by ID.
+      description: Update a user by their ID.
+      operationId: put_user
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user to retrive.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - Users
+  /products:
+    get:
+      summary: Get all products
+      description: Retrieve a list of all products
+      operationId: products
+      parameters:
+        - name: categoryId
+          in: query
+          description: ID of the product to retrieve.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              examples:
+                get_products:
+                  value: |-
+                    {
+                      "products": [
+                        {"id": 1, "name": "hat", "description": "winter hat", "price": "23$"},
+                        {"id": 2, "name": "football", "description": "soccer football for streets", "price": "15$"},
+                        {"id": 3, "name": "Atomic habits", "description": "Atomic Habits is a great book to build new habits in your life", "price": "5$"}
+                      ]
+                    }
+        '404':
+          description: Product not found
+      tags:
+        - Products
+      x-codeSamples:
+        - lang: http
+          source: >
+            # Try out with category parameter
+
+            curl -X GET "http://localhost:4000/products?category=1" -H "accept:
+            application/json"
+  /products/{productId}:
+    get:
+      summary: Get product by ID
+      description: Retrieve a specific product by its ID
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product to retrieve.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              examples:
+                get_product_by_id:
+                  value: |-
+                    {
+                      "id": 1,
+                      "name": "hat",
+                      "description": "winter hat",
+                      "price": "23$"
+                    }
+        '404':
+          description: Product not found
+      tags:
+        - Products
+  /cart:
+    post:
+      summary: Create a cart
+      description: Create new cart
+      operationId: postCart
+      responses:
+        default:
+          description: default!!
+      tags:
+       - Carts
+  /cart/{cartId}:
+    get:
+      summary: Get a cart.
+      description: get a cart by its ID.
+      operationId: getCart
+      parameters:
+        - name: cartId
+          in: path
+          description: ID of the cart to retrieve.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Carts
+    put:
+      summary: Update a cart.
+      description: Update a cart by its ID.
+      operationId: putCart
+      parameters:
+        - name: cartId
+          in: path
+          description: ID of the cart to update.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Carts
+    delete:
+      summary: Delete a cart.
+      description: Delete a cart by its ID.
+      operationId: deleteCart
+      parameters:
+        - name: cartId
+          in: path
+          description: ID of the cart to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Carts
+  /orders:
+    get:
+      summary: Get all orders.
+      description: Retrieve all orders a user have.
+      operationId: getOrders
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Orders
+  /orders/{orderId}:
+    get:
+      summary: Get an order
+      description: Retrieve an order by its Id
+      operationId: getOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: The order id you want to retrive.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Orders
+    put:
+      summary: Update an order
+      description: Update an order by its Id
+      operationId: putOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: The order id you want to update.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Orders
+    delete:
+      summary: Delete an order
+      description: Delete an order by its Id
+      operationId: deleteOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: The order id you want to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Orders
+  /cart/{cartId}/checkout:
+    post:
+      summary: Create an order
+      description: Create new order base on the given cart
+      operationId: postOrder
+      parameters:
+        - name: cartId
+          in: path
+          description: the cart ID you will create an order based on it
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Orders
+        - Carts
