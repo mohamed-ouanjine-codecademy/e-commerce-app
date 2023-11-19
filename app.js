@@ -5,12 +5,13 @@ const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
+// -- Routers
+const usersRouter = require('./routers/users.js');
+const productsRouter = require('./routers/products.js');
+
 // -- utils
 const db = require('./db/index.js');
 const help = require('./helperFunctions.js');
-
-// -- Routers
-const usersRouter = require('./routers/users.js');
 
 // Start app
 const app = express();
@@ -21,6 +22,7 @@ app.use(bodyParser.json());
 
 // mount Routers
 app.use('/users', usersRouter);
+app.use('/products', productsRouter);
 
 // session
 app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
@@ -59,6 +61,7 @@ passport.use(new LocalStrategy(
   }
 ));
 
+// hashPassword middleware:
 const hashPassword = async (req, res, next) => {
   try {
     const { password } = req.body;

@@ -12,7 +12,7 @@ const pool = new Pool(
 );
 
 const users = {
-  createUser : (req, res, next) => {
+  createUser: (req, res, next) => {
     const { email } = req.body;
     const hashedPassword = req.hashedPassword;
     pool.query('INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *', [email, hashedPassword], (err, results) => {
@@ -44,7 +44,100 @@ const users = {
   }
 }
 
+const products = {
+  postProduct: async (name, description, price) => {
+    try {
+      const results = await pool.query(`
+        INSERT INTO products (name, description, price) VALUES
+          ($1, $2, $3)
+        RETURNING *;
+        `,
+        [name, description, price]
+      )
+      return results.rows[0];
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  getProducts: async () => {
+    try {
+      const results = await pool.query('SELECT * FROM products');
+      return results.rows;
+    } catch (err) {
+      throw err
+    }
+  },
+
+  getProductsByCategory: async (categoryId) => {
+    try {
+      const results = await pool.query(`
+        SELECT *
+        FROM products
+        INNER JOIN categories_products
+          ON products.id = categories_products.product_id
+        WHERE categories_products.category_id = $1;`,
+        [categoryId]
+      );
+      return results.rows;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  getProductById: async (productId) => {
+    try {
+      const results = await pool.query(`
+        SELECT *
+        FROM products
+        WHERE id = $1;`,
+        [productId]
+      );
+
+      if (results.rows.length === 0) {
+        const err = new Error('Product not found');
+        err.status = 404;
+        throw err;
+      } else {
+        return results.rows[0];
+      }
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  updateProductById: async (productId, productUpdates) => {
+    try {
+      const results = await pool.query(`
+        UPDATE products
+        SET name = $1, description = $2, price = $3
+        WHERE id = $4
+        RETURNING *;`,
+        [productUpdates.name, productUpdates.description, productUpdates.price, productId]
+      );
+      return results.rows[0];
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  deleteProductById: async (productId) => {
+    try {
+      const results = await pool.query(`
+        DELETE FROM products
+        WHERE id = $1
+        RETURNING *;`,
+        [productId]
+      );
+      return results.rows[0];
+    } catch (err) {
+      throw err;
+    }
+  }
+}
+
 module.exports = {
   pool,
-  users
+  users,
+  products
 }
