@@ -1,20 +1,30 @@
+// imports
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
+// -- utils
 const db = require('./db/index.js');
 const help = require('./helperFunctions.js');
 
+// -- Routers
+const usersRouter = require('./routers/users.js');
+
+// Start app
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 // bodyParser
 app.use(bodyParser.json());
 
+// mount Routers
+app.use('/users', usersRouter);
+
 // session
 app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
+
 // passport
 app.use(passport.initialize());
 app.use(passport.session());
@@ -30,7 +40,7 @@ passport.deserializeUser(async (id, done) => {
   });
 });
 
-// passport local strategy
+// -- passport local strategy
 passport.use(new LocalStrategy(
   { usernameField: 'email' },
   async (email, password, done) => {
@@ -49,7 +59,6 @@ passport.use(new LocalStrategy(
   }
 ));
 
-// hashPassword middleware:
 const hashPassword = async (req, res, next) => {
   try {
     const { password } = req.body;
@@ -80,15 +89,13 @@ app.post(
   }
 );
 
-
 // Error middleware
 app.use((err, req, res, next) => {
   const status = err.status || 500;
   const message = err.message;
-
-  console.error(err);
+  // console.error(err);
   res.status(status).send(message);
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port: ${PORT}`);
