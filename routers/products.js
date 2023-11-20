@@ -8,9 +8,9 @@ const db = require('../db/index.js');
 // start
 router.post('/', async (req, res, next) => {
   try {
-    const { name, description, price } = req.body;
+    const productInf = req.body;
 
-    const newProduct = await db.products.postProduct(name, description, price);
+    const newProduct = await db.products.postProduct(productInf);
 
     res.json(newProduct);
   } catch (err) {
@@ -50,13 +50,11 @@ router.get('/:id', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   try {
     const productId = req.params.id;
-    const productUpdates = req.body;
+    const productNewInf = req.body;
 
-    // this line is check if the product exist or not.
-    await db.products.getProductById(productId);
-    const newProduct = await db.products.updateProductById(productId, productUpdates);
+    const updatedProduct = await db.products.updateProductById(productId ,productNewInf);
 
-    res.json(newProduct);
+    res.json(updatedProduct);
   } catch (err) {
     next(err);
   }
@@ -66,8 +64,6 @@ router.delete('/:id', async (req, res, next) => {
   try {
     const productId = req.params.id;
 
-    // check if the product exist
-    await db.products.getProductById(productId);
     const deletedProduct = await db.products.deleteProductById(productId);
 
     res.json(deletedProduct);
