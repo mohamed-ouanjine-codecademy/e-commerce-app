@@ -15,7 +15,7 @@ const help = require('./helperFunctions.js');
 
 // Start app
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 // bodyParser
 app.use(bodyParser.json());
@@ -47,7 +47,7 @@ passport.use(new LocalStrategy(
   { usernameField: 'email' },
   async (email, password, done) => {
 
-    db.users.findUserByEmail(email, async (err, user) => {
+    await db.users.findUserByEmail(email, async (err, user) => {
       if (err) return done(err);
 
       if (!user) return done(null, false);
@@ -76,7 +76,19 @@ const hashPassword = async (req, res, next) => {
 }
 
 // endpoint: '/signup' -> register a new user.
-app.post('/signup', hashPassword, db.users.createUser);
+app.post('/signup', hashPassword, async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const userInf = [email, req.hashedPassword];
+
+    const newUser = await db.users.createUser(userInf);
+
+    res.status(201).json(newUser);
+  } catch (err) {
+    next(err);
+  }
+}
+);
 
 // endpoint: '/signin -> authenticate a user.
 app.get('/signin', (req, res) => {
@@ -88,7 +100,7 @@ app.post(
   '/signin',
   passport.authenticate('local', { failureRedirect: '/signin' }),
   (req, res) => {
-    res.send(`Welcome back`);
+    res.send(`Welcome back ${req.user.email}`);
   }
 );
 
