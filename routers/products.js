@@ -12,7 +12,7 @@ router.post('/', async (req, res, next) => {
 
     const newProduct = await db.products.postProduct(productInf);
 
-    res.json(newProduct);
+    res.status(201).json(newProduct);
   } catch (err) {
     next(err);
   }
@@ -50,9 +50,9 @@ router.get('/:id', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   try {
     const productId = req.params.id;
-    const productNewInf = req.body;
+    const productNewInfo = req.body;
 
-    const updatedProduct = await db.products.updateProductById(productId ,productNewInf);
+    const updatedProduct = await db.products.updateProductById(productId ,productNewInfo);
 
     res.json(updatedProduct);
   } catch (err) {

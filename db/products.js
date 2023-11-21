@@ -8,8 +8,10 @@ const products = {
 
     try {
       // check input data
-      if (!productInf || !productInf.name || !productInf.price || !productInf.categoriesId || !Array.isArray(productInf.categoriesId)) {
-        throw new Error('Invalid input data');
+      if (!productInf || !productInf.name || !productInf.price || !Array.isArray(productInf.categoriesId) || productInf.categoriesId.length === 0) {
+        const err = new Error('Invalid input data');
+        err.status = 400;
+        throw err;
       }
 
       await client.query('BEGIN');
@@ -40,10 +42,10 @@ const products = {
         categoriesId: productInf.categoriesId
       };
 
-    } catch (error) {
+    } catch (err) {
       await client.query('ROLLBACK');
       console.error(err);
-      throw error;
+      throw err;
 
     } finally {
       client.release();
@@ -113,7 +115,7 @@ const products = {
     }
   },
 
-  updateProductById: async function (productId, productNewInf) {
+  updateProductById: async function (productId, productNewInfo) {
     const client = await pool.connect();
 
     try {
@@ -125,29 +127,17 @@ const products = {
       // setup the products table modifications objects
       const updateFields = [];
       const values = [];
+      const keys = ['name', 'description', 'price'];
       let fieldsCount = 1;
 
-      // check if the product's name will updated
-      if (productNewInf.name) {
-        updateFields.push(`name = $${fieldsCount}`);
-        values.push(productNewInf.name);
-        fieldsCount++;
+      // check if the product's keys that will be updated (e.g. name, description...)
+      for (let key of keys) {
+        if (productNewInfo[key]) {
+          updateFields.push(`${key} = $${fieldsCount}`);
+          values.push(productNewInfo[key]);
+          fieldsCount++;
+        }
       }
-
-      // check if the product's description will updated
-      if (productNewInf.description) {
-        updateFields.push(`description = $${fieldsCount}`);
-        values.push(productNewInf.description);
-        fieldsCount++;
-      }
-
-      // check if the product's price will updated
-      if (productNewInf.price) {
-        updateFields.push(`price = $${fieldsCount}`);
-        values.push(productNewInf.price);
-        fieldsCount++;
-      }
-
       values.push(productId);
 
       // check if there something to updated and updated it in database
@@ -162,12 +152,24 @@ const products = {
       }
 
       // start of product's categories updates
-      await this.updateProductCategories(client, productId, productNewInf.categoriesId);
+      await this.updateProductCategories(client, productId, productNewInfo.categoriesId);
       // end of product's categories updates
+
+      // retrieve product's categories and attach it to product object
+      const categoriesId = await this.getProductCategories(client, productId);
 
       await client.query('COMMIT');
 
-      return await this.getProductById(productId);;
+      if (results) {
+        return {
+          ...results.rows[0],
+          categoriesId
+        };
+      }
+
+      return {
+        categoriesId
+      }
 
     } catch (err) {
       await client.query('ROLLBACK');
@@ -183,46 +185,52 @@ const products = {
     // get existCategories
     const existingCategories = await this.getProductCategories(client, productId);
 
-    // get newCategories
-
-    // get product's categories to DELETE FROM database
-    // & get product's categories to INSERT INTO database
+    // get product's categories to DELETE FROM & INSERT INTO the database
     const categoriesToDelete = existingCategories.filter(categoryId => !newCategories.includes(categoryId));
     const categoriesToInsert = newCategories.filter(categoryId => !existingCategories.includes(categoryId));
 
-    // check if there some product's categories to delete and DELETE them FROM database
+    // check if there are some product's categories to delete and DELETE them FROM database
     if (categoriesToDelete.length > 0) {
       await this.deleteProductCategories(client, productId, categoriesToDelete);
     }
 
-    // check if there some product's categories to INSERT and INSERT them INTO database
+    // check if there are some product's categories to INSERT and INSERT them INTO database
     if (categoriesToInsert.length > 0) {
       await this.insertProductCategories(client, productId, categoriesToInsert);
     }
   },
 
   insertProductCategories: async function (client, productId, categoriesToInsert) {
-    for (const categoryId of categoriesToInsert) {
-      await client.query(`
-        INSERT INTO categories_products (category_id, product_id) VALUES
-          ($1, $2);`,
-        [categoryId, productId]
-      );
+    const updateFields = [];
+    const values = [...categoriesToInsert, productId];
+    const productIdPosition = values.length;
+
+    // populate updateFields array.
+    for (let i = 1; i <= categoriesToInsert.length; i++) {
+      updateFields.push(`($${i}, $${productIdPosition})`);
     }
+
+    // insert categories into the database
+    await client.query(`
+      INSERT INTO categories_products (category_id, product_id) VALUES
+        ${updateFields.join(', ')};`,
+      values
+    );
   },
 
   deleteProductCategories: async function (client, productId, categoriesToDelete) {
     const updateFields = [];
     const values = [...categoriesToDelete, productId];
 
-    // field updateFields.
+    // populate updateFields array.
     for (let i = 1; i <= categoriesToDelete.length; i++) {
       updateFields.push(`category_id = $${i}`);
     }
 
+    // delete categories frome the database
     await client.query(`
-            DELETE FROM categories_products
-            WHERE product_id = $${values.length} AND (${updateFields.join(' OR ')});`,
+      DELETE FROM categories_products
+      WHERE product_id = $${values.length} AND (${updateFields.join(' OR ')});`,
       values
     );
   },
@@ -266,17 +274,17 @@ const products = {
   // this helper function is used to retrieve all product categories by productId
   getProductCategories: async function (client, productId) {
     // get existCategories
-    const existCategories = await client.query(`
+    const results = await client.query(`
       SELECT category_id
       FROM categories_products
       WHERE product_id = $1;`,
       [productId]);
 
-    const existCategoriesArray = existCategories.rows.map(categoryObject => {
-      return categoryObject.category_id;
+    const categoriesId = results.rows.map(categories => {
+      return categories.category_id;
     });
-    console.log(existCategoriesArray);
-    return existCategoriesArray;
+
+    return categoriesId;
   }
 }
 
