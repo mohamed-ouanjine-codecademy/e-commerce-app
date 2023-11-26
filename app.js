@@ -8,6 +8,7 @@ const LocalStrategy = require('passport-local').Strategy;
 // -- Routers
 const usersRouter = require('./routers/users.js');
 const productsRouter = require('./routers/products.js');
+const cartsRouter = require('./routers/carts.js');
 
 // -- utils
 const db = require('./db/index.js');
@@ -20,12 +21,19 @@ const PORT = process.env.PORT || 3000;
 // bodyParser
 app.use(bodyParser.json());
 
-// mount Routers
-app.use('/users', usersRouter);
-app.use('/products', productsRouter);
-
 // session
-app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
+const store = new session.MemoryStore();
+app.use(session({
+  store,
+  secret: process.env.SESSION_SECRET,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24,
+    httpOnly: true,
+    sameSite: "none",
+  },
+  resave: false,
+  saveUninitialized: false
+}));
 
 // passport
 app.use(passport.initialize());
@@ -36,11 +44,17 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-  db.users.findUserById(id, (err, user) => {
+  await db.users.findUserById(id, (err, user) => {
     if (err) return done(err);
     return done(null, user);
   });
 });
+
+// mount Routers
+app.use('/users', usersRouter);
+app.use('/products', productsRouter);
+app.use('/carts', cartsRouter);
+
 
 // -- passport local strategy
 passport.use(new LocalStrategy(
@@ -69,14 +83,13 @@ const hashPassword = async (req, res, next) => {
     req.hashedPassword = hashedPassword;
     next();
   } catch (error) {
-    console.error('Error in hashPassword middleware:', error);
     error.message = 'Server Error';
     next(error);
   }
 }
 
-// endpoint: '/signup' -> register a new user.
-app.post('/signup', hashPassword, async (req, res, next) => {
+// endpoint: '/register' -> register a new user.
+app.post('/register', hashPassword, async (req, res, next) => {
   try {
     const { email } = req.body;
     const userInf = [email, req.hashedPassword];
@@ -90,25 +103,30 @@ app.post('/signup', hashPassword, async (req, res, next) => {
 }
 );
 
-// endpoint: '/signin -> authenticate a user.
-app.get('/signin', (req, res) => {
-  res.send('signin page!');
+// endpoint: '/login -> authenticate a user.
+app.get('/login', (req, res) => {
+  res.send('login page!');
 });
 
-// endpoint: '/signin -> authenticate a user.
+// endpoint: '/login -> authenticate a user.
 app.post(
-  '/signin',
-  passport.authenticate('local', { failureRedirect: '/signin' }),
+  '/login',
+  passport.authenticate('local', { failureRedirect: '/login' }),
   (req, res) => {
-    res.send(`Welcome back ${req.user.email}`);
+    res.send(`Welcome back ${req.user.first_name}`);
   }
 );
 
+app.get("/logout", (req, res) => {
+  req.logout();
+  res.redirect("/");
+});
+
 // Error middleware
 app.use((err, req, res, next) => {
+  console.error(err);
   const status = err.status || 500;
   const message = err.message;
-  // console.error(err);
   res.status(status).send(message);
 });
 

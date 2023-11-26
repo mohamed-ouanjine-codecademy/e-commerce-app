@@ -17,7 +17,6 @@ const users = {
       return results.rows[0];
 
     } catch (err) {
-      console.error(err);
       throw err;
     }
   },
@@ -60,7 +59,6 @@ const users = {
 
     } catch (err) {
       callback(err);
-      console.error(err);
       throw err;
     }
   },
@@ -74,7 +72,6 @@ const users = {
       return results.rows;
 
     } catch (err) {
-      console.error(err);
       throw err;
     }
   },
@@ -97,7 +94,6 @@ const users = {
       return user;
 
     } catch (err) {
-      console.error(err);
       throw err;
     }
   },
@@ -141,7 +137,6 @@ const users = {
       }
 
     } catch (err) {
-      console.error(err);
       throw err;
     }
   },
@@ -167,7 +162,6 @@ const users = {
       return results.rows[0];
 
     } catch (err) {
-      console.error(err);
       throw err;
     }
   }

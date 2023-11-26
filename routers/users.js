@@ -14,7 +14,6 @@ router.get('/', async (req, res, next) => {
     res.json(users);
 
   } catch (err) {
-    console.error(err);
     next(err);
   }
 });
@@ -28,7 +27,6 @@ router.get('/:userId', async (req, res, next) => {
     res.json(user);
 
   } catch (err) {
-    console.error(err);
     next(err);
   }
 });
@@ -57,7 +55,6 @@ router.put('/:userId', async (req, res, next) => {
     });
 
   } catch (err) {
-    console.error(err);
     next(err);
   }
 });
@@ -73,7 +70,6 @@ router.delete('/:userId', async (req, res, next) => {
     });
 
   } catch (err) {
-    console.error(err);
     next(err);
   }
 });

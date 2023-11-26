@@ -8,7 +8,13 @@ const products = {
 
     try {
       // check input data
-      if (!productInf || !productInf.name || !productInf.price || !Array.isArray(productInf.categoriesId) || productInf.categoriesId.length === 0) {
+      if (
+        !productInf ||
+        !productInf.name ||
+        !productInf.price ||
+        !Array.isArray(productInf.categoriesId) ||
+        productInf.categoriesId.length === 0
+      ) {
         const err = new Error('Invalid input data');
         err.status = 400;
         throw err;
@@ -44,7 +50,6 @@ const products = {
 
     } catch (err) {
       await client.query('ROLLBACK');
-      console.error(err);
       throw err;
 
     } finally {
@@ -59,7 +64,6 @@ const products = {
       return results.rows;
 
     } catch (err) {
-      console.error(err);
       throw err
     }
   },
@@ -78,7 +82,6 @@ const products = {
       return results.rows;
 
     } catch (err) {
-      console.error(err);
       throw err;
     }
   },
@@ -107,7 +110,6 @@ const products = {
 
     } catch (err) {
       await client.query('ROLLBACK');
-      console.error(err);
       throw err;
 
     } finally {
@@ -173,7 +175,6 @@ const products = {
 
     } catch (err) {
       await client.query('ROLLBACK');
-      console.error(err);
       throw err;
 
     } finally {
@@ -263,7 +264,6 @@ const products = {
 
     } catch (err) {
       await client.query('ROLLBACK');
-      console.error(err);
       throw err;
 
     } finally {
