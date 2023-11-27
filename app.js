@@ -9,6 +9,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const usersRouter = require('./routers/users.js');
 const productsRouter = require('./routers/products.js');
 const cartsRouter = require('./routers/carts.js');
+const ordersRouter = require('./routers/orders.js');
 
 // -- utils
 const db = require('./db/index.js');
@@ -24,7 +25,6 @@ app.use(bodyParser.json());
 // session
 const store = new session.MemoryStore();
 app.use(session({
-  store,
   secret: process.env.SESSION_SECRET,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24,
@@ -32,7 +32,8 @@ app.use(session({
     sameSite: "none",
   },
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  store
 }));
 
 // passport
@@ -54,6 +55,7 @@ passport.deserializeUser(async (id, done) => {
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/carts', cartsRouter);
+app.use('/orders', ordersRouter);
 
 
 // -- passport local strategy
