@@ -94,9 +94,9 @@ const hashPassword = async (req, res, next) => {
 app.post('/register', hashPassword, async (req, res, next) => {
   try {
     const { email } = req.body;
-    const userInf = [email, req.hashedPassword];
+    const userInfo = { email, password: req.hashedPassword };
 
-    const newUser = await db.users.createUser(userInf);
+    const newUser = await db.users.createUser(userInfo);
 
     res.status(201).json(newUser);
   } catch (err) {

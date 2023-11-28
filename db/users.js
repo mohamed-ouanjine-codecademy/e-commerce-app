@@ -2,19 +2,21 @@ const pool = require('./pool.js');
 const help = require('./helperFunctions.js');
 
 const users = {
-  createUser: async function (userInf) {
+  createUser: async function (userInfo) {
     try {
-      if (!userInf[0] || !userInf[1]) {
+      if (!userInfo.email || !userInfo.password) {
         throw new Error('Invalid input data');
       }
 
       const results = await pool.query(`
         INSERT INTO users (email, password) VALUES
           ($1, $2)
-        RETURNING *`,
-        userInf);
+        RETURNING id, email, password`,
+        [userInfo.email, userInfo.password]);
 
-      return results.rows[0];
+      const newUser = results.rows[0];
+
+      return newUser;
 
     } catch (err) {
       throw err;
@@ -69,7 +71,10 @@ const users = {
       SELECT *
       FROM users;`);
 
-      return results.rows;
+      const users = results.rows
+      this.helpers.changeUserKeys(users);
+
+      return users;
 
     } catch (err) {
       throw err;
@@ -90,6 +95,8 @@ const users = {
       );
 
       const user = help.checkExistence(results, 'User');
+      this.helpers.changeUserKeys(user);
+
 
       return user;
 
@@ -98,26 +105,27 @@ const users = {
     }
   },
 
-  updateUserById: async function (userId, userNewInf) {
+  updateUserById: async function (userId, userNewInfo) {
     try {
       // check if the user exist
       await this.getUserById(userId);
 
-      if (!(typeof userId === 'number') || !userNewInf) {
+      if (!(typeof userId === 'number') || !userNewInfo) {
         throw new Error('Invalid input data');
       }
 
       // set up.
       const updateFields = [];
       const values = [];
-      const keys = ['first_name', 'last_name', 'email', 'address', 'password'];
+      const keys = ['firstName', 'lastName', 'email', 'address', 'password'];
+      const databaseKeys = ['first_name', 'last_name', 'email', 'address', 'password'];
       let fieldsCount = 1;
 
       // check if the users's keys that will be updated (e.g. first_name, last_name...)
-      for (let key of keys) {
-        if (userNewInf[key]) {
-          updateFields.push(`${key} = $${fieldsCount}`);
-          values.push(userNewInf[key]);
+      for (let i = 0; i < keys.length; i++) {
+        if (userNewInfo[keys[i]]) {
+          updateFields.push(`${databaseKeys[i]} = $${fieldsCount}`);
+          values.push(userNewInfo[keys[i]]);
           fieldsCount++;
         }
       }
@@ -133,7 +141,10 @@ const users = {
           values
         );
 
-        return results.rows[0];
+        const updatedUser = results.rows[0];
+        this.helpers.changeUserKeys(updatedUser);
+
+        return updatedUser;
       }
 
     } catch (err) {
@@ -163,6 +174,13 @@ const users = {
 
     } catch (err) {
       throw err;
+    }
+  },
+
+  helpers: {
+    changeUserKeys: function (user) {
+      help.changeKeys(user, 'first_name', 'firstName');
+      help.changeKeys(user, 'last_name', 'lastName');
     }
   }
 }

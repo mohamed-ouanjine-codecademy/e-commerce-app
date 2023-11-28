@@ -5,6 +5,7 @@ const router = express.Router();
 // -- utils
 const db = require('../db/index.js');
 const help = require('../helperFunctions.js');
+const { updateUserById } = require('../db/users.js');
 
 // get all users '/users'
 router.get('/', async (req, res, next) => {
@@ -35,24 +36,19 @@ router.get('/:userId', async (req, res, next) => {
 router.put('/:userId', async (req, res, next) => {
   try {
     const userId = parseInt(req.params.userId);
-    const userNewInf = req.body;
+    const userNewInfo = req.body;
 
-    if (userNewInf.password) {
-      const password = userNewInf.password;
+    if (userNewInfo.password) {
+      const password = userNewInfo.password;
 
       const hashedPassword = await help.hashPassword(password);
 
-      userNewInf.password = hashedPassword;
+      userNewInfo.password = hashedPassword;
     }
 
-    const updatedUser = await db.users.updateUserById(userId, userNewInf);
+    const updatedUser = await db.users.updateUserById(userId, userNewInfo);
 
-    res.json({
-      first_name: updatedUser.first_name,
-      last_name: updatedUser.last_name,
-      email: updatedUser.email,
-      address: updatedUser.address
-    });
+    res.json(updatedUser);
 
   } catch (err) {
     next(err);
@@ -62,7 +58,7 @@ router.put('/:userId', async (req, res, next) => {
 router.delete('/:userId', async (req, res, next) => {
   try {
     const userId = parseInt(req.params.userId);
-    
+
     const deletedUser = await db.users.deleteUserById(userId);
 
     res.status(200).json({
