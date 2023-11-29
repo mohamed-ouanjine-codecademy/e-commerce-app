@@ -1,0 +1,580 @@
+openapi: 3.1.0
+info:
+  title: e-commerce API
+  version: 1.0.0
+  description: A basic API for an e-commerce app
+paths:
+  /register:
+    post:
+      summary: Create new user
+      description: Create a new user with a POST request
+      operationId: signup
+      responses:
+        '201':
+          description: New user Object
+          content:
+            application/json:
+              examples:
+                User:
+                  value: |-
+                    {
+                        "id": 43,
+                        "email": "email@gmail.com",
+                        "password": "$2b$10$56b3H25G7HMyLsGlQP/v6.NqBeNc24N7LPJoKeGxGg2BKkaSnz2wC"
+                    }
+        default:
+          description: Default error sample response
+      requestBody:
+        description: User information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubUser'
+      tags:
+        - Users
+  /login:
+    post:
+      summary: Login a user
+      description: login an existing user to the app
+      operationId: signin
+      responses:
+        '200':
+          description: greeting message
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Greeting message:
+                  value: Welcome back userName
+        default:
+          description: Default error sample response
+      requestBody:
+        description: User registration inforamations
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubUser'
+      tags:
+        - Users
+  /users:
+    get:
+      summary: Get all users
+      description: Get all users from database
+      operationId: users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              examples:
+                Users:
+                  value: |-
+                    [
+                        {
+                            "id": 1,
+                            "email": "email.for.tv.elhajji@gmail.com",
+                            "address": "Temara",
+                            "password": "$2b$10$2BI32jxripPr7ltXsngCpuj8Ka3tH5eG.9UOUn.1Yb4qFFPySiyM.",
+                            "firstName": "Mohamed",
+                            "lastName": "Ouanjine"
+                        },
+                        {
+                            "id": 41,
+                            "email": "riyan@gmail.com",
+                            "address": "tamasna",
+                            "password": "$2b$10$wfCogCxRefz..pjhxV8LBu0vIM6lplolYe5KsyrGGEQpkjeZIztaa",
+                            "firstName": "Riyan",
+                            "lastName": "Alwane"
+                        },
+                        {
+                            "id": 42,
+                            "email": "rayan@gmail.com",
+                            "address": "City",
+                            "password": "$2b$10$Iz00gkJ8Oj/sud6k6/R7duQMyUwu/wIbTF39BP3f0NWjY02NBhb0W",
+                            "firstName": "Rayan",
+                            "lastName": "***"
+                        }
+                    ]
+        default:
+          description: Default error sample response
+      tags:
+        - Users
+  /users/{userId}:
+    get:
+      summary: Get a users by ID
+      description: Get all users from database
+      operationId: get_user
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user to retrive.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User object
+          content:
+            application/json:
+              examples:
+                User:
+                  value: |-
+                    {
+                        "id": 1,
+                        "email": "email.for.tv.elhajji@gmail.com",
+                        "address": "Temara",
+                        "password": "$2b$10$2BI32jxripPr7ltXsngCpuj8Ka3tH5eG.9UOUn.1Yb4qFFPySiyM.",
+                        "firstName": "Mohamed",
+                        "lastName": "Ouanjine"
+                    }
+        default:
+          description: Default error sample response
+      tags:
+        - Users
+    put:
+      summary: Update a user by ID.
+      description: Update a user by their ID.
+      operationId: put_user
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user to retrive.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Updated user object
+          content:
+            application/json:
+              examples:
+                UpdatedUser:
+                  value: |-
+                    {
+                      "id": 1,
+                      "email": "email.for.tv.elhajji@gmail.com",
+                      "address": "Temara",
+                      "password": "$2b$10$2BI32jxripPr7ltXsngCpuj8Ka3tH5eG.9UOUn.1Yb4qFFPySiyM.",
+                      "firstName": "Mohamed",
+                      "lastName": "Ouanjine"
+                    }
+      requestBody:
+        description: A new order object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      tags:
+        - Users
+    delete:
+      summary: Delete a user by ID.
+      description: Delete a user by their ID.
+      operationId: deleteUserById
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user to deleted.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: Default
+      tags:
+        - Users
+  /products:
+    post:
+      summary: Create new product
+      description: >-
+        Ceate new product in the database using product's name, description and
+        price
+      operationId: postProducts
+      responses:
+        '201':
+          description: New product created
+          content:
+            application/json:
+              examples:
+                New product:
+                  value: |-
+                    {
+                        "id": 31,
+                        "name": "foo",
+                        "description": "baz baz",
+                        "price": "$1,000,000.00",
+                        "categoriesId": [
+                            1
+                        ]
+                    }
+      requestBody:
+        description: New product
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      tags:
+        - Products
+    get:
+      summary: Get all products
+      description: Retrieve a list of all products
+      operationId: products
+      parameters:
+        - name: categoryId
+          in: query
+          description: ID of the product to retrieve.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              examples:
+                Products:
+                  value: |-
+                    [
+                        {
+                            "id": 2,
+                            "name": "Laptop",
+                            "description": "Powerful laptop for productivity",
+                            "price": "$1,299.99"
+                        },
+                        {
+                            "id": 3,
+                            "name": "T-shirt",
+                            "description": "Comfortable cotton T-shirt",
+                            "price": "$19.99"
+                        },
+                        {
+                            "id": 4,
+                            "name": "Sofa",
+                            "description": "Modern and comfortable sofa",
+                            "price": "$499.99"
+                        },
+                        {
+                            "id": 1,
+                            "name": "SmartPhone",
+                            "description": "High-performance smartphone",
+                            "price": "$399.99"
+                        }
+                    ]
+      tags:
+        - Products
+      x-codeSamples:
+        - lang: http
+          source: >
+            # Try out with category parameter
+
+            curl -X GET "http://localhost:4000/products?category=1" -H "accept:
+            application/json"
+  /products/{productId}:
+    get:
+      summary: Get product by ID
+      description: Retrieve a specific product by its ID
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product to retrieve.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              examples:
+                get_product_by_id:
+                  value: |-
+                    {
+                      "id": 1,
+                      "name": "SmartPhone",
+                      "description": "High-performance smartphone",
+                      "price": "$399.99",
+                      "categoriesId": [
+                          1
+                      ]
+                    }
+        '404':
+          description: Not found
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Unexisting product:
+                  value: No such Product has been founded.
+      tags:
+        - Products
+    put:
+      summary: Update a product
+      description: Update a product in the database using product's ID
+      operationId: putProducts
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product to updadte.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Updated product
+          content:
+            applicatoin/json:
+              examples:
+              
+                updated name:
+                  value: |-
+                    {
+                      "id": 1,
+                      "name": "New name",
+                      "description": "High-performance smartphone",
+                      "price": "$399.99",
+                      "categoriesId": [
+                        1
+                      ]
+                    }
+                
+                updated price:
+                  value: |-
+                    {
+                      "id": 1,
+                      "name": "New name",
+                      "description": "High-performance smartphone",
+                      "price": "$1,000,000",
+                      "categoriesId": [
+                        1
+                      ]
+                    }
+      requestBody:
+        description: New iformations
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      tags:
+        - Products
+    delete:
+      summary: Delete a product
+      description: Delete a product in the database using product's ID
+      operationId: deleteProducts
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted product
+          content:
+            application/json:
+              examples:
+                delete product whose id is 31:
+                  value: |-
+                    {
+                      "id": 31,
+                      "name": "T-short",
+                      "description": "white t-short for summer",
+                      "price": "$1.00",
+                      "categoriesId": [
+                        2
+                      ]
+                    }
+      tags:
+        - Products
+  /carts:
+    post:
+      summary: Create a cart
+      description: Create new cart
+      operationId: postCart
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Carts
+  /carts/{cartId}:
+    get:
+      summary: Get a cart.
+      description: get a cart by its ID.
+      operationId: getCart
+      parameters:
+        - name: cartId
+          in: path
+          description: ID of the cart to retrieve.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Carts
+    post:
+      summary: Update a cart.
+      description: Add or delete products into a cart by its ID.
+      operationId: putCart
+      parameters:
+        - name: cartId
+          in: path
+          description: ID of the cart to update.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Carts
+    delete:
+      summary: Delete a cart.
+      description: Delete a cart by its ID.
+      operationId: deleteCart
+      parameters:
+        - name: cartId
+          in: path
+          description: ID of the cart to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Carts
+  /carts/{cartId}/item/{productId}:
+    post:
+      summary: Update cart's product quantity
+      description: Update cart's product quantity by cart ID and product ID
+      parameters:
+        - name: cartId
+          in: path
+          description: ID of the cart to delete.
+          required: true
+          schema:
+            type: integer
+        - name: productId
+          in: path
+          description: the product ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default
+      tags:
+        - Carts
+  /orders:
+    get:
+      summary: Get all orders.
+      description: Retrieve all orders a user have.
+      operationId: getOrders
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Orders
+  /orders/{orderId}:
+    get:
+      summary: Get an order
+      description: Retrieve an order by its Id
+      operationId: getOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: The order id you want to retrive.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Orders
+    put:
+      summary: Update an order
+      description: Update an order by its Id
+      operationId: putOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: The order id you want to update.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Orders
+    delete:
+      summary: Delete an order
+      description: Delete an order by its Id
+      operationId: deleteOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: The order id you want to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Orders
+  /cart/{cartId}/checkout:
+    post:
+      summary: Create an order
+      description: Create new order base on the given cart
+      operationId: postOrder
+      parameters:
+        - name: cartId
+          in: path
+          description: the cart ID you will create an order based on it
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: default!!
+      tags:
+        - Orders
+        - Carts
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+        address:
+          type: string
+        password:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+      xml:
+        name: User
+        
+    SubUser:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    Product:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: integer
+        categoriesId:
+          type: array
+          items:
+            type: integer

@@ -3,17 +3,17 @@ const help = require('./helperFunctions.js');
 
 const products = {
 
-  postProduct: async function (productInf) {
+  postProduct: async function (productInfo) {
     const client = await pool.connect();
 
     try {
       // check input data
       if (
-        !productInf ||
-        !productInf.name ||
-        !productInf.price ||
-        !Array.isArray(productInf.categoriesId) ||
-        productInf.categoriesId.length === 0
+        !productInfo ||
+        !productInfo.name ||
+        (typeof productInfo.price != 'number') ||
+        !Array.isArray(productInfo.categoriesId) ||
+        productInfo.categoriesId.length === 0
       ) {
         const err = new Error('Invalid input data');
         err.status = 400;
@@ -22,21 +22,21 @@ const products = {
 
       await client.query('BEGIN');
 
-      // Insert product productInf into products table
+      // Insert product productInfo into products table
       const productResults = await client.query(`
         INSERT INTO products (name, description, price) VALUES
           ($1, $2, $3)
         RETURNING *;`,
-        [productInf.name, productInf.description, productInf.price]
+        [productInfo.name, productInfo.description, productInfo.price]
       );
-      const productId = productResults.rows[0].id;
+      const newProduct = productResults.rows[0];
 
       // Insert product categories into categories_products table
-      for (const categoryId of productInf.categoriesId) {
+      for (const categoryId of productInfo.categoriesId) {
         await client.query(`
         INSERT INTO categories_products (category_id, product_id) VALUES
           ($1, $2);`,
-          [categoryId, productId]
+          [categoryId, newProduct.id]
         );
       }
 
@@ -44,8 +44,8 @@ const products = {
 
       // return created product
       return {
-        ...productResults.rows[0],
-        categoriesId: productInf.categoriesId
+        ...newProduct,
+        categoriesId: productInfo.categoriesId
       };
 
     } catch (err) {

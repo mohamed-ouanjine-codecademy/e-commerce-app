@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 // -- Routers
 const usersRouter = require('./routers/users.js');
@@ -21,6 +23,23 @@ const PORT = process.env.PORT || 3000;
 
 // bodyParser
 app.use(bodyParser.json());
+
+// Define Swagger JSdoc options
+const options = {
+  definition: {
+    openapi: '3.0.1',
+    info: {
+      title: 'My API',
+      version: '1.0.0',
+    },
+  },
+  apis: ['./docs/openapi.yaml'], // Specify the path to your route files
+};
+
+const specs = swaggerJsdoc(options);
+
+// Serve Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // session
 const store = new session.MemoryStore();
