@@ -12,7 +12,7 @@ const isAuthenticated = (req, res, next) => {
 
 router.use(isAuthenticated);
 
-// create cart by ID
+// get a cart by its ID (cartId).
 router.get('/:cartId', async (req, res, next) => {
   try {
     const cartId = req.params.cartId;
@@ -26,12 +26,14 @@ router.get('/:cartId', async (req, res, next) => {
   }
 });
 
+// Create new cart
 router.post('/', async (req, res, next) => {
   try {
     const userId = req.user.id;
+    const items = req.body.items;
 
     // Create a new cart with the user's ID
-    const newCart = await db.carts.createCart(userId);
+    const newCart = await db.carts.createCart(userId, items);
 
     res.status(201).json(newCart);
   } catch (error) {
@@ -39,22 +41,23 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.post('/:cartId', async (req, res, next) => {
+// Add a new product to the specified cart, by providing productId and quantity.
+router.post('/:cartId/items', async (req, res, next) => {
   try {
-    const cartId = parseInt(req.params.cartId); // cartId: 1
-    const items = req.body; // [{productId: 1, quantity: 3}, {productId: 32, quantity: 1}]
+    const cartId = parseInt(req.params.cartId);
+    const item = req.body;
 
-    const cart = await db.carts.updateCartById(cartId, items); // { cartId: 1, items: [{productId: 1, quantity: 3}, {productId: 32, quantity: 1}] }
+    const updatedCart = await db.carts.addItemToCart(cartId, item);
 
-    res.json(cart);
+    res.status(201).json(updatedCart);
 
   } catch (err) {
     next(err);
   }
 });
 
-// update quantity of a product within a cart
-router.post('/:cartId/items/:productId', async (req, res, next) => {
+// Update the quantity of a specific product in the cart.
+router.put('/:cartId/items/:productId', async (req, res, next) => {
   try {
     const cartId = parseInt(req.params.cartId);
     const productId = parseInt(req.params.productId);
@@ -69,14 +72,43 @@ router.post('/:cartId/items/:productId', async (req, res, next) => {
   }
 });
 
+// Remove a specific product from the cart.
+router.delete('/:cartId/items/:productId', async (req, res, next) => {
+  try {
+    const cartId = parseInt(req.params.cartId);
+    const productId = parseInt(req.params.productId);
+
+    await db.carts.deleteItemFromCart(cartId, productId);
+
+    res.status(204).send();
+
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Remove all products from the cart.
+router.delete('/:cartId/items', async (req, res, next) => {
+  try {
+    const cartId = parseInt(req.params.cartId);
+    
+    await db.carts.clearCart(cartId);
+
+    res.status(204).send();
+
+  } catch (err) {
+    next(err);
+  }
+});
+
 // delete a cart
 router.delete('/:cartId', async (req, res, next) => {
   try {
     const cartId = parseInt(req.params.cartId);
 
-    const deletedCart = await db.carts.deleteCart(cartId);
+    await db.carts.deleteCart(cartId);
 
-    res.json(deletedCart);
+    res.status(204).send();
 
   } catch (err) {
     next(err);
@@ -91,7 +123,7 @@ router.post('/:cartId/checkout', async (req, res, next) => {
 
     const order = await db.carts.createOrder(cartId, userId);
 
-    res.json(order);
+    res.status(201).json(order);
 
   } catch (err) {
     next(err);

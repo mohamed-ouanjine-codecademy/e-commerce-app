@@ -2,19 +2,46 @@ const pool = require('./pool.js');
 const help = require('./helperFunctions.js');
 
 const carts = {
-  createCart: async function (userId) {
+  createCart: async function (userId, items) {
+    const client = await pool.connect();
     try {
-      const results = await pool.query(`
+      if (typeof userId !== 'number') {
+        throw new Error('Invalid input data; userid MUST be a number.');
+      }
+
+      await client.query('BEGIN');
+
+      // Create new cart
+      const results = await client.query(`
         INSERT INTO carts (user_id) VALUES
           ($1)
         RETURNING *;`,
         [userId]
       );
+      const newCart = results.rows[0];
+      // Convert creted_at from object to string
+      newCart.created_at = `${newCart.created_at}`;
+      
+      // Create new cart items
+      if (items) {
+        await client.query(`
+          INSERT INTO carts_products VALUES
+            ($1, $2, $3);`,
+          [newCart.id, items[0].productId, items[0].quantity]
+        );
+        newCart.items = [items[0]];
+      }
 
-      return results.rows[0];
+      await client.query('COMMIT');
+
+      return help.transformKeys(newCart);
 
     } catch (err) {
+      await client.query('ROLLBACK');
       throw err;
+
+    } finally {
+      client.release()
     }
   },
 
@@ -34,11 +61,14 @@ const carts = {
       const cart = await help.checkExistence(results, 'Cart');
 
       // get all row (product_id, quantity) related to the cart in carts_products table
-      const items = await this.helpers.getItemsBycartId(client, cartId);
+      const cartItems = await this.helpers.getItemsBycartId(client, cartId);
 
       await client.query('COMMIT');
 
-      return { ...cart, items };
+      // Convert creted_at from object to string
+      cart.created_at = `${cart.created_at}`;
+
+      return help.transformKeys({ ...cart, items: cartItems });
 
     } catch (err) {
       await client.query('ROLLBACK');
@@ -49,12 +79,15 @@ const carts = {
     }
   },
 
-  updateCartById: async function (cartId, item) {
+  addItemToCart: async function (cartId, item) {
     const client = await pool.connect();
     try {
-      if ((typeof cartId != 'number') || !item) {
-        throw new Error('Invalid input data');
+      if ((typeof cartId != 'number') || (typeof item != 'object')) {
+        throw new Error('Invalid input data; cartId must be a number and items must be an array');
       }
+
+      // check if the cart exist
+      await this.getCartById(cartId);
 
       await client.query('BEGIN');
 
@@ -69,7 +102,7 @@ const carts = {
       await client.query('COMMIT');
 
 
-      return { cartId: cartId, items };
+      return help.transformKeys({ id: cartId, items });
 
     } catch (err) {
       await client.query('ROLLBACK');
@@ -77,6 +110,27 @@ const carts = {
 
     } finally {
       client.release();
+    }
+  },
+
+  deleteItemFromCart: async function (cartId, productId) {
+    try {
+      if ((typeof cartId !== 'number') || (typeof productId !== 'number')) {
+        throw new Error('Invalid input data; cartId and productId MUST be a number.');
+      }
+
+      // check if the cart exist
+      await this.getCartById(cartId);
+
+      await pool.query(`
+        DELETE FROM carts_products
+        WHERE cart_id = $1
+          AND product_id = $2;`,
+        [cartId, productId]
+      );
+
+    } catch (err) {
+      throw err;
     }
   },
 
@@ -90,6 +144,9 @@ const carts = {
         throw new Error('Invalid input data');
       }
 
+      // check if the cart exist
+      await this.getCartById(cartId);
+
       const results = await pool.query(`
         UPDATE carts_products
         SET quantity = $1
@@ -99,9 +156,11 @@ const carts = {
         [quantity, cartId, productId]
       );
 
+      const success = results.rows.length > 0;
+      const updatedProduct = success ? help.transformKeys(results.rows[0]) : null;
       return {
-        success: results.rows.length > 0,
-        updatedProduct: results.rows[0]
+        success,
+        updatedProduct
       };
 
     } catch (err) {
@@ -116,6 +175,9 @@ const carts = {
         throw new Error('Invalid input data');
       }
 
+      // check if the cart exist
+      await this.getCartById(cartId);
+
       await client.query('BEGIN');
 
       // remove any row related to the cart in carts_products table
@@ -129,14 +191,15 @@ const carts = {
 
 
       const items = results.rows;
-      help.changeKeys(items, 'product_id', 'productId');
 
       await client.query('COMMIT');
 
-      return {
+      const deletedCart = {
         cartId,
         items
-      }
+      };
+
+      return help.transformKeys(deletedCart);
 
     } catch (err) {
       await client.query('ROLLBACK');
@@ -189,10 +252,35 @@ const carts = {
 
       await client.query('COMMIT');
 
-      return {
+      return help.transformKeys({
         orderId,
         items
+      });
+
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+
+    } finally {
+      client.release();
+    }
+  },
+
+  clearCart: async function (cartId) {
+    const client = await pool.connect();
+    try {
+      if (typeof cartId !== 'number') {
+        throw new Error('Invalid input data; cartId MUST be a number.');
       }
+
+      // Check if the cart exist?
+      await this.getCartById(cartId);
+
+      await client.query('BEGIN');
+
+      await this.helpers.clearCartContent(client, cartId);
+
+      await client.query('COMMIT');
 
     } catch (err) {
       await client.query('ROLLBACK');
@@ -228,11 +316,10 @@ const carts = {
         [cartId]
       );
       const items = results.rows;
-      help.changeKeys(items, 'product_id', 'productId');
+
       return items;
     }
   }
-
 }
 
 module.exports = carts;

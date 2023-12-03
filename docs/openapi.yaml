@@ -1,45 +1,43 @@
 openapi: 3.1.0
+
 info:
   title: e-commerce API
   version: 1.0.0
   description: A basic API for an e-commerce app
+
 paths:
   /register:
     post:
+      tags:
+        - Users
       summary: Create new user
-      description: Create a new user with a POST request
-      operationId: signup
-      responses:
-        '201':
-          description: New user Object
-          content:
-            application/json:
-              examples:
-                User:
-                  value: |-
-                    {
-                        "id": 43,
-                        "email": "email@gmail.com",
-                        "password": "$2b$10$56b3H25G7HMyLsGlQP/v6.NqBeNc24N7LPJoKeGxGg2BKkaSnz2wC"
-                    }
-        default:
-          description: Default error sample response
+      description: Create a new user to the database
+      operationId: register
       requestBody:
         description: User information
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubUser'
-      tags:
-        - Users
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '201':
+          description: New user Object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
   /login:
     post:
+      tags:
+        - Users
       summary: Login a user
       description: login an existing user to the app
       operationId: signin
       responses:
         '200':
-          description: greeting message
+          description: successful operation
           content:
             text/plain; charset=utf-8:
               examples:
@@ -52,17 +50,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubUser'
-      tags:
-        - Users
+              required:
+                - email
+                - password
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: example@gmail.com
+                password:
+                  type: string
+                  example: password
+                  format: password
+
   /users:
     get:
+      tags:
+        - Users
       summary: Get all users
       description: Get all users from database
       operationId: users
       responses:
         '200':
-          description: List of users
+          description: successful operation
           content:
             application/json:
               examples:
@@ -96,10 +106,11 @@ paths:
                     ]
         default:
           description: Default error sample response
-      tags:
-        - Users
+
   /users/{userId}:
     get:
+      tags:
+        - Users
       summary: Get a users by ID
       description: Get all users from database
       operationId: get_user
@@ -112,7 +123,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: User object
+          description: successful operation
           content:
             application/json:
               examples:
@@ -128,9 +139,10 @@ paths:
                     }
         default:
           description: Default error sample response
+
+    put:
       tags:
         - Users
-    put:
       summary: Update a user by ID.
       description: Update a user by their ID.
       operationId: put_user
@@ -143,7 +155,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Updated user object
+          description: successful operation
           content:
             application/json:
               examples:
@@ -163,9 +175,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
+
+    delete:
       tags:
         - Users
-    delete:
       summary: Delete a user by ID.
       description: Delete a user by their ID.
       operationId: deleteUserById
@@ -179,10 +192,11 @@ paths:
       responses:
         default:
           description: Default
-      tags:
-        - Users
+          
   /products:
     post:
+      tags:
+        - Products
       summary: Create new product
       description: >-
         Ceate new product in the database using product's name, description and
@@ -211,9 +225,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Product'
+
+    get:
       tags:
         - Products
-    get:
       summary: Get all products
       description: Retrieve a list of all products
       operationId: products
@@ -225,7 +240,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Successful response
+          description: successful operation
           content:
             application/json:
               examples:
@@ -257,8 +272,7 @@ paths:
                             "price": "$399.99"
                         }
                     ]
-      tags:
-        - Products
+
       x-codeSamples:
         - lang: http
           source: >
@@ -268,18 +282,15 @@ paths:
             application/json"
   /products/{productId}:
     get:
+      tags:
+        - Products
       summary: Get product by ID
       description: Retrieve a specific product by its ID
       parameters:
-        - name: productId
-          in: path
-          description: ID of the product to retrieve.
-          required: true
-          schema:
-            type: integer
+        - $ref: "#/components/parameters/productId"
       responses:
         '200':
-          description: Successful response
+          description: successful operation
           content:
             application/json:
               examples:
@@ -298,25 +309,20 @@ paths:
           description: Not found
           content:
             text/plain; charset=utf-8:
-              examples:
-                Unexisting product:
-                  value: No such Product has been founded.
+              example:
+                No such Product has been founded.
+
+    put:
       tags:
         - Products
-    put:
       summary: Update a product
       description: Update a product in the database using product's ID
       operationId: putProducts
       parameters:
-        - name: productId
-          in: path
-          description: ID of the product to updadte.
-          required: true
-          schema:
-            type: integer
+        - $ref: "#/components/parameters/productId"
       responses:
         '200':
-          description: Updated product
+          description: successful operation
           content:
             applicatoin/json:
               examples:
@@ -344,28 +350,30 @@ paths:
                         1
                       ]
                     }
+        '404':
+          description: Not found
+          content:
+            text/plain; charset=utf-8:
+              example:
+                No such Product has been founded.
       requestBody:
         description: New iformations
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Product'
+
+    delete:
       tags:
         - Products
-    delete:
       summary: Delete a product
       description: Delete a product in the database using product's ID
       operationId: deleteProducts
       parameters:
-        - name: productId
-          in: path
-          description: ID of the product to delete.
-          required: true
-          schema:
-            type: integer
+        - $ref: "#/components/parameters/productId"
       responses:
         '200':
-          description: Deleted product
+          description: successful operation
           content:
             application/json:
               examples:
@@ -380,101 +388,189 @@ paths:
                         2
                       ]
                     }
-      tags:
-        - Products
+        '404':
+          description: Not found
+          content:
+            text/plain; charset=utf-8:
+              example:
+                No such Product has been founded.
+                    
   /carts:
     post:
+      tags:
+        - Carts
       summary: Create a cart
       description: Create new cart
       operationId: postCart
+      requestBody:
+        description: Cart object
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ProductCart"
       responses:
-        default:
-          description: default!!
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+          
+  /carts/{cartId}:
+    # Done
+    get:
       tags:
         - Carts
-  /carts/{cartId}:
-    get:
-      summary: Get a cart.
-      description: get a cart by its ID.
+      summary: Get a specific cart.
+      description: get a cart by its ID (cartId).
       operationId: getCart
       parameters:
-        - name: cartId
-          in: path
-          description: ID of the cart to retrieve.
-          required: true
-          schema:
-            type: integer
+        - $ref: "#/components/parameters/cartId"
       responses:
-        default:
-          description: default!!
-      tags:
-        - Carts
-    post:
-      summary: Update a cart.
-      description: Add or delete products into a cart by its ID.
-      operationId: putCart
-      parameters:
-        - name: cartId
-          in: path
-          description: ID of the cart to update.
-          required: true
-          schema:
-            type: integer
-      responses:
-        default:
-          description: default!!
-      tags:
-        - Carts
+        '200':
+          description: successful operation
+          content:
+            application/json:
+                schema:
+                  $ref: "#/components/schemas/Cart"
+        '404':
+          $ref: "#/components/responses/NotFoundCart"
+             
+    # done
     delete:
+      tags:
+        - Carts
       summary: Delete a cart.
       description: Delete a cart by its ID.
       operationId: deleteCart
       parameters:
-        - name: cartId
-          in: path
-          description: ID of the cart to delete.
-          required: true
-          schema:
-            type: integer
+        - $ref: "#/components/parameters/cartId"
       responses:
-        default:
-          description: default!!
-      tags:
-        - Carts
-  /carts/{cartId}/item/{productId}:
+        '204':
+          description: successful deletion
+        '404':
+          $ref: "#/components/responses/NotFoundCart"
+          
+  /carts/{cartId}/items:
+    # done
     post:
-      summary: Update cart's product quantity
-      description: Update cart's product quantity by cart ID and product ID
-      parameters:
-        - name: cartId
-          in: path
-          description: ID of the cart to delete.
-          required: true
-          schema:
-            type: integer
-        - name: productId
-          in: path
-          description: the product ID
-          required: true
-          schema:
-            type: integer
-      responses:
-        default:
-          description: default
       tags:
         - Carts
+      summary: Add a new product to the specified cart.
+      description: Add a new product to the specified cart, by providing productId and quantity.
+      parameters:
+        - $ref: "#/components/parameters/cartId"
+      requestBody:
+        description: New items
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCart2"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              example: |-
+                  {
+                    "id": 1,
+                    "items": [
+                      {
+                        "productId": 1111,
+                        "quantity": 5
+                      },
+                      {
+                        "productId": 2222,
+                        "quantity": 3
+                      }
+                    ]
+                  }
+    # done
+    delete:
+      tags:
+        - Carts
+      summary: Remove all products from the cart.
+      parameters:
+        - $ref: "#/components/parameters/cartId"
+      responses:
+        '204':
+          description: successful deletion
+        '404':
+          $ref: "#/components/responses/NotFoundCart"
+            
+  /carts/{cartId}/items/{productId}:
+    # done
+    put:
+      tags:
+        - Carts
+      summary:  Update the quantity of a specific product in the cart.
+      description: Update cart's product quantity by cartId and producId
+      parameters:
+        - $ref: "#/components/parameters/cartId"
+        - $ref: "#/components/parameters/productId"
+      requestBody:
+        description: Update quantity of product whose ID is 2222.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  example: 7
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              example: |-
+                  {
+                    "success": true,
+                    "updatedProduct": {
+                        "cartId": 1,
+                        "productId": 2222,
+                        "quantity": 7
+                    }
+                  }
+                  
+        '404':
+          $ref: "#/components/responses/NotFoundCart"
+    # done
+    delete:
+      tags:
+        - Carts
+      summary: Remove a specific product from the cart.
+      parameters:
+        - $ref: "#/components/parameters/cartId"
+        - $ref: "#/components/parameters/productId"
+      responses:
+        '204':
+          description: successful deletion
+        '404':
+          $ref: "#/components/responses/NotFoundCart"
+          
   /orders:
     get:
+      tags:
+        - Orders
       summary: Get all orders.
       description: Retrieve all orders a user have.
       operationId: getOrders
       responses:
         default:
           description: default!!
-      tags:
-        - Orders
+
   /orders/{orderId}:
     get:
+      tags:
+        - Orders
       summary: Get an order
       description: Retrieve an order by its Id
       operationId: getOrder
@@ -488,9 +584,10 @@ paths:
       responses:
         default:
           description: default!!
+
+    put:
       tags:
         - Orders
-    put:
       summary: Update an order
       description: Update an order by its Id
       operationId: putOrder
@@ -504,9 +601,10 @@ paths:
       responses:
         default:
           description: default!!
+
+    delete:
       tags:
         - Orders
-    delete:
       summary: Delete an order
       description: Delete an order by its Id
       operationId: deleteOrder
@@ -520,51 +618,68 @@ paths:
       responses:
         default:
           description: default!!
+
+  /cart/{cartId}/checkout:
+    # done
+    post:
       tags:
         - Orders
-  /cart/{cartId}/checkout:
-    post:
+        - Carts
       summary: Create an order
       description: Create new order base on the given cart
       operationId: postOrder
       parameters:
-        - name: cartId
-          in: path
-          description: the cart ID you will create an order based on it
-          required: true
-          schema:
-            type: integer
+        - $ref: "#/components/parameters/cartId"
       responses:
-        default:
-          description: default!!
-      tags:
-        - Orders
-        - Carts
+        '201':
+          description: successful creation.
+          content:
+            application/json:
+              example: |-
+                {
+                  "orderId": 1,
+                  "items": [
+                      {
+                          "productId": 1111,
+                          "quantity": 5
+                      },
+                      {
+                          "productId": 2222,
+                          "quantity": 7
+                      }
+                  ]
+                }
+                
+        '404':
+          $ref: "#/components/responses/NotFoundCart"
+
 components:
   schemas:
     User:
+      required:
+        - email
+        - password
       type: object
       properties:
         email:
           type: string
+          example: example@gmail.com
         address:
           type: string
+          example: NYC USA
         password:
           type: string
+          example: password
+          format: password
         firstName:
           type: string
+          example: Elon
         lastName:
           type: string
+          example: Musk
       xml:
         name: User
         
-    SubUser:
-      type: object
-      properties:
-        email:
-          type: string
-        password:
-          type: string
     Product:
       type: object
       properties:
@@ -578,3 +693,85 @@ components:
           type: array
           items:
             type: integer
+    ProductCart:
+      type: object
+      properties:
+        productId:
+          type: integer
+          example: 1111
+        quantity:
+          type: integer
+          example: 5
+    ProductCart2:
+      type: object
+      properties:
+        productId:
+          type: integer
+          example: 2222
+        quantity:
+          type: integer
+          example: 3
+    Cart:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          example: Sat Dec 02 2023 12:54:56 GMT+0100 (Central European Standard Time)
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductCart"
+    Cart2:
+      type: object
+      properties:
+        cartId:
+          type: integer
+          example: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductCart2"
+            
+  parameters:
+    productId:
+      name: productId
+      in: path
+      description: The product's ID to fetch
+      required: true
+      schema:
+        type: integer
+    cartId:
+      name: cartId
+      in: path
+      description: The cart's ID to fetch
+      required: true
+      schema:
+        type: integer
+
+  requestBodies:
+    Cart:
+      description: Cart object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductCart"
+
+  responses:
+    NotFoundCart:
+      description: Not found
+      content:
+        text/plain; charset=utf-8:
+          example:
+            No such Cart has been founded.

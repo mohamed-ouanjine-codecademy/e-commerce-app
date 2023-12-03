@@ -8,25 +8,28 @@ const checkExistence = (results, item = 'Element') => {
   }
 }
 
-// Function to recursively change keys
-function changeKeys(obj, oldKey, newKey) {
-  if (obj instanceof Array) {
-      obj.forEach((item) => {
-          changeKeys(item, oldKey, newKey);
-      });
-  } else if (obj instanceof Object) {
-      Object.keys(obj).forEach((key) => {
-          const value = obj[key];
-          if (key === oldKey) {
-              delete obj[key];
-              obj[newKey] = value;
-          }
-          changeKeys(value, oldKey, newKey);
-      });
+// Function to convert keys to camelCase
+const transformKeys = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map(item => transformKeys(item));
+  } else if (obj !== null && typeof obj === 'object') {
+    const transformed = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const camelCaseKey = key.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+        transformed[camelCaseKey] = transformKeys(obj[key]);
+      }
+      if (obj[key] !== null && typeof obj[key] === 'object') {
+        transformed[key] = transformKeys(obj[key]);
+      }
+    }
+    return transformed;
+  } else {
+    return obj;
   }
 }
 
 module.exports = {
   checkExistence,
-  changeKeys
+  transformKeys
 }
