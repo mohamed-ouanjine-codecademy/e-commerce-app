@@ -564,8 +564,43 @@ paths:
       description: Retrieve all orders a user have.
       operationId: getOrders
       responses:
-        default:
-          description: default!!
+        '200':
+          description: successful operation.
+          content:
+            application/json:
+              examples:
+                all orders for an authenticated user:
+                  value: |-
+                    [
+                      {
+                        "id": 1,
+                        "createdAt": "Sun Dec 02 2023 09:28:55 GMT+0100 (Central European Standard Time)",
+                        "items": [
+                          {
+                            "productId": 1111,
+                            "quantity": 5
+                          },
+                          {
+                            "productId": 2222,
+                            "quantity": 3
+                          }
+                        ]
+                      },
+                      {
+                        "id": 2,
+                        "createdAt": "Sun Dec 03 2023 09:28:55 GMT+0100 (Central European Standard Time)",
+                        "items": [
+                          {
+                            "productId": 3333,
+                            "quantity": 5
+                          },
+                          {
+                            "productId": 4444,
+                            "quantity": 3
+                          }
+                        ]
+                      }
+                    ]
 
   /orders/{orderId}:
     get:
@@ -582,25 +617,28 @@ paths:
           schema:
             type: integer
       responses:
-        default:
-          description: default!!
-
-    put:
-      tags:
-        - Orders
-      summary: Update an order
-      description: Update an order by its Id
-      operationId: putOrder
-      parameters:
-        - name: orderId
-          in: path
-          description: The order id you want to update.
-          required: true
-          schema:
-            type: integer
-      responses:
-        default:
-          description: default!!
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              examples:
+                order whose id is 1:
+                  value: |-
+                    {
+                      "id": 1,
+                      "createdAt": "Sun Dec 03 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+                      "status": "shipped",
+                      "items": [
+                          {
+                              "productId": 1111,
+                              "quantity": 5
+                          },
+                          {
+                              "productId": 2222,
+                              "quantity": 7
+                          }
+                      ]
+                    }
 
     delete:
       tags:
@@ -616,14 +654,274 @@ paths:
           schema:
             type: integer
       responses:
-        default:
-          description: default!!
-
-  /cart/{cartId}/checkout:
-    # done
+        '204':
+          description: successful deletion.
+  
+  /orders/{orderId}/status:
+    put:
+      tags:
+        - Orders
+      summary: Update the status of a specific order.
+      description: Updae the status of a specific order by its ID (e.g. placed, processing, shipped, delivered, cancelled or returned).
+      parameters:
+        - name: orderId
+          in: path
+          description: The order's id you want to Update.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: status property
+        required: true
+        content:
+          application/json:
+            examples:
+              placed:
+                value: |-
+                  {
+                    "status": "placed"
+                  }
+              processing:
+                value: |-
+                  {
+                    "status": "processing"
+                  }
+              shipped:
+                value: |-
+                  {
+                    "status": "shipped"
+                  }
+              delivered:
+                value: |-
+                  {
+                    "status": "delivered"
+                  }
+              cancelled:
+                value: |-
+                  {
+                    "status": "cancelled"
+                  }
+              returned:
+                value: |-
+                  {
+                    "status": "returned"
+                  }
+      responses:
+        '200':
+          description: successful updated.
+          content:
+            application/json:
+              examples:
+                placed:
+                  value: |-
+                    {
+                      "id": 1,
+                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+                      "status": "placed"
+                    }
+                processing:
+                  value: |-
+                    {
+                      "id": 1,
+                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+                      "status": "processing"
+                    }
+                shipped:
+                  value: |-
+                    {
+                      "id": 1,
+                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+                      "status": "shipped"
+                    }
+                delivered:
+                  value: |-
+                    {
+                      "id": 1,
+                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+                      "status": "delivered"
+                    }
+                cancelled:
+                  value: |-
+                    {
+                      "id": 1,
+                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+                      "status": "cancelled"
+                    }
+                returned:
+                  value: |-
+                    {
+                      "id": 1,
+                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+                      "status": "returned"
+                    }
+                    
+  /orders/{orderId}/items:
     post:
       tags:
         - Orders
+      summary: Add new items
+      description: add new items to an existing order
+      parameters:
+        - name: orderId
+          in: path
+          description: The order's id you want to add items to.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: New Product to add
+        required: true
+        content:
+          application/json:
+            example: |-
+              {
+                "productId": 3333,
+                "quantity": 1
+              }
+      responses:
+        '201':
+          description: seccesful addition
+          content:
+            application/json:
+              example: |-
+                    {
+                      "success": true,
+                      "message": "Item successfully added to the order.",
+                      "updatedOrder": {
+                          "id": 1,
+                          "items": [
+                            {
+                              "productId": 1111,
+                              "quantity": 5
+                            },
+                            {
+                              "productId": 2222,
+                              "quantity": 7
+                            },
+                            {
+                              "productId": 3333,
+                              "quantity": 1
+                            }
+                          ]
+                      }
+                    }
+                    
+
+        '400':
+          description: Invalid input data
+          content:
+            text/plain; charset=utf-8:
+              example: |-
+                Invalid request payload. Please check the data format.
+                
+        '404':
+          description: Not found
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                order not found:
+                  value: No such Order has been founded.
+                product not found:
+                  value: No such Product has been founded.
+                
+  /orders/{orderId}/items/{productId}:
+    delete:
+      tags:
+        - Orders
+      summary: Romove specific item from an order
+      description:  Romove specific item from the order by order's ID and product's ID
+      parameters:
+        - name: orderId
+          in: path
+          description: The order's ID you want to romove product from.
+          required: true
+          schema:
+            type: integer
+        - name: productId
+          in: path
+          description: The product's ID to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: seccessful deletion
+        '404':
+          description: Not found
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                order not found:
+                  value: No such Order has been founded
+                product not found:
+                  value: No such Product has been founded
+                order doesn't contain product:
+                  value: The specified product does not exist in the order
+          
+    put:
+      tags:
+        - Orders
+      summary: Update the quantity of a specific item in an order
+      description: Updated the quantity of a specific item in an order by orderId and productId
+      parameters:
+        - name: orderId
+          in: path
+          description: The order's ID you want to updated.
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: productId
+          in: path
+          description: The product's ID to updated its quantity.
+          required: true
+          schema:
+            type: integer
+            example: 1111
+      requestBody:
+        description: The new quantity
+        content:
+          application/json:
+            example: |-
+              {
+                "quantity": 3
+              }
+      responses:
+        '200':
+          description: successful update
+          content:
+            application/json:
+              example: |-
+                    {
+                      "success": true,
+                      "message": "Item quantity updated successfully",
+                      "updatedItem": {
+                        "id": 1111,
+                        "quantity": 3
+                      }
+                    }
+        '400':
+          description: Invalid input data
+          content:
+            text/plain; charset=utf-8:
+              example: |-
+                Invalid request payload. Please check the data format.
+        '404':
+          description: Not found
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                order not found:
+                  value: No such Order has been founded
+                product not found:
+                  value: No such Product has been founded
+                order doesn't contain product:
+                  value: The specified product does not exist in the order
+            
+  /carts/{cartId}/checkout:
+    # done 
+    post:
+      tags:
         - Carts
       summary: Create an order
       description: Create new order base on the given cart

@@ -1,5 +1,6 @@
 const pool = require('./pool.js');
-const help = require('./helperFunctions.js')
+const help = require('./helperFunctions.js');
+const products = require('./products.js');
 
 const orders = {
   getOrdersByUserId: async function (userId) {
@@ -22,16 +23,19 @@ const orders = {
         [userId]
       );
 
-      const orders = results.rows; // [{id: 1, created_at: 2023-12-12}, {id: 2, created_at: 2023-12-12} ]
+      const orders = results.rows.map(order => {
+        // Convert created_at from object to string.
+        order.created_at = `${order.created_at}`;
+        return order;
+      }); // [{id: 1, created_at: 2023-12-12}, {id: 2, created_at: 2023-12-12} ]
 
-      const ordersItems = Promise.all(orders.map(async (order) => {
+      const ordersItems = await Promise.all(orders.map(async (order) => {
         const orderId = order.id;
 
-        const items = await this.helpers.getItemsByOrderId(client, orderId);
+        const items = await this.helpers.getItemsByOrderId(orderId, client);
         // change product_id key to productId
-        help.changeKeys(items, 'product_id', 'productId');
 
-        return { ...order, items };
+        return help.transformKeys({ ...order, items });
       }));
 
       await client.query('COMMIT');
@@ -51,33 +55,35 @@ const orders = {
     const client = await pool.connect();
     try {
       if ((typeof userId != 'number') || (typeof orderId != 'number')) {
-        throw new Error('Invalid input data! userId and OrderId must be a number');
+        throw new Error('Invalid input data! userId and OrderId MUST be a number');
       }
 
       await client.query('BEGIN');
 
       // get order by userId and orderId
       const results = await client.query(`
-        SELECT created_at
+        SELECT
+          id,
+          created_at,
+          status
         FROM orders
         WHERE user_id = $1
           AND id = $2`,
         [userId, orderId]
       );
 
-      const orderInf = help.checkExistence(results, 'Order');
+      const order = help.checkExistence(results, 'Order');
 
       // get order items (products)
-      const items = await this.helpers.getItemsByOrderId(client, orderId);
-      help.changeKeys(items, 'product_id', 'productId');
+      const items = await this.helpers.getItemsByOrderId(orderId, client);
 
       await client.query('COMMIT');
 
-      return {
-        orderId,
-        createdAt: orderInf.created_at,
+      return help.transformKeys({
+        ...order,
+        created_at: `${order.created_at}`,
         items
-      }
+      });
 
     } catch (err) {
       await client.query('ROLLBACK');
@@ -85,6 +91,166 @@ const orders = {
 
     } finally {
       client.release();
+    }
+  },
+
+  updateStatus: async function (userId, orderId, status) {
+    try {
+      if ((typeof userId != 'number') || (typeof orderId != 'number') || !status) {
+        throw new Error('Invalid input data! userId and OrderId MUST be a number and status MUST NOT be undefined');
+      }
+
+      const results = await pool.query(`
+        UPDATE orders
+        SET status = $3
+        WHERE id = $2
+          AND user_id = $1
+        RETURNING
+          id,
+          created_at,
+          status;`,
+        [userId, orderId, status]
+      );
+      // Check exisitence
+      const order = help.checkExistence(results, 'Order');
+
+      return help.transformKeys({
+        ...order,
+        created_at: `${order.created_at}`
+      });
+
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  addItemToOrder: async function (userId, orderId, itemInfo) {
+    try {
+      // Check input data
+      if (
+        typeof userId !== 'number' ||
+        typeof orderId !== 'number' ||
+        typeof itemInfo !== 'object' ||
+        typeof itemInfo.productId !== 'number' ||
+        typeof itemInfo.quantity !== 'number'
+      ) {
+        throw {
+          status: 400,
+          message: 'Invalid request payload. Please check the data format.'
+        };
+      }
+
+      // Check if the order belongs to the user
+      await this.getOrderByIdAndUserId(userId, orderId);
+
+      // Check if the product exists
+      await products.getProductById(itemInfo.productId);
+
+      // Add item to order
+      await this.helpers.insertItemToOrder(orderId, itemInfo.productId, itemInfo.quantity);
+
+      // Get order items
+      const items = await this.helpers.getItemsByOrderId(orderId);
+
+      return help.transformKeys({
+        success: true,
+        message: 'Item successfully added to the order.',
+        updatedOrder: {
+          id: orderId,
+          items
+        }
+      });
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  removeItemFromOrderd: async function (userId, orderId, productId) {
+    try {
+      // Check input data
+      if (
+        typeof userId !== 'number' ||
+        typeof orderId !== 'number' ||
+        typeof productId !== 'number'
+      ) {
+        throw {
+          status: 400,
+          message: 'Invalid request payload. Please check the data format.'
+        };
+      }
+
+      // Check if the order belongs to the user
+      await this.getOrderByIdAndUserId(userId, orderId);
+
+      // Check if the product exists
+      await products.getProductById(productId);
+
+      // Check if the product exists in the order
+      const item = await this.helpers.getItemByOrderIdAndProductId(orderId, productId);
+      if (!item) {
+        throw {
+          status: 404,
+          message: 'The specified product does not exist in the order'
+        }
+      }
+
+      // Delete product from order
+      await this.helpers.deleteItemFromOrder(orderId, productId);
+
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  updateOrderProductQuantity: async function (userId, orderId, productId, quantity) {
+    try {
+      // Check input data
+      if (
+        typeof userId !== 'number' ||
+        typeof orderId !== 'number' ||
+        typeof productId !== 'number' ||
+        typeof quantity !== 'number'
+      ) {
+        throw {
+          status: 400,
+          message: 'Invalid request payload. Please check the data format.'
+        };
+      }
+
+      // Check if the order belongs to the user
+      await this.getOrderByIdAndUserId(userId, orderId);
+
+      // Check if the product exists
+      await products.getProductById(productId);
+
+      // Check if the product exists in the order
+      const item = await this.helpers.getItemByOrderIdAndProductId(orderId, productId);
+      if (!item) {
+        throw {
+          status: 404,
+          message: 'The specified product does not exist in the order'
+        }
+      }
+
+      await pool.query(`
+        UPDATE orders_products
+        set quantity = $1
+        WHERE order_id = $2
+          AND product_id = $3;`,
+        [quantity, orderId, productId]
+      );
+
+      return {
+        success: true,
+        message: "Item quantity updated successfully",
+        updatedItem: {
+          id: productId,
+          quantity
+        }
+      }
+
+    } catch (err) {
+      throw err;
     }
   },
 
@@ -119,11 +285,12 @@ const orders = {
 
       await client.query('COMMIT');
 
-      return {
-        orderId,
-        createdAt: order.created_at,
+      return help.transformKeys({
+        id: orderId,
+        created_at: order.created_at,
+        status: order.status,
         items
-      }
+      });
 
     } catch (err) {
       await client.query('ROLLBACK');
@@ -135,7 +302,7 @@ const orders = {
   },
 
   helpers: {
-    getItemsByOrderId: async function (client, orderId) {
+    getItemsByOrderId: async function (orderId, client = pool) {
       try {
         if (typeof orderId != 'number') {
           throw new Error('Invalid input data! orderId must be a number');
@@ -151,6 +318,58 @@ const orders = {
         );
 
         return results.rows;
+
+      } catch (err) {
+        throw err;
+      }
+    },
+
+    insertItemToOrder: async function (orderId, productId, quantity, client = pool) {
+      try {
+        // Insert item to order
+        await client.query(`
+          INSERT INTO orders_products (order_id, product_id, quantity) VALUES
+            ($1, $2, $3);`,
+          [orderId, productId, quantity]
+        );
+      } catch (err) {
+        throw err;
+      }
+    },
+
+    deleteItemFromOrder: async function (orderId, productId, client = pool) {
+      try {
+        const results = await client.query(`
+          DELETE FROM orders_products
+          WHERE order_id = $1
+            AND product_id = $2
+          RETURNING *;`,
+          [orderId, productId]
+        );
+
+        return results.rows[0];
+
+      } catch (err) {
+        throw err;
+      }
+    },
+
+    getItemByOrderIdAndProductId: async function (orderId, productId, client = pool) {
+      try {
+        // Get Item
+        const results = await client.query(`
+          SELECT *
+          FROM orders_products
+          WHERE order_id = $1
+            AND product_id = $2`,
+          [orderId, productId]
+        );
+
+        if (!results.rows) {
+          return undefined;
+        }
+
+        return results.rows[0];
 
       } catch (err) {
         throw err;
