@@ -11,12 +11,12 @@ const users = {
       const results = await pool.query(`
         INSERT INTO users (email, password) VALUES
           ($1, $2)
-        RETURNING id, email, password`,
+        RETURNING *`,
         [userInfo.email, userInfo.password]);
 
       const newUser = results.rows[0];
 
-      return newUser;
+      return help.transformKeys(newUser);
 
     } catch (err) {
       throw err;
@@ -71,10 +71,9 @@ const users = {
       SELECT *
       FROM users;`);
 
-      const users = results.rows
-      this.helpers.changeUserKeys(users);
+      const users = results.rows;
 
-      return users;
+      return help.transformKeys(users);
 
     } catch (err) {
       throw err;
@@ -95,10 +94,8 @@ const users = {
       );
 
       const user = help.checkExistence(results, 'User');
-      this.helpers.changeUserKeys(user);
 
-
-      return user;
+      return help.transformKeys(user);
 
     } catch (err) {
       throw err;
@@ -142,9 +139,8 @@ const users = {
         );
 
         const updatedUser = results.rows[0];
-        this.helpers.changeUserKeys(updatedUser);
 
-        return updatedUser;
+        return help.transformKeys(updatedUser);
       }
 
     } catch (err) {
@@ -169,8 +165,9 @@ const users = {
         RETURNING *;`,
         [userId]
       );
+      const deletedUser = results.rows[0];
 
-      return results.rows[0];
+      return help.transformKeys(deletedUser);
 
     } catch (err) {
       throw err;

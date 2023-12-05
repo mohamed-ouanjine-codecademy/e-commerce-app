@@ -17,16 +17,26 @@ paths:
         description: User information
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/User'
+              example: |-
+                {
+                  "email": "example@gmail.com",
+                  "password": "my-password"
+                }
         required: true
       responses:
         '201':
           description: New user Object
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/User'
+              example: |-
+                {
+                  "id": 1111,
+                  "firstName": null,
+                  "lastName": null,
+                  "email": "example@gmail.com",
+                  "address": null,
+                  "password": "hashed password"
+                }
 
   /login:
     post:
@@ -60,7 +70,7 @@ paths:
                   example: example@gmail.com
                 password:
                   type: string
-                  example: password
+                  example: my-password
                   format: password
 
   /users:
@@ -79,30 +89,30 @@ paths:
                 Users:
                   value: |-
                     [
-                        {
-                            "id": 1,
-                            "email": "email.for.tv.elhajji@gmail.com",
-                            "address": "Temara",
-                            "password": "$2b$10$2BI32jxripPr7ltXsngCpuj8Ka3tH5eG.9UOUn.1Yb4qFFPySiyM.",
-                            "firstName": "Mohamed",
-                            "lastName": "Ouanjine"
-                        },
-                        {
-                            "id": 41,
-                            "email": "riyan@gmail.com",
-                            "address": "tamasna",
-                            "password": "$2b$10$wfCogCxRefz..pjhxV8LBu0vIM6lplolYe5KsyrGGEQpkjeZIztaa",
-                            "firstName": "Riyan",
-                            "lastName": "Alwane"
-                        },
-                        {
-                            "id": 42,
-                            "email": "rayan@gmail.com",
-                            "address": "City",
-                            "password": "$2b$10$Iz00gkJ8Oj/sud6k6/R7duQMyUwu/wIbTF39BP3f0NWjY02NBhb0W",
-                            "firstName": "Rayan",
-                            "lastName": "***"
-                        }
+                      {
+                        "id": 41,
+                        "firstName": "Riyan",
+                        "lastName": "Alwane",
+                        "email": "riyan@gmail.com",
+                        "address": "tamasna",
+                        "password": "hashed_password"
+                      },
+                      {
+                        "id": 42,
+                        "firstName": "Rayan",
+                        "lastName": "***",
+                        "email": "rayan@gmail.com",
+                        "address": "City",
+                        "password": "hashed_password"
+                      },
+                      {
+                        "id": 1,
+                        "firstName": "Mohamed",
+                        "lastName": "Ouanjine",
+                        "email": "email.for.tv.elhajji@gmail.com",
+                        "address": "Temara",
+                        "password": "hashed_password"
+                      }
                     ]
         default:
           description: Default error sample response
@@ -130,12 +140,12 @@ paths:
                 User:
                   value: |-
                     {
-                        "id": 1,
-                        "email": "email.for.tv.elhajji@gmail.com",
-                        "address": "Temara",
-                        "password": "$2b$10$2BI32jxripPr7ltXsngCpuj8Ka3tH5eG.9UOUn.1Yb4qFFPySiyM.",
-                        "firstName": "Mohamed",
-                        "lastName": "Ouanjine"
+                      "id": 1,
+                      "firstName": "Mohamed",
+                      "lastName": "Ouanjine",
+                      "email": "email.for.tv.elhajji@gmail.com",
+                      "address": "Temara",
+                      "password": "hashed_password"
                     }
         default:
           description: Default error sample response
@@ -163,11 +173,11 @@ paths:
                   value: |-
                     {
                       "id": 1,
-                      "email": "email.for.tv.elhajji@gmail.com",
-                      "address": "Temara",
-                      "password": "$2b$10$2BI32jxripPr7ltXsngCpuj8Ka3tH5eG.9UOUn.1Yb4qFFPySiyM.",
                       "firstName": "Mohamed",
-                      "lastName": "Ouanjine"
+                      "lastName": "Ouanjine",
+                      "email": "email.for.tv.elhajji@gmail.com",
+                      "address": "NYC USA",
+                      "password": "hashed_password"
                     }
       requestBody:
         description: A new order object
@@ -190,8 +200,13 @@ paths:
           schema:
             type: integer
       responses:
-        default:
-          description: Default
+        '204':
+          description: seccessful deletion
+        '404':
+          description: Not found
+          content:
+            text/plain; charset=utf-8:
+              example: No such User has been founded.
           
   /products:
     post:
@@ -959,6 +974,12 @@ components:
         - password
       type: object
       properties:
+        firstName:
+          type: string
+          example: Elon
+        lastName:
+          type: string
+          example: Musk
         email:
           type: string
           example: example@gmail.com
@@ -967,14 +988,8 @@ components:
           example: NYC USA
         password:
           type: string
-          example: password
+          example: hashed_password
           format: password
-        firstName:
-          type: string
-          example: Elon
-        lastName:
-          type: string
-          example: Musk
       xml:
         name: User
         
