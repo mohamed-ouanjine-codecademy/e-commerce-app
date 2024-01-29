@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 export const register = createAsyncThunk(
   'signUp/register',
   async ({ email, password }) => {
-    const response = await fetch('/register', {
+    const response = await fetch('/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
