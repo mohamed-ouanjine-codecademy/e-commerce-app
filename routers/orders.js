@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const db = require('../db/index.js');
+const db = require('../controllers');
 const help = require('../helperFunctions.js');
 
 

@@ -1,4 +1,4 @@
-const pool = require('./pool.js');
+const pool = require('../models/database.js');
 const help = require('./helperFunctions.js');
 const products = require('./products.js');
 

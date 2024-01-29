@@ -7,6 +7,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 
+
 // -- Routers
 const usersRouter = require('./routers/users.js');
 const productsRouter = require('./routers/products.js');
@@ -14,7 +15,7 @@ const cartsRouter = require('./routers/carts.js');
 const ordersRouter = require('./routers/orders.js');
 
 // -- utils
-const db = require('./db/index.js');
+const db = require('./controllers');
 const help = require('./helperFunctions.js');
 
 // Start app
@@ -52,6 +53,7 @@ app.use(session({
   },
   resave: false,
   saveUninitialized: false,
+  sameSite: 'none',
   store
 }));
 
@@ -108,6 +110,10 @@ const hashPassword = async (req, res, next) => {
     next(error);
   }
 }
+// root path
+app.get('/', (req, res) => {
+  res.send('Hello, this is your Express server!');
+});
 
 // endpoint: '/register' -> register a new user.
 app.post('/register', hashPassword, async (req, res, next) => {

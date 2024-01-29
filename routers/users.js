@@ -3,9 +3,8 @@ const express = require('express');
 const router = express.Router();
 
 // -- utils
-const db = require('../db/index.js');
+const db = require('../controllers');
 const help = require('../helperFunctions.js');
-const { updateUserById } = require('../db/users.js');
 
 // get all users '/users'
 router.get('/', async (req, res, next) => {

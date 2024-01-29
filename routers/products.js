@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // -- utils
-const db = require('../db/index.js');
+const db = require('../controllers');
 
 // start
 router.post('/', async (req, res, next) => {
