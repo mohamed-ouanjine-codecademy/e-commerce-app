@@ -38,7 +38,7 @@ paths:
                   "password": "hashed password"
                 }
 
-  /login:
+  /sign-in:
     post:
       tags:
         - Users
@@ -49,10 +49,18 @@ paths:
         '200':
           description: successful operation
           content:
-            text/plain; charset=utf-8:
+            application/json:
               examples:
-                Greeting message:
-                  value: Welcome back userName
+                User:
+                  value: |- 
+                    {
+                      "id": 1,
+                      "firstName": "Mohamed",
+                      "lastName": "Ouanjine",
+                      "email": "email.for.tv.elhajji@gmail.com",
+                      "address": "Temara",
+                      "password": "hashed_password"
+                    }
         default:
           description: Default error sample response
       requestBody:

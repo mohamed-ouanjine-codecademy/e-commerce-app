@@ -123,16 +123,16 @@ router.post('/register', hashPassword, async (req, res, next) => {
 );
 
 // endpoint: '/login -> authenticate a user.
-router.get('/login', (req, res) => {
-  res.send('login page!');
+router.get('/sign-in', (req, res) => {
+  res.status(401).json({ message: 'Failed to sign in. Please check your credentials.' });
 });
 
 // endpoint: '/login -> authenticate a user.
 router.post(
-  '/login',
-  passport.authenticate('local', { failureRedirect: '/login' }),
+  '/sign-in',
+  passport.authenticate('local', { failureRedirect: '/api/sign-in' }),
   (req, res) => {
-    res.send(`Welcome back ${req.user.first_name}`);
+    res.status(200).json(req.user);
   }
 );
 
