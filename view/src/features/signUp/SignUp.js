@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { setEmail, clearEmail, setPassword, clearPassword, register } from "./signUpSlice";
+import { SignForm } from "../../components/SignForm";
 
 export function SignUp() {
   const email = useSelector(store => store.signUp.email);
@@ -16,34 +17,18 @@ export function SignUp() {
 
   return (
     <>
-      <form className="container" method="POST" onSubmit={handleSubmit}>
-        <div className="row">
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={email}
-            onChange={(e) => dispatch(setEmail(e.target.value))}
-          />
-        </div>
-        <div className="row">
-          <label>Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={(e) => dispatch(setPassword(e.target.value))}
-          />
-        </div>
-        <div className="row">
-          <input
-            className="col-4"
-            type="submit"
-            value="Sign Up"
-            disabled={email && password ? false : true}
-          />
-        </div>
-      </form>
+      <div className="container">
+        <h3 className="row">Sign Up</h3>
+        <SignForm
+          className="row"
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          onSubmit={handleSubmit}
+          submitValue="Sign Up"
+        />
+      </div>
     </>
   )
 }
