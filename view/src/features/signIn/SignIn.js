@@ -9,7 +9,7 @@ export function SignIn() {
   const password = useSelector(store => store.signIn.user.password)
   const dispatch = useDispatch();
   const navigate = useNavigate()
-  
+
   const handleSubmit = (e) => {
     e.preventDefault()
     dispatch(signIn({ email, password }));
@@ -20,16 +20,18 @@ export function SignIn() {
   return (
     <>
       <div className="container py-5">
-        <h3>Sign In</h3>
-        <SignForm
-          className="row"
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          onSubmit={handleSubmit}
-          submitValue="Sign In"
-        />
+        <div className="row flex-column">
+          <h3 className="col">Sign In</h3>
+          <SignForm
+            className="col"
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            onSubmit={handleSubmit}
+            submitValue="Sign In"
+          />
+        </div>
       </div>
     </>
   )

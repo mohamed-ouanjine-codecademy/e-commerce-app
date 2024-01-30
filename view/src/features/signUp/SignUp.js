@@ -16,11 +16,11 @@ export function SignUp() {
   }
 
   return (
-    <>
-      <div className="container py-5">
-        <h3 className="row">Sign Up</h3>
+    <div className="container py-5">
+      <div className="row flex-column">
+        <h3 className="col">Sign Up</h3>
         <SignForm
-          className="row"
+          className="col"
           email={email}
           setEmail={setEmail}
           password={password}
@@ -29,6 +29,6 @@ export function SignUp() {
           submitValue="Sign Up"
         />
       </div>
-    </>
-  )
+    </div>
+  );
 }
