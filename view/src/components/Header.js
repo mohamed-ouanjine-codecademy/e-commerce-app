@@ -6,10 +6,22 @@ export function Header() {
     <>
       <header>
         <nav>
-          <ul>
-            <li><NavLink to="/">Home</NavLink></li>
-            <li><NavLink to="cart">Cart</NavLink></li>
-            <li><NavLink to="profile">Profile</NavLink></li>
+          <ul className='nav nav-tabs justify-content-center'>
+            <li className='nav-item'>
+              <NavLink
+                className={`nav-link ${({ isActive }) => isActive ? 'active' : ''}`}
+                to="/">Home</NavLink>
+            </li>
+            <li className='nav-item'>
+              <NavLink
+                className={`nav-link ${({ isActive }) => isActive ? 'active' : ''}`}
+                to="cart">Cart</NavLink>
+            </li>
+            <li className='nav-item'>
+              <NavLink
+                className={`nav-link ${({ isActive }) => isActive ? 'active' : ''}`}
+                to="profile">Profile</NavLink>
+            </li>
           </ul>
         </nav>
       </header>
