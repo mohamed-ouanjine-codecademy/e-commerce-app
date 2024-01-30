@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 export function Header() {
   return (
     <>
-      <header>
+      <header className='py-3'>
         <nav>
           <ul className='nav nav-tabs justify-content-center'>
             <li className='nav-item'>
