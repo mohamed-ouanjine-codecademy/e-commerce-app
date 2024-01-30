@@ -17,7 +17,7 @@ export function SignUp() {
 
   return (
     <>
-      <div className="container">
+      <div className="container py-5">
         <h3 className="row">Sign Up</h3>
         <SignForm
           className="row"
