@@ -1,21 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { registerUser } from '../../api/authAPI';
 
 // asyncs
 export const register = createAsyncThunk(
   'signUp/register',
   async ({ email, password }) => {
-    const response = await fetch('/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email,
-        password
-      })
-    });
-    const newUser = await response.json();
-    return newUser;
+    try {
+      const newUser = await registerUser(email, password);
+      return newUser;
+    } catch (error) {
+      throw error;
+    }
   }
 )
 
