@@ -36,8 +36,7 @@ const users = {
         [email]);
 
       const user = help.checkExistence(results, 'User');
-
-      callback(null, user);
+      callback(null, help.transformKeys(user));
 
     } catch (err) {
       callback(err)
