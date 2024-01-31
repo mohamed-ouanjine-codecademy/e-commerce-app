@@ -1,14 +1,12 @@
 import { signInUser } from "../../api/authAPI";
-
-import { createSlice, createAsyncThunk }  from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 
 export const signIn = createAsyncThunk(
   'signIn/user',
-  async ({email, password}) => {
+  async ({ email, password }) => {
     try {
       const user = await signInUser(email, password);
-      console.log(user);
       return user;
     } catch (error) {
       throw error;
@@ -22,7 +20,8 @@ const signInSlice = createSlice({
     user: {
       email: '',
       password: '',
-    }
+    },
+    isSignedIn: false
   },
   reducers: {
     setEmail: (state, action) => {
@@ -38,11 +37,13 @@ const signInSlice = createSlice({
       state.user.password = '';
     }
   },
-  extraReducer: (builder) => {
+  extraReducers: (builder) => {
     builder
-    .addCase(signIn.pending, (state, action) => {
-      state.user = action.payload;
-    })
+      .addCase(signIn.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isSignedIn = true;
+        console.log(action.payload);
+      })
   }
 })
 
