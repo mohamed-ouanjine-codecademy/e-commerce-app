@@ -5,17 +5,17 @@ import { setEmail, clearEmail, setPassword, clearPassword, signIn } from './sign
 import { useNavigate } from 'react-router-dom';
 
 export function SignIn() {
-  const email = useSelector(store => store.signIn.user.email)
-  const password = useSelector(store => store.signIn.user.password)
+  const email = useSelector(store => store.signIn.user.email);
+  const password = useSelector(store => store.signIn.user.password);
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    dispatch(signIn({ email, password }));
-    dispatch(clearEmail())
-    dispatch(clearPassword())
-    navigate('/profile')
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await dispatch(signIn({ email, password }));
+    dispatch(clearEmail());
+    dispatch(clearPassword());
+    navigate('/profile');
   }
   return (
     <>
