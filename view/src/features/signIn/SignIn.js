@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 export function SignIn() {
   const email = useSelector(store => store.signIn.user.email);
   const password = useSelector(store => store.signIn.user.password);
+  const signInPending = useSelector(store => store.signIn.signInPending);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -29,7 +30,7 @@ export function SignIn() {
             password={password}
             setPassword={setPassword}
             onSubmit={handleSubmit}
-            submitValue="Sign In"
+            submitValue={signInPending ? 'Pending ...' : 'Sign In'}
           />
         </div>
       </div>

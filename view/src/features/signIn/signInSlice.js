@@ -21,7 +21,9 @@ const signInSlice = createSlice({
       email: '',
       password: '',
     },
-    isSignedIn: false
+    isSignedIn: false,
+    signInPending: false,
+    signInRejected: false,
   },
   reducers: {
     setEmail: (state, action) => {
@@ -39,9 +41,20 @@ const signInSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(signIn.pending, (state) => {
+        state.signInPending = true;
+        state.signInRejected = false;
+      })
       .addCase(signIn.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isSignedIn = true;
+        
+        state.signInPending = false;
+        state.signInRejected = false;
+      })
+      .addCase(signIn.rejected, (state) => {
+        state.signInPending = false;
+        state.signInRejected = true;
       })
   }
 })
