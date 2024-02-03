@@ -1,19 +1,38 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { setEmail, clearEmail, setPassword, clearPassword, register } from "./signUpSlice";
 import { SignForm } from "../../components/SignForm";
 
 export function SignUp() {
-  const email = useSelector(store => store.signUp.email);
-  const password = useSelector(store => store.signUp.password);
+  const email = useSelector(store => store.signUp.user.email);
+  const password = useSelector(store => store.signUp.user.password);
+  const registerUserPending = useSelector(store => store.signUp.registerUserPending);
+  const registerUserFulfilled = useSelector(store => store.signUp.registerUserFulfilled);
+  const registerUserRejected = useSelector(store => store.signUp.registerUserRejected);
   const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    dispatch(register({ email, password }));
-    dispatch(clearEmail())
-    dispatch(clearPassword())
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Register user
+    await dispatch(register({ email, password }));
+  };
+
+  useEffect(() => {
+    if (registerUserFulfilled) {
+      // Clear email & password
+      dispatch(clearEmail());
+      dispatch(clearPassword());
+    }
+  }, [registerUserFulfilled]);
+
+  // Submit message handler
+  const handleSubmitMessage = () => {
+    if (registerUserPending) {
+      return 'Pending ...';
+    }
+    return 'Sign Up';
+  };
 
   return (
     <div className="container py-5">
@@ -26,7 +45,8 @@ export function SignUp() {
           password={password}
           setPassword={setPassword}
           onSubmit={handleSubmit}
-          submitValue="Sign Up"
+          submitValue={handleSubmitMessage()}
+          isEmailAvailable={!registerUserRejected}
         />
       </div>
     </div>
