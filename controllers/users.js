@@ -8,6 +8,14 @@ const users = {
         throw new Error('Invalid input data');
       }
 
+      // Check email availability
+      const isEmailAvailable = await this.checkEmailAvailability(userInfo.email);
+      console.log(isEmailAvailable);
+      if (isEmailAvailable === false) {
+        throw new Error('Email is not available');
+      }
+
+      // Register user
       const results = await pool.query(`
         INSERT INTO users (email, password) VALUES
           ($1, $2)
@@ -17,6 +25,25 @@ const users = {
       const newUser = results.rows[0];
 
       return help.transformKeys(newUser);
+
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  checkEmailAvailability: async function (email) {
+    try {
+      if (!email) {
+        throw new Error('Invalid input data');
+      }
+
+      const results = await pool.query(`
+        SELECT *
+        FROM users
+        WHERE email = $1;`,
+        [email]);
+      
+      return results.rows.length === 0;
 
     } catch (err) {
       throw err;
@@ -40,7 +67,7 @@ const users = {
 
     } catch (err) {
       callback(err)
-      throw err
+      throw err;
     }
   },
 

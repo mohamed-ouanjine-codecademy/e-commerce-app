@@ -107,11 +107,11 @@ router.get('/', (req, res) => {
   res.send('Hello, this is your Express server!');
 });
 
-// endpoint: '/register' -> register a new user.
 router.post('/register', hashPassword, async (req, res, next) => {
   try {
     const { email } = req.body;
-    const userInfo = { email, password: req.hashedPassword };
+    const password  = req.hashedPassword;
+    const userInfo = { email, password };
 
     const newUser = await db.users.createUser(userInfo);
 
