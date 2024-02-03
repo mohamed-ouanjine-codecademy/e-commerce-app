@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 
 export const signIn = createAsyncThunk(
-  'signIn/user',
+  'signIn/signIn',
   async ({ email, password }) => {
     try {
       const user = await signInUser(email, password);
@@ -21,7 +21,7 @@ const signInSlice = createSlice({
       email: '',
       password: '',
     },
-    isSignedIn: false,
+    signInFulfilled: false,
     signInPending: false,
     signInRejected: false,
   },
@@ -43,17 +43,19 @@ const signInSlice = createSlice({
     builder
       .addCase(signIn.pending, (state) => {
         state.signInPending = true;
+        state.signInFulfilled = false
         state.signInRejected = false;
       })
       .addCase(signIn.fulfilled, (state, action) => {
         state.user = action.payload;
-        state.isSignedIn = true;
         
         state.signInPending = false;
+        state.signInFulfilled = true;
         state.signInRejected = false;
       })
       .addCase(signIn.rejected, (state) => {
         state.signInPending = false;
+        state.signInFulfilled = false
         state.signInRejected = true;
       })
   }

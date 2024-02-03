@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { SignForm } from "../../components/SignForm";
 import { useDispatch, useSelector } from "react-redux";
 import { setEmail, clearEmail, setPassword, clearPassword, signIn } from './signInSlice';
@@ -8,16 +8,26 @@ export function SignIn() {
   const email = useSelector(store => store.signIn.user.email);
   const password = useSelector(store => store.signIn.user.password);
   const signInPending = useSelector(store => store.signIn.signInPending);
+  const signInFulfilled = useSelector(store => store.signIn.signInFulfilled);
+  const signInRejected = useSelector(store => store.signIn.signInRejected);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    await dispatch(signIn({ email, password }));
-    dispatch(clearEmail());
-    dispatch(clearPassword());
-    navigate('/profile');
+    dispatch(signIn({ email, password }));
   }
+
+  useEffect(() => {
+    if (signInFulfilled) {
+      // Clear email & password
+      dispatch(clearEmail());
+      dispatch(clearPassword());
+      // Redirect user to profile
+      navigate('/profile');
+    }
+  }, [signInFulfilled]);
+
   return (
     <>
       <div className="container py-5">
@@ -31,6 +41,7 @@ export function SignIn() {
             setPassword={setPassword}
             onSubmit={handleSubmit}
             submitValue={signInPending ? 'Pending ...' : 'Sign In'}
+            credentials={!signInRejected}
           />
         </div>
       </div>

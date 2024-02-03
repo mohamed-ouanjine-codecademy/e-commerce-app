@@ -10,6 +10,7 @@ export function SignForm({
   onSubmit,
   submitValue,
   isEmailAvailable,
+  credentials
 }) {
   const dispatch = useDispatch();
 
@@ -24,9 +25,20 @@ export function SignForm({
     return null;
   };
 
+  const renderEmailAndPasswordFeedback = () => {
+    if (credentials === false) {
+      return (
+        <div className="invalid-feedback">
+          Wrong email or password
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <form className={`${className} container`} onSubmit={onSubmit}>
-      <div className={`row mb-3 ${isEmailAvailable === false ? 'has-error' : ''}`}>
+      <div className={`row mb-3 ${isEmailAvailable === false && 'has-error'}`}>
         <label htmlFor='email' className="form-label">Email:</label>
         <input
           id='email'
@@ -39,17 +51,18 @@ export function SignForm({
         />
         {renderEmailFeedback()}
       </div>
-      <div className="row mb-3">
+      <div className={`row mb-3 ${credentials === false && 'has-error'}`}>
         <label htmlFor='password' className="form-label">Password:</label>
         <input
           id='password'
-          className="form-control"
+          className={`form-control ${credentials === false && 'is-invalid'}`}
           type="password"
           name="password"
           value={password}
           onChange={(e) => dispatch(setPassword(e.target.value))}
           placeholder='*******'
         />
+        {renderEmailAndPasswordFeedback()}
       </div>
       <div className="row">
         <input
