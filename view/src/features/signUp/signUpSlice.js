@@ -12,24 +12,51 @@ export const register = createAsyncThunk(
       throw error;
     }
   }
-)
+);
 
 export const signUpSlice = createSlice({
   name: 'signUp',
-  initialState: {},
+  initialState: {
+    user: {
+      email: '',
+      password: '',
+    },
+    registerUserPending: false,
+    registerUserFulfilled: false,
+    registerUserRejected: false,
+  },
   reducers: {
     setEmail: (state, action) => {
-      state.email = action.payload;
+      state.user.email = action.payload;
     },
     clearEmail: (state) => {
-      state.email = '';
+      state.user.email = '';
     },
     setPassword: (state, action) => {
-      state.password = action.payload;
+      state.user.password = action.payload;
     },
     clearPassword: (state) => {
-      state.password = '';
+      state.user.password = '';
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      // Register new user
+      .addCase(register.pending, (state) => {
+        state.registerUserPending = true;
+        state.registerUserFulfilled = false;
+        state.registerUserRejected = false;
+      })
+      .addCase(register.fulfilled, (state) => {
+        state.registerUserPending = false;
+        state.registerUserFulfilled = true;
+        state.registerUserRejected = false;
+      })
+      .addCase(register.rejected, (state) => {
+        state.registerUserPending = false;
+        state.registerUserFulfilled = false;
+        state.registerUserRejected = true;
+      })
   }
 });
 
