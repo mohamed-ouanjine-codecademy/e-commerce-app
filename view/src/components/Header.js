@@ -20,7 +20,7 @@ export function Header() {
             <li className='nav-item'>
               <NavLink
                 className={`nav-link ${({ isActive }) => isActive ? 'active' : ''}`}
-                to="profile">Profile</NavLink>
+                to="user/profile">Profile</NavLink>
             </li>
           </ul>
         </nav>

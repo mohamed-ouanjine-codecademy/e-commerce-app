@@ -107,6 +107,17 @@ router.get('/', (req, res) => {
   res.send('Hello, this is your Express server!');
 });
 
+router.get('/check-email', async (req, res, next) => {
+  try {
+    const { email } = req.query;
+    const isEmailAvailable = await db.users.checkEmailAvailability(email);
+
+    res.json({ isEmailAvailable });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/register', hashPassword, async (req, res, next) => {
   try {
     const { email } = req.body;

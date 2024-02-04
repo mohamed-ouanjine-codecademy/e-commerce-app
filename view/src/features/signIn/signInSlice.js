@@ -7,7 +7,10 @@ export const signIn = createAsyncThunk(
   async ({ email, password }) => {
     try {
       const user = await signInUser(email, password);
-      return user;
+      return {
+        ...user,
+        password
+      };
     } catch (error) {
       throw error;
     }
@@ -48,7 +51,7 @@ const signInSlice = createSlice({
       })
       .addCase(signIn.fulfilled, (state, action) => {
         state.user = action.payload;
-        
+
         state.signInPending = false;
         state.signInFulfilled = true;
         state.signInRejected = false;

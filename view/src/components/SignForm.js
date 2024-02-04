@@ -18,7 +18,7 @@ export function SignForm({
     if (isEmailAvailable === false) {
       return (
         <div className="invalid-feedback">
-          Email is not available. Please choose another.
+          Email is not available. Please choose another one.
         </div>
       );
     }

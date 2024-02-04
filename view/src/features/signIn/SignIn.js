@@ -1,12 +1,14 @@
 import React, { useEffect } from "react";
 import { SignForm } from "../../components/SignForm";
 import { useDispatch, useSelector } from "react-redux";
-import { setEmail, clearEmail, setPassword, clearPassword, signIn } from './signInSlice';
+import { setEmail, setPassword, signIn } from './signInSlice';
 import { useNavigate } from 'react-router-dom';
+import { setUserInfo } from "../userInfo/userInfoSlice";
 
 export function SignIn() {
   const email = useSelector(store => store.signIn.user.email);
   const password = useSelector(store => store.signIn.user.password);
+  const user = useSelector(store => store.signIn.user);
   const signInPending = useSelector(store => store.signIn.signInPending);
   const signInFulfilled = useSelector(store => store.signIn.signInFulfilled);
   const signInRejected = useSelector(store => store.signIn.signInRejected);
@@ -20,11 +22,10 @@ export function SignIn() {
 
   useEffect(() => {
     if (signInFulfilled) {
-      // Clear email & password
-      dispatch(clearEmail());
-      dispatch(clearPassword());
+      // Set user info
+      dispatch(setUserInfo(user));
       // Redirect user to profile
-      navigate('/profile');
+      navigate('/user/profile');
     }
   }, [signInFulfilled]);
 

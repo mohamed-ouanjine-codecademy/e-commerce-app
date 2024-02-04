@@ -3,12 +3,12 @@ import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router';
 
 export function Profile() {
-  const firstName = useSelector((store) => store.signIn.user?.firstName);
+  const firstName = useSelector((store) => store.userInfo.user.firstName);
   const isSignedIn = useSelector((store) => store.signIn.signInFulfilled);
 
   // Redirect the user if is not signed in
   if (!isSignedIn) {
-    return <Navigate to="/sign-in" />
+    return <Navigate to="/user/sign-in" />
   }
 
   return (

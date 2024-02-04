@@ -24,10 +24,10 @@ export function Footer() {
             <h3>Auth</h3>
             <ul className="nav nav-underline flex-column">
               <li className='nav-item'>
-                <Link className={`nav-link ${({ isActive }) => isActive && 'active'}`} to="/sign-up">Sign Up</Link>
+                <Link className={`nav-link ${({ isActive }) => isActive && 'active'}`} to="/user/sign-up">Sign Up</Link>
               </li>
               <li className='nav-item'>
-                <Link className={`nav-link ${({ isActive }) => isActive && 'active'}`} to="/sign-in">Sign In</Link>
+                <Link className={`nav-link ${({ isActive }) => isActive && 'active'}`} to="/user/sign-in">Sign In</Link>
               </li>
             </ul>
           </div>
