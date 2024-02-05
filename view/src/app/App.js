@@ -11,7 +11,7 @@ import { UserInfo } from '../features/userInfo/UserInfo';
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<Root />}>
     <Route index element={<ProductList />} />
-    <Route path='user/sign-up' element={<SignUp />}/>\
+    <Route path='user/sign-up' element={<SignUp />}/>
     <Route path='user/info' element={<UserInfo />} />
     <Route path='user/sign-in' element={<SignIn />}/>
     <Route path='user/profile' element={<Profile />}/>

@@ -12,6 +12,7 @@ const products = {
         !productInfo ||
         !productInfo.name ||
         (typeof productInfo.price != 'number') ||
+        !productInfo.imageUrl ||
         !Array.isArray(productInfo.categoriesId) ||
         productInfo.categoriesId.length === 0
       ) {
@@ -24,10 +25,10 @@ const products = {
 
       // Insert product productInfo into products table
       const productResults = await client.query(`
-        INSERT INTO products (name, description, price) VALUES
-          ($1, $2, $3)
+        INSERT INTO products (name, description, price, image_url) VALUES
+          ($1, $2, $3, $4)
         RETURNING *;`,
-        [productInfo.name, productInfo.description, productInfo.price]
+        [productInfo.name, productInfo.description, productInfo.price, productInfo.imageUrl]
       );
       const newProduct = productResults.rows[0];
 
