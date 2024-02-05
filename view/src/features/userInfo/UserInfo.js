@@ -5,14 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { UserInfoForm } from "../../components/UserInfoForm";
 
 export function UserInfo() {
-  const userId = useSelector(store => store.signIn.user.id);
+  const userId = useSelector(state => state.signIn.user.id);
   const {
     firstName,
     lastName,
     address
-  } = useSelector(store => store.userInfo.user);
-  const updateUserInfoPending = useSelector(store => store.userInfo.updateUserInfoPending);
-  const updateUserInfoFulfilled = useSelector(store => store.userInfo.updateUserInfoFulfilled);
+  } = useSelector(state => state.userInfo.user);
+  const updateUserInfoPending = useSelector(state => state.userInfo.updateUserInfoPending);
+  const updateUserInfoFulfilled = useSelector(state => state.userInfo.updateUserInfoFulfilled);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

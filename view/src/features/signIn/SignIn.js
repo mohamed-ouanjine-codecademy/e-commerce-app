@@ -6,12 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { setUserInfo } from "../userInfo/userInfoSlice";
 
 export function SignIn() {
-  const email = useSelector(store => store.signIn.user.email);
-  const password = useSelector(store => store.signIn.user.password);
-  const user = useSelector(store => store.signIn.user);
-  const signInPending = useSelector(store => store.signIn.signInPending);
-  const signInFulfilled = useSelector(store => store.signIn.signInFulfilled);
-  const signInRejected = useSelector(store => store.signIn.signInRejected);
+  const email = useSelector(state => state.signIn.user.email);
+  const password = useSelector(state => state.signIn.user.password);
+  const user = useSelector(state => state.signIn.user);
+  const signInPending = useSelector(state => state.signIn.signInPending);
+  const signInFulfilled = useSelector(state => state.signIn.signInFulfilled);
+  const signInRejected = useSelector(state => state.signIn.signInRejected);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

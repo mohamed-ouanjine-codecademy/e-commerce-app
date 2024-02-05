@@ -6,15 +6,15 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { signIn } from "../signIn/signInSlice";
 
 export function SignUp() {
-  const email = useSelector(store => store.signUp.user.email);
-  const password = useSelector(store => store.signUp.user.password);
-  const isEmailAvailable = useSelector(store => store.signUp.isEmailAvailable);
-  const checkEmailPending = useSelector(store => store.signUp.checkEmailPending);
-  const checkEmailFulfilled = useSelector(store => store.signUp.checkEmailFulfilled);
-  const registerUserPending = useSelector(store => store.signUp.registerUserPending);
-  const registerUserFulfilled = useSelector(store => store.signUp.registerUserFulfilled);
-  const signInPending = useSelector(store => store.signIn.signInPending);
-  const signInFulfilled = useSelector(store => store.signIn.signInFulfilled);
+  const email = useSelector(state => state.signUp.user.email);
+  const password = useSelector(state => state.signUp.user.password);
+  const isEmailAvailable = useSelector(state => state.signUp.isEmailAvailable);
+  const checkEmailPending = useSelector(state => state.signUp.checkEmailPending);
+  const checkEmailFulfilled = useSelector(state => state.signUp.checkEmailFulfilled);
+  const registerUserPending = useSelector(state => state.signUp.registerUserPending);
+  const registerUserFulfilled = useSelector(state => state.signUp.registerUserFulfilled);
+  const signInPending = useSelector(state => state.signIn.signInPending);
+  const signInFulfilled = useSelector(state => state.signIn.signInFulfilled);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
