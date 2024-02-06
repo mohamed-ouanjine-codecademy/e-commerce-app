@@ -1,7 +1,0 @@
-.productsContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  justify-items: center;
-  grid-auto-flow: row dense;
-  gap: .5rem;
-}
