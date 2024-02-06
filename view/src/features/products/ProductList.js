@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import styles from './ProductList.module.css';
 import { useDispatch, useSelector } from "react-redux";
 import { loadProducts } from "./productListSlice";
 import { ProductItem } from "../../components/ProductItem/ProductItem";
@@ -16,23 +15,23 @@ export function ProductList() {
 
   return (
     <>
-      <div className="container-fluid py-3">
+      <div className="container-fluid g-2">
         <div className="row">
           <h2 className="col">Products</h2>
         </div>
-        <div className={`row ${styles.productsContainer}`}>
+        <div className={`row g-3 row-cols-2 row-cols-md-3 row-cols-lg-4`}>
           {
             loadProductsPending ? (
 
-              Array.from({ length: 6 }, (_, i) =>
-                <div className="p-0" key={i}>
+              Array.from({ length: 8 }, (_, i) =>
+                <div className="col" key={i}>
                   <PrototypeProductItem />
                 </div>
               )
             ) : (
               products.map(product => {
                 return (
-                  <div className="p-0" key={product.id}>
+                  <div className="col" key={product.id}>
                     <ProductItem product={product} />
                   </div>
                 )
