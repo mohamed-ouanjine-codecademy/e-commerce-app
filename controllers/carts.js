@@ -1,5 +1,6 @@
 const pool = require('../models/database.js');
 const help = require('./helperFunctions.js');
+const products = require('./products.js');
 
 const carts = {
   createCart: async function (userId, items) {
@@ -21,7 +22,7 @@ const carts = {
       const newCart = results.rows[0];
       // Convert creted_at from object to string
       newCart.created_at = `${newCart.created_at}`;
-      
+
       // Create new cart items
       if (items) {
         await client.query(`
@@ -45,7 +46,7 @@ const carts = {
     }
   },
 
-  getCartById: async function (cartId) {
+  getCartById: async function (cartId, include) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
@@ -61,7 +62,7 @@ const carts = {
       const cart = await help.checkExistence(results, 'Cart');
 
       // get all row (product_id, quantity) related to the cart in carts_products table
-      const cartItems = await this.helpers.getItemsBycartId(client, cartId);
+      const cartItems = await this.helpers.getItemsBycartId(client, cartId, include);
 
       await client.query('COMMIT');
 
@@ -76,6 +77,36 @@ const carts = {
 
     } finally {
       client.release();
+    }
+  },
+
+  getCartByUserId: async function (userId) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const results = await client.query(`
+        SELECT *
+        FROM carts
+        WHERE user_id = $1`,
+        [userId]
+      );
+
+      // check if the cart exist
+      const cart = help.checkExistence(results, 'Cart');
+      const cartId = cart.id;
+      // get all row (product_id, quantity) related to the cart in carts_products table
+      const cartItems = await this.helpers.getItemsBycartId(client, cartId);
+
+      await client.query('COMMIT');
+
+      // Convert creted_at from object to string
+      cart.created_at = `${cart.created_at}`;
+
+      return help.transformKeys({ ...cart, items: cartItems });
+
+    } catch (err) {
+      throw err;
     }
   },
 
@@ -306,7 +337,7 @@ const carts = {
       }
     },
 
-    getItemsBycartId: async function (client, cartId) {
+    getItemsBycartId: async function (client, cartId, include) {
       const results = await client.query(`
         SELECT
           product_id,
@@ -315,9 +346,19 @@ const carts = {
         WHERE cart_id = $1;`,
         [cartId]
       );
-      const items = results.rows;
+      
+      const cartItems = await Promise.all(
+        results.rows.map(async ({ product_id, quantity }) => {
+          const product = include ? await products.getProductById(product_id, client) : null;
+          return {
+            productId: product_id,
+            quantity,
+            product,
+          };
+        })
+      );
 
-      return items;
+      return cartItems;
     }
   }
 }

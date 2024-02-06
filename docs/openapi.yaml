@@ -17,14 +17,14 @@ paths:
         description: User information
         content:
           application/json:
-              example: |-
-                {
-                  "email": "example@gmail.com",
-                  "password": "my-password"
-                }
+            example: |-
+              {
+                "email": "example@gmail.com",
+                "password": "my-password"
+              }
         required: true
       responses:
-        '201':
+        "201":
           description: New user Object
           content:
             application/json:
@@ -46,13 +46,13 @@ paths:
       description: login an existing user to the app
       operationId: signin
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
               examples:
                 User:
-                  value: |- 
+                  value: |-
                     {
                       "id": 1,
                       "firstName": "Mohamed",
@@ -89,7 +89,7 @@ paths:
       description: Get all users from database
       operationId: users
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
@@ -140,7 +140,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
@@ -172,7 +172,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
@@ -192,7 +192,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: "#/components/schemas/User"
 
     delete:
       tags:
@@ -208,14 +208,14 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
+        "204":
           description: seccessful deletion
-        '404':
+        "404":
           description: Not found
           content:
             text/plain; charset=utf-8:
               example: No such User has been founded.
-          
+
   /products:
     post:
       tags:
@@ -226,7 +226,7 @@ paths:
         price
       operationId: postProducts
       responses:
-        '201':
+        "201":
           description: New product created
           content:
             application/json:
@@ -247,7 +247,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: "#/components/schemas/Product"
 
     get:
       tags:
@@ -262,7 +262,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
@@ -312,7 +312,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/productId"
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
@@ -328,12 +328,11 @@ paths:
                           1
                       ]
                     }
-        '404':
+        "404":
           description: Not found
           content:
             text/plain; charset=utf-8:
-              example:
-                No such Product has been founded.
+              example: No such Product has been founded.
 
     put:
       tags:
@@ -344,12 +343,11 @@ paths:
       parameters:
         - $ref: "#/components/parameters/productId"
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             applicatoin/json:
               examples:
-              
                 updated name:
                   value: |-
                     {
@@ -361,7 +359,7 @@ paths:
                         1
                       ]
                     }
-                
+
                 updated price:
                   value: |-
                     {
@@ -373,18 +371,17 @@ paths:
                         1
                       ]
                     }
-        '404':
+        "404":
           description: Not found
           content:
             text/plain; charset=utf-8:
-              example:
-                No such Product has been founded.
+              example: No such Product has been founded.
       requestBody:
         description: New iformations
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: "#/components/schemas/Product"
 
     delete:
       tags:
@@ -395,7 +392,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/productId"
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
@@ -411,13 +408,12 @@ paths:
                         2
                       ]
                     }
-        '404':
+        "404":
           description: Not found
           content:
             text/plain; charset=utf-8:
-              example:
-                No such Product has been founded.
-                    
+              example: No such Product has been founded.
+
   /carts:
     post:
       tags:
@@ -437,33 +433,52 @@ paths:
                   items:
                     $ref: "#/components/schemas/ProductCart"
       responses:
-        '201':
+        "201":
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Cart"
-          
+
   /carts/{cartId}:
     # Done
     get:
       tags:
         - Carts
       summary: Get a specific cart.
-      description: get a cart by its ID (cartId).
+      description: Get a cart by its ID (cartId). Optionally include item details with `?include=items`.
       operationId: getCart
       parameters:
         - $ref: "#/components/parameters/cartId"
+        - name: include
+          in: query
+          description: Include details of cart items in the response (e.g., product information).
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
-                schema:
-                  $ref: "#/components/schemas/Cart"
-        '404':
+              schema:
+                $ref: "#/components/schemas/Cart"
+                allOf:
+                  - if:
+                      properties:
+                        include:
+                          const: true
+                    then:
+                      properties:
+                        items:
+                          items:
+                            properties:
+                              product:
+                                $ref: "#/components/schemas/Product"
+        "404":
           $ref: "#/components/responses/NotFoundCart"
-             
+
     # done
     delete:
       tags:
@@ -474,11 +489,29 @@ paths:
       parameters:
         - $ref: "#/components/parameters/cartId"
       responses:
-        '204':
+        "204":
           description: successful deletion
-        '404':
+        "404":
           $ref: "#/components/responses/NotFoundCart"
-          
+
+  /carts/users/{userId}:
+    # Done
+    get:
+      tags:
+        - Carts
+      summary: Get a specific cart by user ID.
+      description: get a cart by its user ID (user must be signed in).
+      operationId: getCartByUserId
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        "404":
+          $ref: "#/components/responses/NotFoundCart"
+
   /carts/{cartId}/items:
     # done
     post:
@@ -496,24 +529,24 @@ paths:
             schema:
               $ref: "#/components/schemas/ProductCart2"
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
               example: |-
-                  {
-                    "id": 1,
-                    "items": [
-                      {
-                        "productId": 1111,
-                        "quantity": 5
-                      },
-                      {
-                        "productId": 2222,
-                        "quantity": 3
-                      }
-                    ]
-                  }
+                {
+                  "id": 1,
+                  "items": [
+                    {
+                      "productId": 1111,
+                      "quantity": 5
+                    },
+                    {
+                      "productId": 2222,
+                      "quantity": 3
+                    }
+                  ]
+                }
     # done
     delete:
       tags:
@@ -522,17 +555,17 @@ paths:
       parameters:
         - $ref: "#/components/parameters/cartId"
       responses:
-        '204':
+        "204":
           description: successful deletion
-        '404':
+        "404":
           $ref: "#/components/responses/NotFoundCart"
-            
+
   /carts/{cartId}/items/{productId}:
     # done
     put:
       tags:
         - Carts
-      summary:  Update the quantity of a specific product in the cart.
+      summary: Update the quantity of a specific product in the cart.
       description: Update cart's product quantity by cartId and producId
       parameters:
         - $ref: "#/components/parameters/cartId"
@@ -549,21 +582,21 @@ paths:
                   type: integer
                   example: 7
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
               example: |-
-                  {
-                    "success": true,
-                    "updatedProduct": {
-                        "cartId": 1,
-                        "productId": 2222,
-                        "quantity": 7
-                    }
+                {
+                  "success": true,
+                  "updatedProduct": {
+                      "cartId": 1,
+                      "productId": 2222,
+                      "quantity": 7
                   }
-                  
-        '404':
+                }
+
+        "404":
           $ref: "#/components/responses/NotFoundCart"
     # done
     delete:
@@ -574,11 +607,11 @@ paths:
         - $ref: "#/components/parameters/cartId"
         - $ref: "#/components/parameters/productId"
       responses:
-        '204':
+        "204":
           description: successful deletion
-        '404':
+        "404":
           $ref: "#/components/responses/NotFoundCart"
-          
+
   /orders:
     get:
       tags:
@@ -587,7 +620,7 @@ paths:
       description: Retrieve all orders a user have.
       operationId: getOrders
       responses:
-        '200':
+        "200":
           description: successful operation.
           content:
             application/json:
@@ -640,7 +673,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
@@ -677,9 +710,9 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
+        "204":
           description: successful deletion.
-  
+
   /orders/{orderId}/status:
     put:
       tags:
@@ -730,7 +763,7 @@ paths:
                     "status": "returned"
                   }
       responses:
-        '200':
+        "200":
           description: successful updated.
           content:
             application/json:
@@ -777,7 +810,7 @@ paths:
                       "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
                       "status": "returned"
                     }
-                    
+
   /orders/{orderId}/items:
     post:
       tags:
@@ -802,42 +835,41 @@ paths:
                 "quantity": 1
               }
       responses:
-        '201':
+        "201":
           description: seccesful addition
           content:
             application/json:
               example: |-
-                    {
-                      "success": true,
-                      "message": "Item successfully added to the order.",
-                      "updatedOrder": {
-                          "id": 1,
-                          "items": [
-                            {
-                              "productId": 1111,
-                              "quantity": 5
-                            },
-                            {
-                              "productId": 2222,
-                              "quantity": 7
-                            },
-                            {
-                              "productId": 3333,
-                              "quantity": 1
-                            }
-                          ]
-                      }
-                    }
-                    
+                {
+                  "success": true,
+                  "message": "Item successfully added to the order.",
+                  "updatedOrder": {
+                      "id": 1,
+                      "items": [
+                        {
+                          "productId": 1111,
+                          "quantity": 5
+                        },
+                        {
+                          "productId": 2222,
+                          "quantity": 7
+                        },
+                        {
+                          "productId": 3333,
+                          "quantity": 1
+                        }
+                      ]
+                  }
+                }
 
-        '400':
+        "400":
           description: Invalid input data
           content:
             text/plain; charset=utf-8:
               example: |-
                 Invalid request payload. Please check the data format.
-                
-        '404':
+
+        "404":
           description: Not found
           content:
             text/plain; charset=utf-8:
@@ -846,13 +878,13 @@ paths:
                   value: No such Order has been founded.
                 product not found:
                   value: No such Product has been founded.
-                
+
   /orders/{orderId}/items/{productId}:
     delete:
       tags:
         - Orders
       summary: Romove specific item from an order
-      description:  Romove specific item from the order by order's ID and product's ID
+      description: Romove specific item from the order by order's ID and product's ID
       parameters:
         - name: orderId
           in: path
@@ -867,9 +899,9 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
+        "204":
           description: seccessful deletion
-        '404':
+        "404":
           description: Not found
           content:
             text/plain; charset=utf-8:
@@ -880,7 +912,7 @@ paths:
                   value: No such Product has been founded
                 order doesn't contain product:
                   value: The specified product does not exist in the order
-          
+
     put:
       tags:
         - Orders
@@ -910,26 +942,26 @@ paths:
                 "quantity": 3
               }
       responses:
-        '200':
+        "200":
           description: successful update
           content:
             application/json:
               example: |-
-                    {
-                      "success": true,
-                      "message": "Item quantity updated successfully",
-                      "updatedItem": {
-                        "id": 1111,
-                        "quantity": 3
-                      }
-                    }
-        '400':
+                {
+                  "success": true,
+                  "message": "Item quantity updated successfully",
+                  "updatedItem": {
+                    "id": 1111,
+                    "quantity": 3
+                  }
+                }
+        "400":
           description: Invalid input data
           content:
             text/plain; charset=utf-8:
               example: |-
                 Invalid request payload. Please check the data format.
-        '404':
+        "404":
           description: Not found
           content:
             text/plain; charset=utf-8:
@@ -940,9 +972,9 @@ paths:
                   value: No such Product has been founded
                 order doesn't contain product:
                   value: The specified product does not exist in the order
-            
+
   /carts/{cartId}/checkout:
-    # done 
+    # done
     post:
       tags:
         - Carts
@@ -952,7 +984,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/cartId"
       responses:
-        '201':
+        "201":
           description: successful creation.
           content:
             application/json:
@@ -970,8 +1002,8 @@ paths:
                       }
                   ]
                 }
-                
-        '404':
+
+        "404":
           $ref: "#/components/responses/NotFoundCart"
 
 components:
@@ -1000,7 +1032,7 @@ components:
           format: password
       xml:
         name: User
-        
+
     Product:
       type: object
       properties:
@@ -1060,7 +1092,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProductCart2"
-            
+
   parameters:
     productId:
       name: productId
@@ -1096,5 +1128,4 @@ components:
       description: Not found
       content:
         text/plain; charset=utf-8:
-          example:
-            No such Cart has been founded.
+          example: No such Cart has been founded.

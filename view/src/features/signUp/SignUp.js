@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { setEmail, setPassword, checkEmail, setCheckEmailDefault, register } from "./signUpSlice";
+import { signIn } from "../signIn/signInSlice";
+import { createCart } from "../cart/cartSlice";
 import { SignForm } from "../../components/SignForm";
 import { Navigate, useNavigate } from "react-router-dom";
-import { signIn } from "../signIn/signInSlice";
 
 export function SignUp() {
   const email = useSelector(state => state.signUp.user.email);
@@ -15,6 +16,8 @@ export function SignUp() {
   const registerUserFulfilled = useSelector(state => state.signUp.registerUserFulfilled);
   const signInPending = useSelector(state => state.signIn.signInPending);
   const signInFulfilled = useSelector(state => state.signIn.signInFulfilled);
+  const createCartPending = useSelector(state => state.cart.createCartPending);
+  const createCartFulfilled = useSelector(state => state.cart.createCartFulfilled);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -35,34 +38,32 @@ export function SignUp() {
     if (isEmailAvailable && checkEmailFulfilled) registerUser();
   }, [isEmailAvailable, checkEmailFulfilled]);
 
-  // Sign In user
+  // Sign In user & create cart
   useEffect(() => {
-    const signInUser = async () => {
+    const signInUserAndCartCart = async () => {
       // Sign In user auto
       await dispatch(signIn({ email, password }));
+      // Create Cart
+      await dispatch(createCart());
     }
-    if (registerUserFulfilled) signInUser();
+    if (registerUserFulfilled) signInUserAndCartCart();
   }, [registerUserFulfilled]);
 
   // Redirect user
   useEffect(() => {
-    if (signInFulfilled) {
+    if (createCartFulfilled) {
       // Redirect user to /user/info (page to get user info)
       navigate('/user/info');
     }
-  }, [signInFulfilled]);
+  }, [createCartFulfilled]);
 
   // Submit message handler
   const handleSubmitMessage = () => {
-    if (checkEmailPending || registerUserPending || signInPending) {
+    if (checkEmailPending || registerUserPending || signInPending || createCartPending) {
       return 'Pending ...';
     }
     return 'Sign Up';
   };
-
-  if (registerUserFulfilled) {
-    return <Navigate to='/user/info' />
-  }
 
   return (
     <div className="container py-5">

@@ -12,17 +12,9 @@ const productsRouter = require('./products.js');
 const cartsRouter = require('./carts.js');
 const ordersRouter = require('./orders.js');
 
-// mount routers
-router.use('/users', usersRouter);
-router.use('/products', productsRouter);
-router.use('/carts', cartsRouter);
-router.use('/orders', ordersRouter);
-
 // -- utils
 const db = require('../controllers');
 const help = require('../helperFunctions.js');
-
-
 
 // Define Swagger JSdoc options
 const options = {
@@ -47,7 +39,7 @@ router.use(session({
   secret: process.env.SESSION_SECRET,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24,
-    httpOnly: true,
+    // httpOnly: true,
     sameSite: "none",
   },
   resave: false,
@@ -90,6 +82,12 @@ passport.use(new LocalStrategy(
   }
 ));
 
+// mount routers
+router.use('/users', usersRouter);
+router.use('/products', productsRouter);
+router.use('/carts', cartsRouter);
+router.use('/orders', ordersRouter);
+
 // hashPassword middleware:
 const hashPassword = async (req, res, next) => {
   try {
@@ -104,7 +102,10 @@ const hashPassword = async (req, res, next) => {
 }
 // root path
 router.get('/', (req, res) => {
-  res.send('Hello, this is your Express server!');
+  if (req.user) {
+    return res.json({user: req.user});
+  }
+  return res.send('Hello, this is your Express server!');
 });
 
 router.get('/check-email', async (req, res, next) => {

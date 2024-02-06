@@ -2,22 +2,27 @@ const router = require('express').Router();
 
 const db = require('../controllers');
 
-// Middlewares
-const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect('/login');
-}
-
-router.use(isAuthenticated);
-
 // get a cart by its ID (cartId).
 router.get('/:cartId', async (req, res, next) => {
   try {
-    const cartId = req.params.cartId;
+    const { cartId } = req.params;
+    const { include } = req.query;
 
-    const cart = await db.carts.getCartById(cartId);
+    const cart = await db.carts.getCartById(cartId, include);
+
+    res.json(cart);
+
+  } catch (err) {
+    next(err);
+  }
+});
+
+// get a cart by its user ID.
+router.get('/users/:userId', async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    const cart = await db.carts.getCartByUserId(userId);
 
     res.json(cart);
 
@@ -29,6 +34,8 @@ router.get('/:cartId', async (req, res, next) => {
 // Create new cart
 router.post('/', async (req, res, next) => {
   try {
+    console.log('Hello user id:');
+    console.log(req.user);
     const userId = req.user.id;
     const items = req.body.items;
 
@@ -91,7 +98,7 @@ router.delete('/:cartId/items/:productId', async (req, res, next) => {
 router.delete('/:cartId/items', async (req, res, next) => {
   try {
     const cartId = parseInt(req.params.cartId);
-    
+
     await db.carts.clearCart(cartId);
 
     res.status(204).send();
@@ -129,6 +136,5 @@ router.post('/:cartId/checkout', async (req, res, next) => {
     next(err);
   }
 });
-
 
 module.exports = router;

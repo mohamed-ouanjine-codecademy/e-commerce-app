@@ -87,11 +87,15 @@ const products = {
     }
   },
 
-  getProductById: async function (productId) {
-    const client = await pool.connect();
+  getProductById: async function (productId, client = null) {
+    let shouldRelease = false;
+    if (!client) {
+      client = await pool.connect();
+      shouldRelease = true;
+    }
 
     try {
-      await client.query('BEGIN');
+      shouldRelease && await client.query('BEGIN');
 
       const results = await client.query(`
         SELECT *
@@ -105,16 +109,16 @@ const products = {
       // retrieve product's categories and attach it to product object
       product.categoriesId = await this.getProductCategories(client, productId);
 
-      await client.query('COMMIT');
+      shouldRelease && await client.query('COMMIT');
 
       return product;
 
     } catch (err) {
-      await client.query('ROLLBACK');
+      shouldRelease && await client.query('ROLLBACK');
       throw err;
 
     } finally {
-      client.release();
+      shouldRelease && client.release();
     }
   },
 
