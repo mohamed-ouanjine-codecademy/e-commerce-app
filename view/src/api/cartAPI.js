@@ -46,15 +46,27 @@ export const AddItemToCartAPI = async (cartId, productId, quantity, include) => 
       `${BASE_URL}/${cartId}/items?include=${encodeURIComponent(include)}`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId,
           quantity
         })
       }
     );
+
+    return await handleResponse(response);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const removeItemFromCartAPI = async (cartId, productId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${cartId}/items/${productId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cartId, productId })
+    });
 
     return await handleResponse(response);
   } catch (error) {

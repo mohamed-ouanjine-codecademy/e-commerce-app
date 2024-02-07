@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { createCartAPI, getCartByUserIdAPI, getCartByIdAPI, AddItemToCartAPI } from "../../api/cartAPI";
+import { createCartAPI, getCartByUserIdAPI, getCartByIdAPI, AddItemToCartAPI, removeItemFromCartAPI } from "../../api/cartAPI";
 
 export const createCart = createAsyncThunk(
   'cart/createCart',
@@ -59,6 +59,20 @@ export const addItemToCartAsync = createAsyncThunk(
 // // Update item quantity
 // export const UpdateItemQuantity
 
+// remove item from cart
+export const removeItemFromCartAsync = createAsyncThunk(
+  'cart/removeItemFromCartAsync',
+  async ({ cartId, productId }) => {
+    try {
+      const response = await removeItemFromCartAPI(cartId, productId);
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+)
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
@@ -93,16 +107,24 @@ const cartSlice = createSlice({
     addItemAsyncPending: false,
     addItemAsyncFulfilled: false,
     addItemAsyncRejected: false,
+
+    removeItemFromCartAsyncPending: false,
+    removeItemFromCartAsyncFulfilled: false,
+    removeItemFromCartAsyncRejected: false,
   },
   reducers: {
     addItemToCartSync: (state, action) => {
       const product = action.payload;
       const productIndex = state.items.findIndex(item => item.productId === product.productId);
-      if (productIndex !== -1){
+      if (productIndex !== -1) {
         state.items[productIndex].quantity += 1;
       } else {
         state.items.push(product);
       }
+    },
+    removeItemFromCartSync: (state, action) => {
+      const product = action.payload;
+      state.items = state.items.filter(item => item.productId !== product.productId);
     }
   },
   extraReducers: (builder) => {
@@ -182,8 +204,27 @@ const cartSlice = createSlice({
         state.addItemAsyncFulfilled = false;
         state.addItemAsyncRejected = true;
       })
+      // remove item from cart (addItemToCartAsync)
+      .addCase(removeItemFromCartAsync.pending, (state) => {
+        state.removeItemFromCartAsyncPending = true;
+        state.removeItemFromCartAsyncFulfilled = false;
+        state.removeItemFromCartAsyncRejected = false;
+      })
+      .addCase(removeItemFromCartAsync.fulfilled, (state, action) => {
+        const product = action.payload.product;
+        state.items = state.items.filter(item => item.productId !== product.id);
+
+        state.removeItemFromCartAsyncPending = false;
+        state.removeItemFromCartAsyncFulfilled = true;
+        state.removeItemFromCartAsyncRejected = false;
+      })
+      .addCase(removeItemFromCartAsync.rejected, (state) => {
+        state.removeItemFromCartAsyncPending = false;
+        state.removeItemFromCartAsyncFulfilled = false;
+        state.removeItemFromCartAsyncRejected = true;
+      })
   }
 });
 
-export const { addItemToCartSync } = cartSlice.actions;
+export const { addItemToCartSync, removeItemFromCartSync } = cartSlice.actions;
 export default cartSlice.reducer;
