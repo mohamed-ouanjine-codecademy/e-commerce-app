@@ -80,7 +80,7 @@ const carts = {
     }
   },
 
-  getCartByUserId: async function (userId) {
+  getCartByUserId: async function (userId, include) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
@@ -96,7 +96,7 @@ const carts = {
       const cart = help.checkExistence(results, 'Cart');
       const cartId = cart.id;
       // get all row (product_id, quantity) related to the cart in carts_products table
-      const cartItems = await this.helpers.getItemsBycartId(client, cartId);
+      const cartItems = await this.helpers.getItemsBycartId(client, cartId, include);
 
       await client.query('COMMIT');
 
@@ -110,7 +110,7 @@ const carts = {
     }
   },
 
-  addItemToCart: async function (cartId, item) {
+  addItemToCart: async function (cartId, item, include) {
     const client = await pool.connect();
     try {
       if ((typeof cartId != 'number') || (typeof item != 'object')) {
@@ -128,7 +128,7 @@ const carts = {
         [cartId, item.productId, item.quantity]
       );
       // get all row (product_id, quantity) related to the cart in carts_products table
-      const items = await this.helpers.getItemsBycartId(client, cartId);
+      const items = await this.helpers.getItemsBycartId(client, cartId, include);
 
       await client.query('COMMIT');
 
@@ -353,7 +353,7 @@ const carts = {
           return {
             productId: product_id,
             quantity,
-            product,
+            productInfo: product,
           };
         })
       );

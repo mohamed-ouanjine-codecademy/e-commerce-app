@@ -21,8 +21,9 @@ router.get('/:cartId', async (req, res, next) => {
 router.get('/users/:userId', async (req, res, next) => {
   try {
     const { userId } = req.params;
+    const { include } = req.query;
 
-    const cart = await db.carts.getCartByUserId(userId);
+    const cart = await db.carts.getCartByUserId(userId, include);
 
     res.json(cart);
 
@@ -53,8 +54,9 @@ router.post('/:cartId/items', async (req, res, next) => {
   try {
     const cartId = parseInt(req.params.cartId);
     const item = req.body;
+    const include = req.query.include;
 
-    const updatedCart = await db.carts.addItemToCart(cartId, item);
+    const updatedCart = await db.carts.addItemToCart(cartId, item, include);
 
     res.status(201).json(updatedCart);
 

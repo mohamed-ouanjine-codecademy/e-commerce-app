@@ -1,4 +1,5 @@
 import React from 'react';
+import { AddToCartButton } from '../AddToCartButton';
 
 export function ProductItem({ className, product }) {
   return (
@@ -9,7 +10,7 @@ export function ProductItem({ className, product }) {
           <h5 className="card-title">{product.name}</h5>
           <h6 className="card-subtitle mb-2 text-body-secondary">{product.price}</h6>
           <p className="card-text">{product.description}</p>
-          <a href="#" className="btn btn-primary">Add to Cart</a>
+          <AddToCartButton product={product} />
         </div>
       </div>
     </>

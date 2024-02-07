@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getCartById, getCartByUserId } from './cartSlice';
 import { CartItem } from '../../components/cartItem/CartItem';
 import { PrototypeProductItem } from '../../components/ProductItem/PrototypeProductItme';
-import { Navigate } from 'react-router-dom';
 
 export function Cart() {
   const isSignedIn = useSelector((state) => state.signIn.signInFulfilled);
@@ -29,35 +28,25 @@ export function Cart() {
   // Retrieve cart
   useEffect(() => {
     const getCartByUserIdFunc = async () => {
-      await dispatch(getCartByUserId({ userId }));
+      await dispatch(getCartByUserId({ userId, include: true }));
     };
-    getCartByUserIdFunc();
+    isSignedIn && getCartByUserIdFunc();
   }, []);
 
   useEffect(() => {
     const getCartByIdFunc = async () => {
-      if (cartId) {
-        await dispatch(getCartById({ cartId, include: true }));
-      }
+      await dispatch(getCartById({ cartId, include: true }));
     };
-    getCartByIdFunc();
+    (cartId !== 0) && getCartByIdFunc();
   }, [cartId]);
 
   const renderItems = () => {
-    if (getCartByIdFulfilled) {
-      return items.map((item, i) => (
-        <div key={i}>
-          <CartItem item={item} />
-        </div>
-      ));
-    } else {
-      return null; // Or a placeholder if needed
-    }
+    return items.map((item, i) => (
+      <div key={i}>
+        <CartItem item={item} />
+      </div>
+    ));
   };
-
-  if (!isSignedIn) {
-    return <Navigate to="/user/sign-in" />;
-  }
 
   return (
     <>

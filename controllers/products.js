@@ -61,9 +61,9 @@ const products = {
   getProducts: async function () {
     try {
       const results = await pool.query('SELECT * FROM products');
-
-      return results.rows;
-
+      const products  = help.transformKeys(results.rows);
+      
+      return products;
     } catch (err) {
       throw err
     }

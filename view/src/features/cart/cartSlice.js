@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { createCartAPI, getCartByUserIdAPI, getCartByIdAPI } from "../../api/cartAPI";
+import { createCartAPI, getCartByUserIdAPI, getCartByIdAPI, AddItemToCartAPI } from "../../api/cartAPI";
 
 export const createCart = createAsyncThunk(
   'cart/createCart',
@@ -17,9 +17,9 @@ export const createCart = createAsyncThunk(
 // Get cart by user ID
 export const getCartByUserId = createAsyncThunk(
   'cart/getCartByUserId',
-  async ({ userId }) => {
+  async ({ userId, include }) => {
     try {
-      const cart = await getCartByUserIdAPI(userId);
+      const cart = await getCartByUserIdAPI(userId, include);
 
       return cart;
     } catch (error) {
@@ -40,28 +40,44 @@ export const getCartById = createAsyncThunk(
       throw error;
     }
   }
-)
+);
+
+// Add to cart Async
+export const addItemToCartAsync = createAsyncThunk(
+  'cart/addItemToCartAsync',
+  async ({ cartId, productId, quantity, include }) => {
+    try {
+      const cart = await AddItemToCartAPI(cartId, productId, quantity, include);
+
+      return cart
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+// // Update item quantity
+// export const UpdateItemQuantity
 
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
     id: 0,
     items: [
-      {
-        productId: 0,
-        quantity: 0,
-        product: {
-          id: 0,
-          name: "",
-          description: "",
-          price: "",
-          imageUrl: "",
-          cloudinaryId: "",
-          categoriesId: []
-        }
-      }
+      // {
+      //   productId: 0,
+      //   quantity: 0,
+      //   productInfo: {
+      //     id: 0,
+      //     name: "",
+      //     description: "",
+      //     price: "",
+      //     imageUrl: "",
+      //     cloudinaryId: "",
+      //     categoriesId: []
+      //   }
+      // }
     ],
-
     createCartPending: false,
     createCartFulfilled: false,
     createCartRejected: false,
@@ -74,6 +90,20 @@ const cartSlice = createSlice({
     getCartByIdFulfilled: false,
     getCartByIdRejected: false,
 
+    addItemAsyncPending: false,
+    addItemAsyncFulfilled: false,
+    addItemAsyncRejected: false,
+  },
+  reducers: {
+    addItemToCartSync: (state, action) => {
+      const product = action.payload;
+      const productIndex = state.items.findIndex(item => item.productId === product.productId);
+      if (productIndex !== -1){
+        state.items[productIndex].quantity += 1;
+      } else {
+        state.items.push(product);
+      }
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -136,7 +166,24 @@ const cartSlice = createSlice({
         state.getCartByIdFulfilled = false;
         state.getCartByIdRejected = true;
       })
+      // add item to cart (addItemToCartAsync)
+      .addCase(addItemToCartAsync.pending, (state) => {
+        state.addItemAsyncPending = true;
+        state.addItemAsyncFulfilled = false;
+        state.addItemAsyncRejected = false;
+      })
+      .addCase(addItemToCartAsync.fulfilled, (state, action) => {
+        state.addItemAsyncPending = false;
+        state.addItemAsyncFulfilled = true;
+        state.addItemAsyncRejected = false;
+      })
+      .addCase(addItemToCartAsync.rejected, (state) => {
+        state.addItemAsyncPending = false;
+        state.addItemAsyncFulfilled = false;
+        state.addItemAsyncRejected = true;
+      })
   }
 });
 
+export const { addItemToCartSync } = cartSlice.actions;
 export default cartSlice.reducer;
