@@ -10,8 +10,10 @@ export function ProductList() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(loadProducts());
-  }, []);
+    if (!products.length) {
+      dispatch(loadProducts());
+    }
+  }, [products, dispatch]);
 
   return (
     <>
