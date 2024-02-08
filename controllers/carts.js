@@ -153,12 +153,24 @@ const carts = {
       // check if the cart exist
       await this.getCartById(cartId);
 
-      await pool.query(`
+      const results = await pool.query(`
         DELETE FROM carts_products
         WHERE cart_id = $1
           AND product_id = $2;`,
         [cartId, productId]
       );
+
+      return {
+        data: {
+          product: {
+            id: productId
+          },
+          cart: {
+            id: cartId
+          }
+        },
+        message: 'product deleted successfully'
+      }
 
     } catch (err) {
       throw err;

@@ -607,8 +607,22 @@ paths:
         - $ref: "#/components/parameters/cartId"
         - $ref: "#/components/parameters/productId"
       responses:
-        "204":
+        "200":
           description: successful deletion
+          content:
+            application/json:
+              example: |-
+                {
+                  "data": {
+                    "product": {
+                      "id": 1
+                    },
+                    "cart": {
+                      "id": 1
+                    }
+                  },
+                  "message": "product deleted successfully"
+                }
         "404":
           $ref: "#/components/responses/NotFoundCart"
 

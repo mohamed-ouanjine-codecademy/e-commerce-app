@@ -87,9 +87,9 @@ router.delete('/:cartId/items/:productId', async (req, res, next) => {
     const cartId = parseInt(req.params.cartId);
     const productId = parseInt(req.params.productId);
 
-    await db.carts.deleteItemFromCart(cartId, productId);
+    const result = await db.carts.deleteItemFromCart(cartId, productId);
 
-    res.status(204).send();
+    res.json(result);
 
   } catch (err) {
     next(err);
