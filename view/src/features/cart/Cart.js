@@ -49,6 +49,7 @@ export function Cart() {
     return items.map((item, i) => (
       <div key={i} >
         <CartItem
+          className={'col'}
           item={item}
           onRemove={async () => {
             if (cartId !== 0) {
@@ -67,17 +68,23 @@ export function Cart() {
 
   return (
     <>
-      <h1>My Cart</h1>
-      {(getCartByUserIdPending || getCartByIdPending) && (
-        Array.from({ length: 6 }, (_, i) =>
-          <div key={i}>
-            <PrototypeProductItem />
-          </div>
-        )
-      )}
-      {renderItems()}
-      {getCartByUserIdRejected && <p>Error: {getCartByUserIdRejected.message}</p>}
-      {getCartByIdRejected && <p>Error: {getCartByIdRejected.message}</p>}
+      <div className='container-fluid'>
+        <div className='row'>
+          <h1 className='col'>My Cart</h1>
+        </div>
+        <div className='row row-cols-1'>
+          {(getCartByUserIdPending || getCartByIdPending) && (
+            Array.from({ length: 6 }, (_, i) =>
+              <div key={i}>
+                <PrototypeProductItem className={'col'}/>
+              </div>
+            )
+          )}
+          {renderItems()}
+          {getCartByUserIdRejected && <p>Error: {getCartByUserIdRejected}</p>}
+          {getCartByIdRejected && <p>Error: {getCartByIdRejected}</p>}
+        </div>
+      </div>
     </>
   );
 }

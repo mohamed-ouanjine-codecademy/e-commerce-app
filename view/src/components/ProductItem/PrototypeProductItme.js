@@ -21,7 +21,7 @@ export function PrototypeProductItem({ className }) {
           <a href="#" class="btn btn-primary disabled placeholder" aria-disabled="true">Add to Cart</a>
         </div>
       </div> */}
-      <div className="card" aria-hidden="true">
+      <div className={`${className} card`} aria-hidden="true">
         <img src={placeholderImage} className="card-img-top" alt="placeholder image" />
         <div className="card-body">
           <h5 className="card-title placeholder-glow">

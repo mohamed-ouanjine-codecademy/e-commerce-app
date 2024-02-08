@@ -17,7 +17,7 @@ export function ProductList() {
 
   return (
     <>
-      <div className="container-fluid g-2">
+      <div className="container-fluid">
         <div className="row">
           <h2 className="col">Products</h2>
         </div>
