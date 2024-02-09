@@ -123,11 +123,16 @@ router.post('/register', hashPassword, async (req, res, next) => {
   try {
     const { email } = req.body;
     const password  = req.hashedPassword;
-    const userInfo = { email, password };
 
-    const newUser = await db.users.createUser(userInfo);
+    const response = await db.users.createUserAndCart(email, password);
+    const newUser = response.user;
 
-    res.status(201).json(newUser);
+    res.status(201).json({
+      id: newUser.id,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      address: newUser.address,
+    });
   } catch (err) {
     next(err);
   }

@@ -3,14 +3,18 @@ const help = require('./helperFunctions.js');
 const products = require('./products.js');
 
 const carts = {
-  createCart: async function (userId, items) {
-    const client = await pool.connect();
+  createCart: async function (client, userId, items) {
+    const shouldRelease = client ? false : true;
     try {
+      if (shouldRelease) {
+        client = await pool.connect();
+      }
+
       if (typeof userId !== 'number') {
         throw new Error('Invalid input data; userid MUST be a number.');
       }
 
-      await client.query('BEGIN');
+      shouldRelease && await client.query('BEGIN');
 
       // Create new cart
       const results = await client.query(`
@@ -33,16 +37,16 @@ const carts = {
         newCart.items = [items[0]];
       }
 
-      await client.query('COMMIT');
+      shouldRelease && await client.query('COMMIT');
 
       return help.transformKeys(newCart);
 
     } catch (err) {
-      await client.query('ROLLBACK');
+      shouldRelease && await client.query('ROLLBACK');
       throw err;
 
     } finally {
-      client.release()
+      shouldRelease && client.release()
     }
   },
 
@@ -358,7 +362,7 @@ const carts = {
         WHERE cart_id = $1;`,
         [cartId]
       );
-      
+
       const cartItems = await Promise.all(
         results.rows.map(async ({ product_id, quantity }) => {
           const product = include ? await products.getProductById(product_id, client) : null;

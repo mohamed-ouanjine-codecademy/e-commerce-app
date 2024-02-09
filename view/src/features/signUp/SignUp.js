@@ -7,8 +7,7 @@ import { SignForm } from "../../components/SignForm";
 import { Navigate, useNavigate } from "react-router-dom";
 
 export function SignUp() {
-  const email = useSelector(state => state.signUp.user.email);
-  const password = useSelector(state => state.signUp.user.password);
+  const {id: userId, email, password } = useSelector(state => state.signUp.user);
   const isEmailAvailable = useSelector(state => state.signUp.isEmailAvailable);
   const checkEmailPending = useSelector(state => state.signUp.checkEmailPending);
   const checkEmailFulfilled = useSelector(state => state.signUp.checkEmailFulfilled);
@@ -16,8 +15,6 @@ export function SignUp() {
   const registerUserFulfilled = useSelector(state => state.signUp.registerUserFulfilled);
   const signInPending = useSelector(state => state.signIn.signInPending);
   const signInFulfilled = useSelector(state => state.signIn.signInFulfilled);
-  const createCartPending = useSelector(state => state.cart.createCartPending);
-  const createCartFulfilled = useSelector(state => state.cart.createCartFulfilled);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -33,33 +30,35 @@ export function SignUp() {
     const registerUser = async () => {
       // Register User
       await dispatch(register({ email, password }));
-      dispatch(setCheckEmailDefault());
+      // dispatch(setCheckEmailDefault());
     }
     if (isEmailAvailable && checkEmailFulfilled) registerUser();
-  }, [isEmailAvailable, checkEmailFulfilled]);
+  }, [isEmailAvailable, checkEmailFulfilled, dispatch]);
 
   // Sign In user & create cart
   useEffect(() => {
-    const signInUserAndCartCart = async () => {
-      // Sign In user auto
-      await dispatch(signIn({ email, password }));
-      // Create Cart
-      await dispatch(createCart());
+    const signInFunc = async () => {
+      try {
+        // Sign In user auto
+        await dispatch(signIn({ email, password }));
+      } catch (error) {
+        throw error;
+      }
     }
-    if (registerUserFulfilled) signInUserAndCartCart();
-  }, [registerUserFulfilled]);
+    if (registerUserFulfilled) signInFunc();
+  }, [registerUserFulfilled, dispatch]);
 
   // Redirect user
   useEffect(() => {
-    if (createCartFulfilled) {
+    if (signInFulfilled) {
       // Redirect user to /user/info (page to get user info)
       navigate('/user/info');
     }
-  }, [createCartFulfilled]);
+  }, [signInFulfilled]);
 
   // Submit message handler
   const handleSubmitMessage = () => {
-    if (checkEmailPending || registerUserPending || signInPending || createCartPending) {
+    if (checkEmailPending || registerUserPending || signInPending) {
       return 'Pending ...';
     }
     return 'Sign Up';

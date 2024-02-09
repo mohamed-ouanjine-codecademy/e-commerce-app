@@ -35,13 +35,11 @@ router.get('/users/:userId', async (req, res, next) => {
 // Create new cart
 router.post('/', async (req, res, next) => {
   try {
-    console.log('Hello user id:');
-    console.log(req.user);
-    const userId = req.user.id;
-    const items = req.body.items;
+    // const userId = req.user.id;
+    const { userId, items } = req.body;
 
     // Create a new cart with the user's ID
-    const newCart = await db.carts.createCart(userId, items);
+    const newCart = await db.carts.createCart(parseInt(userId), items);
 
     res.status(201).json(newCart);
   } catch (error) {

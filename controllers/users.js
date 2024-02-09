@@ -1,12 +1,20 @@
 const pool = require('../models/database.js');
 const help = require('./helperFunctions.js');
+const carts = require('./carts.js');
 
 const users = {
-  createUser: async function (userInfo) {
+  createUser: async function (client, userInfo) {
+    const shouldRelease = client ? false : true;
     try {
+      if (shouldRelease) {
+        client = await pool.connect();
+      }
+
       if (!userInfo.email || !userInfo.password) {
         throw new Error('Invalid input data');
       }
+
+      shouldRelease && await client.query('BEGIN');
 
       // Check email availability
       const isEmailAvailable = await this.checkEmailAvailability(userInfo.email);
@@ -16,18 +24,52 @@ const users = {
       }
 
       // Register user
-      const results = await pool.query(`
+      const results = await client.query(`
         INSERT INTO users (email, password) VALUES
           ($1, $2)
         RETURNING *`,
         [userInfo.email, userInfo.password]);
 
-      const newUser = results.rows[0];
+      shouldRelease && await client.query('COMMIT');
 
+      const newUser = results.rows[0];
       return help.transformKeys(newUser);
 
     } catch (err) {
+      shouldRelease && await client.query('ROLLBACK');
       throw err;
+    } finally {
+      shouldRelease && client.release();
+    }
+  },
+
+  createUserAndCart: async function (userEmail, userPassword) {
+    const client = await pool.connect();
+    try {
+
+      await client.query('BEGIN');
+      // Create user.
+      const newUser = await this.createUser(client, {
+        email: userEmail, password: userPassword
+      });
+      // Create a cart for the user.
+      const newCart = await carts.createCart(client, newUser.id);
+
+      await client.query('COMMIT');
+
+      const response = help.transformKeys({
+        user: newUser,
+        cart: newCart
+      });
+
+      return response;
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+
+    } finally {
+      client.release();
     }
   },
 
@@ -42,7 +84,7 @@ const users = {
         FROM users
         WHERE email = $1;`,
         [email]);
-      
+
       return results.rows.length === 0;
 
     } catch (err) {

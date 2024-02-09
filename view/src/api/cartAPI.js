@@ -2,7 +2,7 @@ import { handleResponse } from "./utilities";
 
 const BASE_URL = '/api/carts';
 
-export const createCartAPI = async (items) => {
+export const createCartAPI = async (userId, items) => {
   try {
     const response = await fetch(`${BASE_URL}`, {
       method: 'POST',
@@ -10,6 +10,7 @@ export const createCartAPI = async (items) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        userId,
         items: items
       })
     });

@@ -21,10 +21,7 @@ export const register = createAsyncThunk(
   async ({ email, password }) => {
     try {
       const newUser = await registerUser(email, password);
-      return {
-        email: newUser.email,
-        password
-      };
+      return newUser;
     } catch (error) {
       throw error;
     }
@@ -59,18 +56,6 @@ export const signUpSlice = createSlice({
     },
     clearPassword: (state) => {
       state.user.password = '';
-    },
-    setRegisterDefault: (state) => {
-      state.isRegistered = false;
-      state.registerUserPending = false;
-      state.registerUserFulfilled = false;
-      state.registerUserRejected = false;
-    },
-    setCheckEmailDefault: (state) => {
-      state.isEmailAvailable = true;
-      state.checkEmailPending = false;
-      state.checkEmailFulfilled = false;
-      state.checkEmailRejected = false;
     }
   },
   extraReducers: (builder) => {
@@ -100,7 +85,11 @@ export const signUpSlice = createSlice({
         state.registerUserRejected = false;
       })
       .addCase(register.fulfilled, (state, action) => {
-        state.user = action.payload;
+        const user = action.payload;
+        state.user = {
+          ...state.user,
+          ...user
+        };
         state.isRegistered = true;
 
         state.registerUserPending = false;
@@ -120,8 +109,6 @@ export const {
   clearEmail,
   setPassword,
   clearPassword,
-  setRegisterDefault,
-  setCheckEmailDefault
 } = signUpSlice.actions;
 
 export default signUpSlice.reducer;

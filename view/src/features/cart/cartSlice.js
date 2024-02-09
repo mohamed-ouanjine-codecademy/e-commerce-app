@@ -3,9 +3,9 @@ import { createCartAPI, getCartByUserIdAPI, getCartByIdAPI, AddItemToCartAPI, re
 
 export const createCart = createAsyncThunk(
   'cart/createCart',
-  async () => {
+  async ({ userId }) => {
     try {
-      const cart = await createCartAPI();
+      const cart = await createCartAPI(userId);
 
       return cart;
     } catch (error) {
