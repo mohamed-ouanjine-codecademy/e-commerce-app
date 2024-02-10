@@ -1,6 +1,6 @@
 import { handleResponse } from './utilities';
 
-const BASE_URL = "/api";
+const BASE_URL = "/api/auth";
 
 export const checkEmailAvailability = async (email) => {
   try {
@@ -32,7 +32,7 @@ export const registerUser = async (email, password) => {
 
 export const signInUser = async (email, password) => {
   try {
-    const response = await fetch(`${BASE_URL}/sign-in`, {
+    const response = await fetch(`${BASE_URL}/login/password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

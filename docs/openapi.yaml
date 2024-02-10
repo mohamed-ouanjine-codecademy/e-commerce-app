@@ -6,7 +6,7 @@ info:
   description: A basic API for an e-commerce app
 
 paths:
-  /register:
+  auth/register:
     post:
       tags:
         - Users
@@ -38,7 +38,7 @@ paths:
                   "password": "hashed password"
                 }
 
-  /sign-in:
+  auth/login/password:
     post:
       tags:
         - Users

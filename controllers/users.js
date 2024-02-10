@@ -125,7 +125,7 @@ const users = {
         WHERE id = $1;`,
         [id]);
 
-      return callback(null, results.rows[0]);
+      return callback(null, help.transformKeys(results.rows[0]));
 
     } catch (err) {
       callback(err);
