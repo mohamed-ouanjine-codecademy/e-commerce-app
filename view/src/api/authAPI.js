@@ -2,6 +2,15 @@ import { handleResponse } from './utilities';
 
 const BASE_URL = "/api/auth";
 
+export const checkAuthenticationAPI = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/is-authenticated`);
+
+    return await handleResponse(response);
+  } catch (error) {
+    throw error;
+  }
+}
 export const checkEmailAvailability = async (email) => {
   try {
     const response = await fetch(`${BASE_URL}/check-email?email=${encodeURIComponent(email)}`);
@@ -30,7 +39,7 @@ export const registerUser = async (email, password) => {
   }
 };
 
-export const signInUser = async (email, password) => {
+export const signInUserAPI = async (email, password) => {
   try {
     const response = await fetch(`${BASE_URL}/login/password`, {
       method: 'POST',

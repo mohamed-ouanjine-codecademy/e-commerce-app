@@ -98,9 +98,12 @@ const carts = {
 
       // check if the cart exist
       const cart = help.checkExistence(results, 'Cart');
-      const cartId = cart.id;
       // get all row (product_id, quantity) related to the cart in carts_products table
-      const cartItems = await this.helpers.getItemsBycartId(client, cartId, include);
+      let cartItems;
+      if (include) {
+        const cartId = cart.id;
+        cartItems = await this.helpers.getItemsBycartId(client, cartId, include);
+      }
 
       await client.query('COMMIT');
 
@@ -114,15 +117,16 @@ const carts = {
     }
   },
 
-  addItemToCart: async function (cartId, item, include) {
+  addItemToCart: async function (userId, item, include) {
     const client = await pool.connect();
     try {
-      if ((typeof cartId != 'number') || (typeof item != 'object')) {
+      if ((typeof userId != 'number') || (typeof item != 'object')) {
         throw new Error('Invalid input data; cartId must be a number and items must be an array');
       }
 
       // check if the cart exist
-      await this.getCartById(cartId);
+      const cart = await this.getCartByUserId(userId, false);
+      const cartId = cart.id;
 
       await client.query('BEGIN');
 

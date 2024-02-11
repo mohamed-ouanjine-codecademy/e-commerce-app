@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RouterProvider, createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
 // components
 import { Root } from '../components/Root';
@@ -7,6 +7,8 @@ import { SignUp } from '../features/signUp/SignUp';
 import { SignIn } from '../features/signIn/SignIn';
 import { Profile } from '../features/profile/Profile';
 import { Cart } from '../features/cart/Cart';
+import { useDispatch } from 'react-redux';
+import { checkAuthentication } from '../features/signIn/signInSlice';
 
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<Root />}>
@@ -19,6 +21,13 @@ const router = createBrowserRouter(createRoutesFromElements(
 ));
 
 function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const checkAuthenticationFunc = async () => {
+      await dispatch(checkAuthentication());
+    }
+    checkAuthenticationFunc()
+  }, [dispatch])
   return (
     <RouterProvider router={router} />
   );

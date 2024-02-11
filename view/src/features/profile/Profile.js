@@ -5,8 +5,10 @@ import { Navigate } from "react-router-dom";
 import { UserProfile } from "../../components/UserProfile";
 
 export function Profile() {
-  const loadProfileInfoPending = useSelector(state => state.profile.loadProfileInfoPending);
-  const loadProfileInfoRejected = useSelector(state => state.profile.loadProfileInfoRejected);
+  const {
+    isPending: loadProfileInfoPending,
+    isRejected: loadProfileInfoRejected,
+  } = useSelector(state => state.profile.loadProfileInfo);
   const user = useSelector(state => state.profile.user);
   const dispatch = useDispatch();
 

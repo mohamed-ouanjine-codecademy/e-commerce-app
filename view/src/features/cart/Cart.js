@@ -5,45 +5,28 @@ import { CartItem } from '../../components/cartItem/CartItem';
 import { PrototypeProductItem } from '../../components/ProductItem/PrototypeProductItme';
 
 export function Cart() {
-  const isSignedIn = useSelector(state => state.signIn.signInFulfilled);
-  const userId = useSelector(state => state.userInfo.user.id);
   const cartId = useSelector(state => state.cart.id);
   const items = useSelector(state => state.cart.items);
-  const getCartByUserIdPending = useSelector(
-    state => state.cart.getCartByUserIdPending
-  );
-  const getCartByIdPending = useSelector((state) => state.cart.getCartByIdPending);
-  const getCartByUserIdFulfilled = useSelector(
-    state => state.cart.getCartByUserIdFulfilled
-  );
-  const getCartByIdFulfilled = useSelector(
-    state => state.cart.getCartByIdFulfilled
-  );
-  const getCartByUserIdRejected = useSelector(
-    state => state.cart.getCartByUserIdRejected
-  );
-  const getCartByIdRejected = useSelector(state => state.cart.getCartByIdRejected);
-  //
-  const removeItemFromCartAsyncPending = useSelector(
-    state => state.cart.removeItemFromCartAsyncPending
-  );
+  const {
+    getCartByUserIdPending,
+    removeItemFromCartAsyncPending
+  } = useSelector(state => state.cart.isPending);
+  const {
+    getCartByUserIdFulfilled
+  } = useSelector(state => state.cart.isFulfilled);
+  const {
+    getCartByUserIdRejected
+  } = useSelector(state => state.cart.isRejected);
+
   const dispatch = useDispatch();
 
   // Retrieve cart
   useEffect(() => {
     const getCartByUserIdFunc = async () => {
-      await dispatch(getCartByUserId({ userId, include: true }));
+      await dispatch(getCartByUserId({ include: true }));
     };
-    isSignedIn && getCartByUserIdFunc();
-  }, []);
-
-  useEffect(() => {
-    const getCartByIdFunc = async () => {
-      await dispatch(getCartById({ cartId, include: true }));
-    };
-    (cartId !== 0) && getCartByIdFunc();
-  }, [cartId]);
-
+    getCartByUserIdFunc();
+  }, [dispatch]);
 
   const renderItems = () => {
     return items.map((item, i) => (
@@ -73,16 +56,15 @@ export function Cart() {
           <h1 className='col'>My Cart</h1>
         </div>
         <div className='row row-cols-1'>
-          {(getCartByUserIdPending || getCartByIdPending) && (
+          {(getCartByUserIdPending) && (
             Array.from({ length: 6 }, (_, i) =>
               <div key={i}>
-                <PrototypeProductItem className={'col'}/>
+                <PrototypeProductItem className={'col'} />
               </div>
             )
           )}
-          {renderItems()}
+          {items.length !== 0 && renderItems()}
           {getCartByUserIdRejected && <p>Error: {getCartByUserIdRejected}</p>}
-          {getCartByIdRejected && <p>Error: {getCartByIdRejected}</p>}
         </div>
       </div>
     </>

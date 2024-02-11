@@ -1,22 +1,24 @@
 import React, { useEffect } from "react";
 import { SignForm } from "../../components/SignForm";
 import { useDispatch, useSelector } from "react-redux";
-import { setEmail, setPassword, signIn, setDefault } from './signInSlice';
+import { setEmail, setPassword, signInUser, setDefault } from './signInSlice';
 import { useNavigate } from 'react-router-dom';
 // import { setUserInfo } from "../userInfo/userInfoSlice";
 
 export function SignIn() {
   const email = useSelector(state => state.signIn.user.email);
   const password = useSelector(state => state.signIn.user.password);
-  const signInPending = useSelector(state => state.signIn.signInPending);
-  const signInFulfilled = useSelector(state => state.signIn.signInFulfilled);
-  const signInRejected = useSelector(state => state.signIn.signInRejected);
+  const {
+    isPending: signInPending,
+    isFulfilled: signInFulfilled,
+    isRejected: signInRejected
+  } = useSelector(state => state.signIn.signInUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await dispatch(signIn({ email, password }));
+    await dispatch(signInUser({ email, password }));
   }
 
   useEffect(() => {

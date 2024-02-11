@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { setEmail, setPassword, checkEmail, setCheckEmailDefault, register } from "./signUpSlice";
-import { signIn } from "../signIn/signInSlice";
+import { signInUser } from "../signIn/signInSlice";
 import { createCart } from "../cart/cartSlice";
 import { SignForm } from "../../components/SignForm";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -40,7 +40,7 @@ export function SignUp() {
     const signInFunc = async () => {
       try {
         // Sign In user auto
-        await dispatch(signIn({ email, password }));
+        await dispatch(signInUser({ email, password }));
       } catch (error) {
         throw error;
       }

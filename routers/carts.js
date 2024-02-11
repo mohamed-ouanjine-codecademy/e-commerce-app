@@ -2,6 +2,25 @@ const router = require('express').Router();
 
 const db = require('../controllers');
 
+// get authenticated user cart
+router.get('/cart', async (req, res, next) => {
+  try {
+    if (req.isAuthenticated) {
+      userId = req.user.id;
+      include = req.query.include;
+
+      const cart  = await db.carts.getCartByUserId(userId, include);
+
+      return res.json({  status: 'success', data: { ...cart } })
+    }
+    res.status(401).json({
+      status: 'error',
+      message: 'Unauthorized'
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 // get a cart by its ID (cartId).
 router.get('/:cartId', async (req, res, next) => {
   try {
@@ -48,16 +67,22 @@ router.post('/', async (req, res, next) => {
 });
 
 // Add a new product to the specified cart, by providing productId and quantity.
-router.post('/:cartId/items', async (req, res, next) => {
+router.post('/items', async (req, res, next) => {
   try {
-    const cartId = parseInt(req.params.cartId);
-    const item = req.body;
-    const include = req.query.include;
+    if (req.isAuthenticated) {
+      // const cartId = parseInt(req.params.cartId);
+      const userId = req.user.id;
+      const item = req.body;
+      const include = req.query.include;
 
-    const updatedCart = await db.carts.addItemToCart(cartId, item, include);
+      const updatedCart = await db.carts.addItemToCart(userId, item, include);
 
-    res.status(201).json(updatedCart);
-
+      return res.status(201).json(updatedCart);
+    }
+    res.status(401).json({
+      status: 'error',
+      message: 'Unauthorized'
+    });
   } catch (err) {
     next(err);
   }

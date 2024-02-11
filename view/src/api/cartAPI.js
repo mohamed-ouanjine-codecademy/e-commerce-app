@@ -21,9 +21,9 @@ export const createCartAPI = async (userId, items) => {
   }
 }
 
-export const getCartByUserIdAPI = async (userId, include) => {
+export const getCartByUserIdAPI = async (include) => {
   try {
-    const response = await fetch(`${BASE_URL}/users/${userId}?include=${encodeURIComponent(include)}`);
+    const response = await fetch(`${BASE_URL}/cart?include=${encodeURIComponent(include)}`);
 
     return await handleResponse(response);
   } catch (error) {
@@ -41,10 +41,10 @@ export const getCartByIdAPI = async (cartId, include) => {
   }
 };
 
-export const AddItemToCartAPI = async (cartId, productId, quantity, include) => {
+export const AddItemToCartAPI = async (productId, quantity, include) => {
   try {
     const response = await fetch(
-      `${BASE_URL}/${cartId}/items?include=${encodeURIComponent(include)}`,
+      `${BASE_URL}/items?include=${encodeURIComponent(include)}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

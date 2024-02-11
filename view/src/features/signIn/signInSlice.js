@@ -1,16 +1,29 @@
-import { signInUser } from "../../api/authAPI";
+import { signInUserAPI, checkAuthenticationAPI } from "../../api/authAPI";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 
-export const signIn = createAsyncThunk(
+export const signInUser = createAsyncThunk(
   'signIn/signIn',
   async ({ email, password }) => {
     try {
-      const user = await signInUser(email, password);
+      const user = await signInUserAPI(email, password);
       return {
         ...user,
         password
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+export const checkAuthentication = createAsyncThunk(
+  'signIn/checkAuthentication',
+  async () => {
+    try {
+      const response = await checkAuthenticationAPI();
+
+      return response.data;
     } catch (error) {
       throw error;
     }
@@ -24,9 +37,21 @@ const signInSlice = createSlice({
       email: '',
       password: '',
     },
-    signInPending: false,
-    signInFulfilled: false,
-    signInRejected: false,
+    isAuthenticated: false,
+    checkAuthentication: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
+    },
+    signInUser: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
+    },
+    error: {
+      checkAuthentication: null,
+      signInUser: null
+    }
   },
   reducers: {
     setEmail: (state, action) => {
@@ -49,22 +74,43 @@ const signInSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(signIn.pending, (state) => {
-        state.signInPending = true;
-        state.signInFulfilled = false
-        state.signInRejected = false;
+      // Sing in
+      .addCase(signInUser.pending, (state) => {
+        state.signInUser.isPending = true;
+        state.signInUser.isFulfilled = false
+        state.signInUser.isRejected = false;
       })
-      .addCase(signIn.fulfilled, (state, action) => {
+      .addCase(signInUser.fulfilled, (state, action) => {
         state.user = action.payload;
 
-        state.signInPending = false;
-        state.signInFulfilled = true;
-        state.signInRejected = false;
+        state.signInUser.isPending = false;
+        state.signInUser.isFulfilled = true;
+        state.signInUser.isRejected = false;
       })
-      .addCase(signIn.rejected, (state) => {
-        state.signInPending = false;
-        state.signInFulfilled = false
-        state.signInRejected = true;
+      .addCase(signInUser.rejected, (state, action) => {
+        state.error.signInUser = action.error.message;
+        state.signInUser.isPending = false;
+        state.signInUser.isFulfilled = false
+        state.signInUser.isRejected = true;
+      })
+      // checkAuthentication
+      .addCase(checkAuthentication.pending, (state) => {
+        state.checkAuthentication.isPending = true;
+        state.checkAuthentication.isFulfilled = false
+        state.checkAuthentication.isRejected = false;
+      })
+      .addCase(checkAuthentication.fulfilled, (state, action) => {
+        state.isAuthenticated = action.payload.isAuthenticated;
+
+        state.checkAuthentication.isPending = false;
+        state.checkAuthentication.isFulfilled = true;
+        state.checkAuthentication.isRejected = false;
+      })
+      .addCase(checkAuthentication.rejected, (state, action) => {
+        state.error.checkAuthentication = action.error.message;
+        state.checkAuthentication.isPending = false;
+        state.checkAuthentication.isFulfilled = false
+        state.checkAuthentication.isRejected = true;
       })
   }
 })

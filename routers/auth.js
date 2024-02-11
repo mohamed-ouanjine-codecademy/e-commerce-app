@@ -125,6 +125,21 @@ router.post('/logout', function (req, res, next) {
   });
 });
 
+router.get('/is-authenticated', (req, res, next) => {
+  if (req.isAuthenticated()) {
+    res.json({
+      status: 'success',
+      data: {
+        isAuthenticated: true
+      }
+    });
+  } else {
+    res.status(401).json({
+      status: 'error',
+      message: 'Unauthorized'
+    });
+  }
+})
 router.get('/check-email', async (req, res, next) => {
   try {
     const { email } = req.query;

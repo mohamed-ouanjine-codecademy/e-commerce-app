@@ -41,13 +41,20 @@ const profileSlice = createSlice({
       lastName: '',
       address: '',
     },
-    loadProfileInfoPending: false,
-    loadProfileInfoFulfilled: false,
-    loadProfileInfoRejected: false,
-    isUserInfoUpdated: false,
-    updateUserInfoPending: false,
-    updateUserInfoFulfilled: false,
-    updateUserInfoRejected: false,
+    loadProfileInfo: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
+    },
+    updateUserInfo: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
+    },
+    error: {
+      loadProfileInfo: null,
+      updateUserInfo: null
+    }
   },
   reducers: {
     setUserInfo: (state, action) => {
@@ -61,46 +68,46 @@ const profileSlice = createSlice({
     },
     setAddress: (state, action) => {
       state.user.address = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
       // load info
       .addCase(loadProfileInfo.pending, (state) => {
-        state.loadProfileInfoPending = true;
-        state.loadProfileInfoFulfilled = false;
-        state.loadProfileInfoRejected = false;
+        state.loadProfileInfo.isPending = true;
+        state.loadProfileInfo.isFulfilled = false;
+        state.loadProfileInfo.isRejected = false;
       })
       .addCase(loadProfileInfo.fulfilled, (state, action) => {
         state.user = action.payload;
 
-        state.loadProfileInfoPending = false;
-        state.loadProfileInfoFulfilled = true;
-        state.loadProfileInfoRejected = false;
+        state.loadProfileInfo.isPending = false;
+        state.loadProfileInfo.isFulfilled = true;
+        state.loadProfileInfo.isRejected = false;
       })
-      .addCase(loadProfileInfo.rejected, (state) => {
-        state.loadProfileInfoPending = false;
-        state.loadProfileInfoFulfilled = false;
-        state.loadProfileInfoRejected = true;
+      .addCase(loadProfileInfo.rejected, (state, action) => {
+        state.error.loadProfileInfo = action.error.message;
+
+        state.loadProfileInfo.isPending = false;
+        state.loadProfileInfo.isFulfilled = false;
+        state.loadProfileInfo.isRejected = true;
       })
       // updated info
       .addCase(updateUserInfo.pending, (state) => {
-        state.updateUserInfoPending = true;
-        state.updateUserInfoFulfilled = false;
-        state.updateUserInfoRejected = false;
+        state.updateUserInfo.isPending = true;
+        state.updateUserInfo.isFulfilled = false;
+        state.updateUserInfo.isRejected = false;
       })
       .addCase(updateUserInfo.fulfilled, (state, action) => {
         state.user = action.payload;
-        state.isUserInfoUpdated = true;
-
-        state.updateUserInfoPending = false;
-        state.updateUserInfoFulfilled = true;
-        state.updateUserInfoRejected = false;
+        state.updateUserInfo.isPending = false;
+        state.updateUserInfo.isFulfilled = true;
+        state.updateUserInfo.isRejected = false;
       })
       .addCase(updateUserInfo.rejected, (state) => {
-        state.updateUserInfoPending = false;
-        state.updateUserInfoFulfilled = false;
-        state.updateUserInfoRejected = true;
+        state.updateUserInfo.isPending = false;
+        state.updateUserInfo.isFulfilled = false;
+        state.updateUserInfo.isRejected = true;
       })
   }
 });
