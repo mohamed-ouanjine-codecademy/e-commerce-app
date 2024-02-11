@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCartById, getCartByUserId, removeItemFromCartSync, removeItemFromCartAsync } from './cartSlice';
+import { getCartByUserId, removeItemFromCartSync, removeItemFromCartAsync } from './cartSlice';
 import { CartItem } from '../../components/cartItem/CartItem';
-import { PrototypeProductItem } from '../../components/ProductItem/PrototypeProductItme';
+import { PrototypeCartItem } from '../../components/cartItem/PrototypeCartItem';
 
 export function Cart() {
   const cartId = useSelector(state => state.cart.id);
@@ -30,9 +30,8 @@ export function Cart() {
 
   const renderItems = () => {
     return items.map((item, i) => (
-      <div key={i} >
+      <div key={i} className='col'>
         <CartItem
-          className={'col'}
           item={item}
           onRemove={async () => {
             if (cartId !== 0) {
@@ -55,11 +54,11 @@ export function Cart() {
         <div className='row'>
           <h1 className='col'>My Cart</h1>
         </div>
-        <div className='row row-cols-1'>
+        <div className='row row-cols-1 g-3'>
           {(getCartByUserIdPending) && (
             Array.from({ length: 6 }, (_, i) =>
-              <div key={i}>
-                <PrototypeProductItem className={'col'} />
+              <div key={i} className='col' style={{ height: '160px'}}>
+                <PrototypeCartItem />
               </div>
             )
           )}

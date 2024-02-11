@@ -67,9 +67,7 @@ const signInSlice = createSlice({
       state.user.password = '';
     },
     setDefault: (state) => {
-      state.signInPending = false;
-      state.signInFulfilled = false;
-      state.signInRejected = false;
+      state.isAuthenticated = false;
     }
   },
   extraReducers: (builder) => {

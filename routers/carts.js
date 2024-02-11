@@ -5,7 +5,7 @@ const db = require('../controllers');
 // get authenticated user cart
 router.get('/cart', async (req, res, next) => {
   try {
-    if (req.isAuthenticated) {
+    if (req.isAuthenticated()) {
       userId = req.user.id;
       include = req.query.include;
 
@@ -69,7 +69,7 @@ router.post('/', async (req, res, next) => {
 // Add a new product to the specified cart, by providing productId and quantity.
 router.post('/items', async (req, res, next) => {
   try {
-    if (req.isAuthenticated) {
+    if (req.isAuthenticated()) {
       // const cartId = parseInt(req.params.cartId);
       const userId = req.user.id;
       const item = req.body;
