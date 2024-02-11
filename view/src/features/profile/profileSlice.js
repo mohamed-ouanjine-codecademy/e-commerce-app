@@ -1,8 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { putUserInfo } from "../../api/usersAPI";
+import { loadProfileInfoAPI } from "../../api/authAPI";
 
 export const updateUserInfo = createAsyncThunk(
-  'userInfo/updateUserInfo',
+  'profile/updateUserInfo',
   async ({ userId, firstName, lastName, address }) => {
     try {
       const updatedUser = await putUserInfo(userId, {
@@ -18,17 +19,31 @@ export const updateUserInfo = createAsyncThunk(
   }
 );
 
-const userInfoslice = createSlice({
-  name: 'userInfo',
+export const loadProfileInfo = createAsyncThunk(
+  'profile/loadProfileInfo',
+  async () => {
+    try {
+      const response = await loadProfileInfoAPI();
+
+      return response.data; // user object
+    } catch (error) {
+      throw error;
+    }
+  }
+)
+
+const profileSlice = createSlice({
+  name: 'profile',
   initialState: {
     user: {
       id: '',
       firstName: '',
       lastName: '',
-      email: '',
       address: '',
-      password: '',
     },
+    loadProfileInfoPending: false,
+    loadProfileInfoFulfilled: false,
+    loadProfileInfoRejected: false,
     isUserInfoUpdated: false,
     updateUserInfoPending: false,
     updateUserInfoFulfilled: false,
@@ -50,7 +65,26 @@ const userInfoslice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(updateUserInfo.pending, (state, action) => {
+      // load info
+      .addCase(loadProfileInfo.pending, (state) => {
+        state.loadProfileInfoPending = true;
+        state.loadProfileInfoFulfilled = false;
+        state.loadProfileInfoRejected = false;
+      })
+      .addCase(loadProfileInfo.fulfilled, (state, action) => {
+        state.user = action.payload;
+
+        state.loadProfileInfoPending = false;
+        state.loadProfileInfoFulfilled = true;
+        state.loadProfileInfoRejected = false;
+      })
+      .addCase(loadProfileInfo.rejected, (state) => {
+        state.loadProfileInfoPending = false;
+        state.loadProfileInfoFulfilled = false;
+        state.loadProfileInfoRejected = true;
+      })
+      // updated info
+      .addCase(updateUserInfo.pending, (state) => {
         state.updateUserInfoPending = true;
         state.updateUserInfoFulfilled = false;
         state.updateUserInfoRejected = false;
@@ -63,7 +97,7 @@ const userInfoslice = createSlice({
         state.updateUserInfoFulfilled = true;
         state.updateUserInfoRejected = false;
       })
-      .addCase(updateUserInfo.rejected, (state, action) => {
+      .addCase(updateUserInfo.rejected, (state) => {
         state.updateUserInfoPending = false;
         state.updateUserInfoFulfilled = false;
         state.updateUserInfoRejected = true;
@@ -71,6 +105,6 @@ const userInfoslice = createSlice({
   }
 });
 
-export const { setUserInfo, setFirstName, setLastName, setAddress } = userInfoslice.actions;
+export const { setUserInfo, setFirstName, setLastName, setAddress } = profileSlice.actions;
 
-export default userInfoslice.reducer;
+export default profileSlice.reducer;

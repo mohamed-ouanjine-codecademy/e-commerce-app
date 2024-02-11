@@ -1,33 +1,33 @@
 import React, { useEffect } from "react";
 import { SignForm } from "../../components/SignForm";
 import { useDispatch, useSelector } from "react-redux";
-import { setEmail, setPassword, signIn } from './signInSlice';
+import { setEmail, setPassword, signIn, setDefault } from './signInSlice';
 import { useNavigate } from 'react-router-dom';
-import { setUserInfo } from "../userInfo/userInfoSlice";
+// import { setUserInfo } from "../userInfo/userInfoSlice";
 
 export function SignIn() {
   const email = useSelector(state => state.signIn.user.email);
   const password = useSelector(state => state.signIn.user.password);
-  const user = useSelector(state => state.signIn.user);
   const signInPending = useSelector(state => state.signIn.signInPending);
   const signInFulfilled = useSelector(state => state.signIn.signInFulfilled);
   const signInRejected = useSelector(state => state.signIn.signInRejected);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(signIn({ email, password }));
+    await dispatch(signIn({ email, password }));
   }
 
   useEffect(() => {
     if (signInFulfilled) {
+      dispatch(setDefault());
       // Set user info
-      dispatch(setUserInfo(user));
+      // dispatch(setUserInfo(user));
       // Redirect user to profile
       navigate('/user/profile');
     }
-  }, [signInFulfilled]);
+  }, [signInFulfilled, dispatch]);
 
   return (
     <>

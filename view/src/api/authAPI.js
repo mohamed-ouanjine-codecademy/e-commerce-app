@@ -48,3 +48,29 @@ export const signInUser = async (email, password) => {
     throw error;
   }
 };
+
+export const loadProfileInfoAPI = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/profile`, {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    return await handleResponse(response);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const logOutAPI = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    return await handleResponse(response);
+  } catch (error) {
+    throw error;
+  }
+}

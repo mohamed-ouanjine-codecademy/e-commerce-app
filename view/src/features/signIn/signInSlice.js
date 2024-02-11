@@ -24,8 +24,8 @@ const signInSlice = createSlice({
       email: '',
       password: '',
     },
-    signInFulfilled: false,
     signInPending: false,
+    signInFulfilled: false,
     signInRejected: false,
   },
   reducers: {
@@ -40,6 +40,11 @@ const signInSlice = createSlice({
     },
     clearPassword: (state) => {
       state.user.password = '';
+    },
+    setDefault: (state) => {
+      state.signInPending = false;
+      state.signInFulfilled = false;
+      state.signInRejected = false;
     }
   },
   extraReducers: (builder) => {
@@ -64,5 +69,5 @@ const signInSlice = createSlice({
   }
 })
 
-export const { setEmail, clearEmail, setPassword, clearPassword } = signInSlice.actions;
+export const { setEmail, clearEmail, setPassword, clearPassword, setDefault } = signInSlice.actions;
 export default signInSlice.reducer;
