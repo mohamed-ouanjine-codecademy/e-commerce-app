@@ -71,7 +71,7 @@ export const loadProfileInfoAPI = async () => {
   }
 }
 
-export const logOutAPI = async () => {
+export const logOutUserAPI = async () => {
   try {
     const response = await fetch(`${BASE_URL}/logout`, {
       method: 'POST',

@@ -40,10 +40,13 @@ router.use('/auth', authRouter);
 
 // root path
 router.get('/', (req, res) => {
-  if (req.user) {
+  if (req.isAuthenticated()) {
     return res.json({user: req.user});
   }
-  return res.send('Hello, this is your Express server!');
+  return res.json({
+    status: 'success',
+    data: {}
+  });
 });
 
 module.exports = router;

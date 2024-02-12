@@ -1,19 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { logOutAPI } from '../api/authAPI';
+import { LogOut } from '../features/logOut/LogOut';
 import { useSelector } from 'react-redux';
 
 export function Footer() {
   const isAuthenticated= useSelector(state => state.signIn.isAuthenticated);
-  const handleLogOut = async (e) => {
-    e.preventDefault();
-
-    try {
-      await logOutAPI();
-    } catch (error) {
-      throw error;
-    }
-  }
 
   return (
     <>
@@ -43,7 +34,7 @@ export function Footer() {
                 {!isAuthenticated && <Link className={`nav-link ${({ isActive }) => isActive && 'active'}`} to="/user/sign-in">Sign In</Link>}
               </li>
               <li className='nav-item'>
-                <Link className={`nav-link ${({ isActive }) => isActive && 'active'}`}  onClick={handleLogOut}>Log Out</Link>
+                {isAuthenticated && <LogOut className={`nav-link ${({ isActive }) => isActive && 'active'}`} >Log Out</LogOut>}
               </li>
             </ul>
           </div>

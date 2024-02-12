@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { SignForm } from "../../components/SignForm";
 import { useDispatch, useSelector } from "react-redux";
-import { setEmail, clearEmail, setPassword, clearPassword, signInUser } from './signInSlice';
+import { setEmail, clearEmail, setPassword, clearPassword, signInUser, setDefaultSignInUser } from './signInSlice';
 import { Navigate, useNavigate } from 'react-router-dom';
 // import { setUserInfo } from "../userInfo/userInfoSlice";
 
@@ -27,6 +27,7 @@ export function SignIn() {
       // Clear email & password
       dispatch(clearEmail());
       dispatch(clearPassword());
+      dispatch(setDefaultSignInUser())
       navigate('/user/profile');
     }
   }, [signInFulfilled, dispatch, navigate]);

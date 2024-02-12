@@ -64,10 +64,13 @@ const signInSlice = createSlice({
     clearPassword: (state) => {
       state.password = '';
     },
-    setDefault: (state) => {
+    setDefaultSignInUser: (state) => {
       state.signInUser.isPending = false;
       state.signInUser.isFulfilled = false;
       state.signInUser.isRejected = false;
+    },
+    setIsAuthenticated: (state, action) => {
+      state.isAuthenticated = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -75,7 +78,7 @@ const signInSlice = createSlice({
       // Sing in
       .addCase(signInUser.pending, (state) => {
         state.signInUser.isPending = true;
-        state.signInUser.isFulfilled = false
+        state.signInUser.isFulfilled = false;
         state.signInUser.isRejected = false;
       })
       .addCase(signInUser.fulfilled, (state, action) => {
@@ -89,13 +92,13 @@ const signInSlice = createSlice({
       .addCase(signInUser.rejected, (state, action) => {
         state.error.signInUser = action.error.message;
         state.signInUser.isPending = false;
-        state.signInUser.isFulfilled = false
+        state.signInUser.isFulfilled = false;
         state.signInUser.isRejected = true;
       })
       // checkAuthentication
       .addCase(checkAuthentication.pending, (state) => {
         state.checkAuthentication.isPending = true;
-        state.checkAuthentication.isFulfilled = false
+        state.checkAuthentication.isFulfilled = false;
         state.checkAuthentication.isRejected = false;
       })
       .addCase(checkAuthentication.fulfilled, (state, action) => {
@@ -114,5 +117,12 @@ const signInSlice = createSlice({
   }
 })
 
-export const { setEmail, clearEmail, setPassword, clearPassword, setDefault } = signInSlice.actions;
+export const {
+  setEmail,
+  clearEmail,
+  setPassword,
+  clearPassword,
+  setDefaultSignInUser,
+  setIsAuthenticated
+} = signInSlice.actions;
 export default signInSlice.reducer;
