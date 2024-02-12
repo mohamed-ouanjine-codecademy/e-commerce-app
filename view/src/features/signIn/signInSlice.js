@@ -33,10 +33,8 @@ export const checkAuthentication = createAsyncThunk(
 const signInSlice = createSlice({
   name: 'signIn',
   initialState: {
-    user: {
-      email: '',
-      password: '',
-    },
+    email: '',
+    password: '',
     isAuthenticated: false,
     checkAuthentication: {
       isPending: false,
@@ -55,19 +53,21 @@ const signInSlice = createSlice({
   },
   reducers: {
     setEmail: (state, action) => {
-      state.user.email = action.payload;
+      state.email = action.payload;
     },
     clearEmail: (state) => {
-      state.user.email = '';
+      state.email = '';
     },
     setPassword: (state, action) => {
-      state.user.password = action.payload;
+      state.password = action.payload;
     },
     clearPassword: (state) => {
-      state.user.password = '';
+      state.password = '';
     },
     setDefault: (state) => {
-      state.isAuthenticated = false;
+      state.signInUser.isPending = false;
+      state.signInUser.isFulfilled = false;
+      state.signInUser.isRejected = false;
     }
   },
   extraReducers: (builder) => {
@@ -80,6 +80,7 @@ const signInSlice = createSlice({
       })
       .addCase(signInUser.fulfilled, (state, action) => {
         state.user = action.payload;
+        state.isAuthenticated = true;
 
         state.signInUser.isPending = false;
         state.signInUser.isFulfilled = true;
