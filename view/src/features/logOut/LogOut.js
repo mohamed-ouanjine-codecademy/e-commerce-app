@@ -2,8 +2,9 @@ import React, { useEffect } from "react";
 import { logOutUser } from "./logOutSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { setIsAuthenticated } from "../signIn/signInSlice";
 import { setDefault } from "./logOutSlice";
+import { setIsAuthenticated } from "../signIn/signInSlice";
+import { clearCartData } from "../cart/cartSlice";
 
 export function LogOut({ className, children }) {
   const {
@@ -21,10 +22,13 @@ export function LogOut({ className, children }) {
   useEffect(() => {
     if (logOutUserFulfilled) {
       dispatch(setIsAuthenticated(false));
+      // set log out to default
       dispatch(setDefault());
+      // clear cart data
+      dispatch(clearCartData());
       navigate('/');
     }
-  });
+  }, [dispatch, logOutUserFulfilled]);
   return (
     <>
       <Link className={`${className}`} onClick={handleLogOut}>

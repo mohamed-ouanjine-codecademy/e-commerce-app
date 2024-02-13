@@ -15,7 +15,7 @@ router.get('/cart', async (req, res, next) => {
     }
     res.status(401).json({
       status: 'error',
-      message: 'Unauthorized'
+      message: 'Unauthorized, Please Sign In to access your cart'
     });
   } catch (error) {
     next(error);

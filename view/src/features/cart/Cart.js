@@ -5,19 +5,19 @@ import { CartItem } from '../../components/cartItem/CartItem';
 import { PrototypeCartItem } from '../../components/cartItem/PrototypeCartItem';
 
 export function Cart() {
-  const cartId = useSelector(state => state.cart.id);
+  const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
+  const cartId = useSelector(state => state.cart.cartId);
   const items = useSelector(state => state.cart.items);
   const {
-    getCartByUserIdPending,
-    removeItemFromCartAsyncPending
-  } = useSelector(state => state.cart.isPending);
+    isPending: getCartByUserIdPending,
+    isRejected: getCartByUserIdRejected
+  } = useSelector(state => state.cart.getCartByUserId);
   const {
-    getCartByUserIdFulfilled
-  } = useSelector(state => state.cart.isFulfilled);
+    isPending: removeItemFromCartAsyncPending
+  } = useSelector(state => state.cart.removeItemFromCartAsync);
   const {
-    getCartByUserIdRejected
-  } = useSelector(state => state.cart.isRejected);
-
+    getCartByUserId: getCartByUserIdError
+  } = useSelector(state => state.cart.error);
   const dispatch = useDispatch();
 
   // Retrieve cart
@@ -34,13 +34,10 @@ export function Cart() {
         <CartItem
           item={item}
           onRemove={async () => {
-            if (cartId !== 0) {
               // if there is a true cart
-              await dispatch(removeItemFromCartAsync({ cartId, productId: item.productId }));
-            } else {
+              isAuthenticated && await dispatch(removeItemFromCartAsync({ cartId, productId: item.productId }));
               // if there is a false cart
               dispatch(removeItemFromCartSync({ productId: item.productId }));
-            }
           }}
           removeItemPending={removeItemFromCartAsyncPending}
         />
@@ -62,8 +59,8 @@ export function Cart() {
               </div>
             )
           )}
-          {items.length !== 0 && renderItems()}
-          {getCartByUserIdRejected && <p>Error: {getCartByUserIdRejected}</p>}
+          {renderItems()}
+          {getCartByUserIdRejected && <p>Error: {getCartByUserIdError}</p>}
         </div>
       </div>
     </>

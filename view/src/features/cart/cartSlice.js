@@ -82,7 +82,7 @@ export const removeItemFromCartAsync = createAsyncThunk(
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
-    id: 0,
+    cartId: 0,
     items: [
       // {
       //   productId: 0,
@@ -98,27 +98,38 @@ const cartSlice = createSlice({
       //   }
       // }
     ],
-    isPending: {
-      createCartPending: false,
-      getCartByUserIdPending: false,
-      getCartByIdPending: false,
-      addItemAsyncPending: false,
-      removeItemFromCartAsyncPending: false,
+    createCart: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
     },
-    isFulfilled: {
-      createCartFulfilled: false,
-      getCartByUserIdFulfilled: false,
-      getCartByIdFulfilled: false,
-      addItemAsyncFulfilled: false,
-      removeItemFromCartAsyncFulfilled: false,
+    getCartByUserId: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
     },
-    isRejected: {
-      createCartRejected: false,
-      getCartByUserIdRejected: false,
-      getCartByIdRejected: false,
-      addItemAsyncRejected: false,
-      removeItemFromCartAsyncRejected: false,
+    getCartById: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
     },
+    addItemToCartAsync: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
+    },
+    removeItemFromCartAsync: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
+    },
+    error: {
+      createCart: null,
+      getCartByUserId: null,
+      getCartById: null,
+      addItemToCartAsync: null,
+      removeItemFromCartAsync: null,
+    }
   },
   reducers: {
     addItemToCartSync: (state, action) => {
@@ -133,106 +144,116 @@ const cartSlice = createSlice({
     removeItemFromCartSync: (state, action) => {
       const product = action.payload;
       state.items = state.items.filter(item => item.productId !== product.productId);
+    },
+    clearCartData: (state) => {
+      state.cartId = 0;
+      state.items = [];
     }
   },
   extraReducers: (builder) => {
     builder
       // create cart (carteCart)
       .addCase(createCart.pending, (state) => {
-        state.isPending.createCartPending = true;
-        state.isFulfilled.createCartFulfilled = false;
-        state.isRejected.createCartRejected = false;
+        state.createCart.isPending = true;
+        state.createCart.isFulfilled = false;
+        state.createCart.isRejected = false;
       })
       .addCase(createCart.fulfilled, (state, action) => {
         const cart = action.payload;
         state.id = cart.id;
         state.items = cart.items;
 
-        state.isPending.createCartPending = false;
-        state.isFulfilled.createCartFulfilled = true;
-        state.isRejected.createCartRejected = false;
+        state.createCart.isPending = false;
+        state.createCart.isFulfilled = true;
+        state.createCart.isRejected = false;
       })
       .addCase(createCart.rejected, (state) => {
-        state.isPending.createCartPending = false;
-        state.isFulfilled.createCartFulfilled = false;
-        state.isRejected.createCartRejected = true;
+        state.createCart.isPending = false;
+        state.createCart.isFulfilled = false;
+        state.createCart.isRejected = true;
+      })
+      // get cart by id (getCartById)
+      .addCase(getCartById.pending, (state) => {
+        state.getCartById.isPending = true;
+        state.getCartById.isFulfilled = false;
+        state.getCartById.isRejected = false;
+      })
+      .addCase(getCartById.fulfilled, (state, action) => {
+        const cart = action.payload;
+        state.items = cart.items;
+
+        state.getCartById.isPending = false;
+        state.getCartById.isFulfilled = true;
+        state.getCartById.isRejected = false;
+      })
+      .addCase(getCartById.rejected, (state) => {
+        state.getCartById.isPending = false;
+        state.getCartById.isFulfilled = false;
+        state.getCartById.isRejected = true;
       })
       // get cart by user's id (getCartByUserId)
       .addCase(getCartByUserId.pending, (state) => {
-        state.isPending.getCartByUserIdPending = true;
-        state.isFulfilled.getCartByUserIdFulfilled = false;
-        state.isRejected.getCartByUserIdRejected = false;
+        state.getCartByUserId.isPending = true;
+        state.getCartByUserId.isFulfilled = false;
+        state.getCartByUserId.isRejected = false;
       })
       .addCase(getCartByUserId.fulfilled, (state, action) => {
         const cart = action.payload;
         state.id = cart.id;
         state.items = cart.items;
 
-        state.isPending.getCartByUserIdPending = false;
-        state.isFulfilled.getCartByUserIdFulfilled = true;
-        state.isRejected.getCartByUserIdRejected = false;
+        state.getCartByUserId.isPending = false;
+        state.getCartByUserId.isFulfilled = true;
+        state.getCartByUserId.isRejected = false;
       })
-      .addCase(getCartByUserId.rejected, (state) => {
-        state.isPending.getCartByUserIdPending = false;
-        state.isFulfilled.getCartByUserIdFulfilled = false;
-        state.isRejected.getCartByUserIdRejected = true;
-      })
-      // get cart by id (getCartById)
-      .addCase(getCartById.pending, (state) => {
-        state.isPending.getCartByIdPending = true;
-        state.isFulfilled.getCartByIdFulfilled = false;
-        state.isRejected.getCartByIdRejected = false;
-      })
-      .addCase(getCartById.fulfilled, (state, action) => {
-        const cart = action.payload;
-        state.items = cart.items;
+      .addCase(getCartByUserId.rejected, (state, action) => {
+        state.error.getCartByUserId = action.error.message;
 
-        state.isPending.getCartByIdPending = false;
-        state.isFulfilled.getCartByIdFulfilled = true;
-        state.isRejected.getCartByIdRejected = false;
-      })
-      .addCase(getCartById.rejected, (state) => {
-        state.isPending.etCartByIdPending = false;
-        state.isFulfilled.getCartByIdFulfilled = false;
-        state.isRejected.getCartByIdRejected = true;
+        state.getCartByUserId.isPending = false;
+        state.getCartByUserId.isFulfilled = false;
+        state.getCartByUserId.isRejected = true;
       })
       // add item to cart (addItemToCartAsync)
       .addCase(addItemToCartAsync.pending, (state) => {
-        state.isPending.addItemAsyncPending = true;
-        state.isFulfilled.addItemAsyncFulfilled = false;
-        state.isRejected.addItemAsyncRejected = false;
+        state.addItemAsync.isPending = true;
+        state.addItemAsync.isFulfilled = false;
+        state.addItemAsync.isRejected = false;
       })
       .addCase(addItemToCartAsync.fulfilled, (state, action) => {
-        state.isPending.addItemAsyncPending = false;
-        state.isFulfilled.addItemAsyncFulfilled = true;
-        state.isRejected.addItemAsyncRejected = false;
+        state.addItemAsync.isPending = false;
+        state.addItemAsync.isFulfilled = true;
+        state.addItemAsync.isRejected = false;
       })
       .addCase(addItemToCartAsync.rejected, (state) => {
-        state.isPending.addItemAsyncPending = false;
-        state.isFulfilled.addItemAsyncFulfilled = false;
-        state.isRejected.addItemAsyncRejected = true;
+        state.addItemAsync.isPending = false;
+        state.addItemAsync.isFulfilled = false;
+        state.addItemAsync.isRejected = true;
       })
       // remove item from cart (addItemToCartAsync)
       .addCase(removeItemFromCartAsync.pending, (state) => {
-        state.isPending.removeItemFromCartAsyncPending = true;
-        state.isFulfilled.removeItemFromCartAsyncFulfilled = false;
-        state.isRejected.removeItemFromCartAsyncRejected = false;
+        state.removeItemFromCartAsync.isPending = true;
+        state.removeItemFromCartAsync.isFulfilled = false;
+        state.removeItemFromCartAsync.isRejected = false;
       })
       .addCase(removeItemFromCartAsync.fulfilled, (state, action) => {
         const product = action.payload.product;
         state.items = state.items.filter(item => item.productId !== product.id);
 
-        state.isPending.removeItemFromCartAsyncPending = false;
-        state.isFulfilled.removeItemFromCartAsyncFulfilled = true;
-        state.isRejected.removeItemFromCartAsyncRejected = false;
+        state.removeItemFromCartAsync.isPending = false;
+        state.removeItemFromCartAsync.isFulfilled = true;
+        state.removeItemFromCartAsync.isRejected = false;
       })
       .addCase(removeItemFromCartAsync.rejected, (state) => {
-        state.isPending.removeItemFromCartAsyncPending = false;
-        state.isFulfilled.removeItemFromCartAsyncFulfilled = false;
-        state.isRejected.removeItemFromCartAsyncRejected = true;
+        state.removeItemFromCartAsync.isPending = false;
+        state.removeItemFromCartAsync.isFulfilled = false;
+        state.removeItemFromCartAsync.isRejected = true;
       })
   }
 });
 
-export const { addItemToCartSync, removeItemFromCartSync } = cartSlice.actions;
+export const {
+  addItemToCartSync,
+  removeItemFromCartSync,
+  clearCartData
+} = cartSlice.actions;
 export default cartSlice.reducer;
