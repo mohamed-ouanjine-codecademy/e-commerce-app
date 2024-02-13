@@ -30,7 +30,7 @@ export function LogOut({ className, children }) {
       dispatch(clearCartData());
       navigate('/user/sign-in');
     }
-  }, [dispatch, logOutUserFulfilled]);
+  }, [dispatch, logOutUserFulfilled, navigate]);
   return (
     <>
       <Link className={`${className}`} onClick={handleLogOut}>
