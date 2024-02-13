@@ -14,7 +14,9 @@ export function LogOut({ className, children }) {
   const navigate = useNavigate();
 
   // Log Out user (event handler)
-  const handleLogOut = async () => {
+  const handleLogOut = async (e) => {
+    e.preventDefault();
+
     await dispatch(logOutUser());
   }
 
@@ -26,7 +28,7 @@ export function LogOut({ className, children }) {
       dispatch(setDefault());
       // clear cart data
       dispatch(clearCartData());
-      navigate('/');
+      navigate('/user/sign-in');
     }
   }, [dispatch, logOutUserFulfilled]);
   return (
