@@ -87,6 +87,7 @@ const cartSlice = createSlice({
       // {
       //   productId: 0,
       //   quantity: 0,
+      //   isRemoving: false,
       //   productInfo: {
       //     id: 0,
       //     name: "",
@@ -199,7 +200,7 @@ const cartSlice = createSlice({
       })
       .addCase(getCartByUserId.fulfilled, (state, action) => {
         const cart = action.payload;
-        state.id = cart.id;
+        state.cartId = cart.id;
         state.items = cart.items;
 
         state.getCartByUserId.isPending = false;
@@ -230,7 +231,12 @@ const cartSlice = createSlice({
         state.addItemToCartAsync.isRejected = true;
       })
       // remove item from cart (addItemToCartAsync)
-      .addCase(removeItemFromCartAsync.pending, (state) => {
+      .addCase(removeItemFromCartAsync.pending, (state, action) => {
+        const productId = action.meta.arg.productId;
+        state.items = state.items.map((item) =>
+          item.productId === productId ? { ...item, isRemoving: true } : item
+        );
+
         state.removeItemFromCartAsync.isPending = true;
         state.removeItemFromCartAsync.isFulfilled = false;
         state.removeItemFromCartAsync.isRejected = false;
@@ -243,7 +249,12 @@ const cartSlice = createSlice({
         state.removeItemFromCartAsync.isFulfilled = true;
         state.removeItemFromCartAsync.isRejected = false;
       })
-      .addCase(removeItemFromCartAsync.rejected, (state) => {
+      .addCase(removeItemFromCartAsync.rejected, (state, action) => {
+        const productId = action.meta.arg.productId;
+        state.items = state.items.map((item) =>
+          item.productId === productId ? { ...item, isRemoving: false } : item
+        );
+
         state.removeItemFromCartAsync.isPending = false;
         state.removeItemFromCartAsync.isFulfilled = false;
         state.removeItemFromCartAsync.isRejected = true;

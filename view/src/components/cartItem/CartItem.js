@@ -21,7 +21,7 @@ export function CartItem({ className, item, onRemove, removeItemPending }) {
               <div className="col-3 p-0">
                 <div className="d-flex flex-column justify-content-between">
                   <div className="align-self-center p-1">
-                    <Trash onRemove={onRemove}/>
+                    <Trash onRemove={onRemove} removeItemPending={removeItemPending} />
                   </div>
                   <div className="align-self-center">
                     <h6 className="card-subtitle mb-2 text-body-secondary">{product.price}</h6>

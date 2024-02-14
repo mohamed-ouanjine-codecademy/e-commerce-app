@@ -34,12 +34,15 @@ export function Cart() {
         <CartItem
           item={item}
           onRemove={async () => {
-              // if there is a true cart
-              isAuthenticated && await dispatch(removeItemFromCartAsync({ cartId, productId: item.productId }));
-              // if there is a false cart
-              dispatch(removeItemFromCartSync({ productId: item.productId }));
+            isAuthenticated ? (
+                // if there is a true cart
+                await dispatch(removeItemFromCartAsync({ cartId, productId: item.productId }))
+              ) : (
+                // if there is a false cart
+                dispatch(removeItemFromCartSync({ productId: item.productId }))
+              )
           }}
-          removeItemPending={removeItemFromCartAsyncPending}
+          removeItemPending={item.isRemoving}
         />
       </div >
     ));
