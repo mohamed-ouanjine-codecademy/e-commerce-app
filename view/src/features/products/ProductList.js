@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loadProducts } from "./productListSlice";
+import { addItemToCartSync, addItemToCartAsync } from "../cart/cartSlice";
 import { ProductItem } from "../../components/ProductItem/ProductItem";
 import { PrototypeProductItem } from "../../components/ProductItem/PrototypeProductItme";
 
@@ -34,7 +35,7 @@ export function ProductList() {
               products.map(product => {
                 return (
                   <div className="col" key={product.id}>
-                    <ProductItem product={product} />
+                    <ProductItem product={product} onAddItemToCart={ { sync: addItemToCartSync, async: addItemToCartAsync } } />
                   </div>
                 )
               })

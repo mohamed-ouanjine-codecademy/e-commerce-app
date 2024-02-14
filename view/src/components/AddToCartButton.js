@@ -1,11 +1,10 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addItemToCartSync, addItemToCartAsync } from "../features/cart/cartSlice";
 
-export function AddToCartButton({ product }) {
+export function AddToCartButton({ product, onAddItemToCart }) {
   const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
-  const { id: productId } = product;
   const items = useSelector(state => state.cart.items);
+  const { id: productId } = product;
   const dispatch = useDispatch();
 
   const handleAddToCart = async (e) => {
@@ -13,13 +12,8 @@ export function AddToCartButton({ product }) {
 
     const productIndex = items.findIndex(item => item.productId === productId);
     if (productIndex === -1) {
-      try {
-        dispatch(addItemToCartSync({ productId, quantity: 1, productInfo: product }));
-        isAuthenticated && await dispatch(addItemToCartAsync({ productId, quantity: 1, include: true }));
-        // Handle successful API response here (e.g., display success message)
-      } catch (error) {
-        // Handle error here (e.g., dispatch a rejected action, display error message)
-      }
+        if (!isAuthenticated) dispatch(onAddItemToCart.sync({ productId, quantity: 1, productInfo: product }));
+        if (isAuthenticated) await dispatch(onAddItemToCart.async({ productId, quantity: 1, include: true }));
     }
   };
 

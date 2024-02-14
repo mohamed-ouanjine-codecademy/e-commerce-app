@@ -215,19 +215,19 @@ const cartSlice = createSlice({
       })
       // add item to cart (addItemToCartAsync)
       .addCase(addItemToCartAsync.pending, (state) => {
-        state.addItemAsync.isPending = true;
-        state.addItemAsync.isFulfilled = false;
-        state.addItemAsync.isRejected = false;
+        state.addItemToCartAsync.isPending = true;
+        state.addItemToCartAsync.isFulfilled = false;
+        state.addItemToCartAsync.isRejected = false;
       })
       .addCase(addItemToCartAsync.fulfilled, (state, action) => {
-        state.addItemAsync.isPending = false;
-        state.addItemAsync.isFulfilled = true;
-        state.addItemAsync.isRejected = false;
+        state.addItemToCartAsync.isPending = false;
+        state.addItemToCartAsync.isFulfilled = true;
+        state.addItemToCartAsync.isRejected = false;
       })
       .addCase(addItemToCartAsync.rejected, (state) => {
-        state.addItemAsync.isPending = false;
-        state.addItemAsync.isFulfilled = false;
-        state.addItemAsync.isRejected = true;
+        state.addItemToCartAsync.isPending = false;
+        state.addItemToCartAsync.isFulfilled = false;
+        state.addItemToCartAsync.isRejected = true;
       })
       // remove item from cart (addItemToCartAsync)
       .addCase(removeItemFromCartAsync.pending, (state) => {
