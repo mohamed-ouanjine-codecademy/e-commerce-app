@@ -1,20 +1,25 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import { setEmail, setPassword, checkEmail, setCheckEmailDefault, register } from "./signUpSlice";
+import { setEmail, setPassword, checkEmailAvailability, registerUser } from "./signUpSlice";
 import { signInUser } from "../signIn/signInSlice";
-import { createCart } from "../cart/cartSlice";
 import { SignForm } from "../../components/SignForm";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export function SignUp() {
-  const {id: userId, email, password } = useSelector(state => state.signUp.user);
+  const { email, password } = useSelector(state => state.signUp.user);
   const isEmailAvailable = useSelector(state => state.signUp.isEmailAvailable);
-  const checkEmailPending = useSelector(state => state.signUp.checkEmailPending);
-  const checkEmailFulfilled = useSelector(state => state.signUp.checkEmailFulfilled);
-  const registerUserPending = useSelector(state => state.signUp.registerUserPending);
-  const registerUserFulfilled = useSelector(state => state.signUp.registerUserFulfilled);
-  const signInPending = useSelector(state => state.signIn.signInPending);
-  const signInFulfilled = useSelector(state => state.signIn.signInFulfilled);
+  const { 
+    isPending : checkEmailAvailabilityPending,
+    isFulfilled: checkEmailAvailabilityFulfilled,
+  } = useSelector(state => state.signUp.checkEmailAvailability);
+  const { 
+    isPending : registerUserPending,
+    isFulfilled: registerUserFulfilled,
+  } = useSelector(state => state.signUp.registerUser);
+  const { 
+    isPending : signInUserPending,
+    isFulfilled: signInUserFulfilled,
+  } = useSelector(state => state.signIn.signInUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -22,18 +27,18 @@ export function SignUp() {
     e.preventDefault();
 
     // Check email availability
-    await dispatch(checkEmail({ email }));
+    await dispatch(checkEmailAvailability({ email }));
   };
 
   // Register User
   useEffect(() => {
-    const registerUser = async () => {
+    const registerUserFunc = async () => {
       // Register User
-      await dispatch(register({ email, password }));
+      await dispatch(registerUser({ email, password }));
       // dispatch(setCheckEmailDefault());
     }
-    if (isEmailAvailable && checkEmailFulfilled) registerUser();
-  }, [isEmailAvailable, checkEmailFulfilled, dispatch]);
+    if (isEmailAvailable && checkEmailAvailabilityFulfilled) registerUserFunc();
+  }, [email ,password, isEmailAvailable, checkEmailAvailabilityFulfilled, dispatch]);
 
   // Sign In user & create cart
   useEffect(() => {
@@ -46,24 +51,24 @@ export function SignUp() {
       }
     }
     if (registerUserFulfilled) signInFunc();
-  }, [registerUserFulfilled, dispatch]);
+  }, [email, password, registerUserFulfilled, dispatch]);
 
   // Redirect user
   useEffect(() => {
-    if (signInFulfilled) {
+    if (signInUserFulfilled) {
       // Redirect user to /user/info (page to get user info)
       navigate('/user/info');
     }
-  }, [signInFulfilled]);
+  }, [navigate, signInUserFulfilled]);
 
   // Submit message handler
   const handleSubmitMessage = () => {
-    if (checkEmailPending || registerUserPending || signInPending) {
+    if (checkEmailAvailabilityPending || registerUserPending || signInUserPending) {
       return 'Pending ...';
     }
     return 'Sign Up';
   };
-
+  
   return (
     <div className="container py-5">
       <div className="row flex-column">

@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { checkEmailAvailability, registerUser } from '../../api/authAPI';
+import { checkEmailAvailabilityAPI, registerUserAPI } from '../../api/authAPI';
 
 // asyncs
-export const checkEmail = createAsyncThunk(
-  'signUp/checkEmail',
+export const checkEmailAvailability = createAsyncThunk(
+  'signUp/checkEmailAvailability',
   async ({ email }) => {
     try {
-      const response = await checkEmailAvailability(email);
+      const response = await checkEmailAvailabilityAPI(email);
       const isEmailAvailable = response.isEmailAvailable;
 
       return isEmailAvailable;
@@ -16,11 +16,11 @@ export const checkEmail = createAsyncThunk(
   }
 );
 
-export const register = createAsyncThunk(
-  'signUp/register',
+export const registerUser = createAsyncThunk(
+  'signUp/registerUser',
   async ({ email, password }) => {
     try {
-      const newUser = await registerUser(email, password);
+      const newUser = await registerUserAPI(email, password);
       return newUser;
     } catch (error) {
       throw error;
@@ -36,13 +36,17 @@ export const signUpSlice = createSlice({
       password: '',
     },
     isEmailAvailable: true,
-    checkEmailPending: false,
-    checkEmailFulfilled: false,
-    checkEmailRejected: false,
+    checkEmailAvailability: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
+    },
     isRegistered: false,
-    registerUserPending: false,
-    registerUserFulfilled: false,
-    registerUserRejected: false,
+    registerUser: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
+    },
   },
   reducers: {
     setEmail: (state, action) => {
@@ -56,35 +60,45 @@ export const signUpSlice = createSlice({
     },
     clearPassword: (state) => {
       state.user.password = '';
+    },
+    setCheckEmailAvailabilityToDefault: (state) => {
+      state.checkEmailAvailability.isPending = false;
+      state.checkEmailAvailability.isFulfilled = false;
+      state.checkEmailAvailability.isRejected = false;
+    },
+    setRegisterUserToDefault: (state) => {
+      state.registerUser.isPending = false;
+      state.registerUser.isFulfilled = false;
+      state.registerUser.isRejected = false;
     }
   },
   extraReducers: (builder) => {
     builder
       // Check email availability
-      .addCase(checkEmail.pending, (state) => {
-        state.checkEmailPending = true;
-        state.checkEmailFulfilled = false;
-        state.checkEmailRejected = false;
+      .addCase(checkEmailAvailability.pending, (state) => {
+        state.checkEmailAvailability.isPending = true;
+        state.checkEmailAvailability.isFulfilled = false;
+        state.checkEmailAvailability.isRejected = false;
       })
-      .addCase(checkEmail.fulfilled, (state, action) => {
+      .addCase(checkEmailAvailability.fulfilled, (state, action) => {
         state.isEmailAvailable = action.payload;
 
-        state.checkEmailPending = false;
-        state.checkEmailFulfilled = true;
-        state.checkEmailRejected = false;
+        state.checkEmailAvailability.isPending = false;
+        state.checkEmailAvailability.isFulfilled = true;
+        state.checkEmailAvailability.isRejected = false;
       })
-      .addCase(checkEmail.rejected, (state) => {
-        state.checkEmailPending = false;
-        state.checkEmailFulfilledd = false;
-        state.checkEmailRejected = true;
+      .addCase(checkEmailAvailability.rejected, (state) => {
+        state.checkEmailAvailability.isPending = false;
+        state.checkEmailAvailability.isFulfilled = false;
+        state.checkEmailAvailability.isRejected = true;
       })
       // Register new user
-      .addCase(register.pending, (state) => {
-        state.registerUserPending = true;
-        state.registerUserFulfilled = false;
-        state.registerUserRejected = false;
+      .addCase(registerUser.pending, (state) => {
+        state.registerUser.isPending = true;
+        state.registerUser.isFulfilled = false;
+        state.registerUser.isRejected = false;
       })
-      .addCase(register.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state, action) => {
         const user = action.payload;
         state.user = {
           ...state.user,
@@ -92,14 +106,14 @@ export const signUpSlice = createSlice({
         };
         state.isRegistered = true;
 
-        state.registerUserPending = false;
-        state.registerUserFulfilled = true;
-        state.registerUserRejected = false;
+        state.registerUser.isPending = false;
+        state.registerUser.isFulfilled = true;
+        state.registerUser.isRejected = false;
       })
-      .addCase(register.rejected, (state) => {
-        state.registerUserPending = false;
-        state.registerUserFulfilled = false;
-        state.registerUserRejected = true;
+      .addCase(registerUser.rejected, (state) => {
+        state.registerUser.isPending = false;
+        state.registerUser.isFulfilled = false;
+        state.registerUser.isRejected = true;
       })
   }
 });

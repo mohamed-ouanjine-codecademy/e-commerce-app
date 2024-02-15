@@ -18,7 +18,6 @@ const users = {
 
       // Check email availability
       const isEmailAvailable = await this.checkEmailAvailability(userInfo.email);
-      console.log(isEmailAvailable);
       if (isEmailAvailable === false) {
         throw new Error('Email is not available');
       }

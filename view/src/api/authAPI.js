@@ -11,7 +11,7 @@ export const checkAuthenticationAPI = async () => {
     throw error;
   }
 }
-export const checkEmailAvailability = async (email) => {
+export const checkEmailAvailabilityAPI = async (email) => {
   try {
     const response = await fetch(`${BASE_URL}/check-email?email=${encodeURIComponent(email)}`);
 
@@ -20,7 +20,7 @@ export const checkEmailAvailability = async (email) => {
     throw error;
   }
 }
-export const registerUser = async (email, password) => {
+export const registerUserAPI = async (email, password) => {
   try {
     const response = await fetch(`${BASE_URL}/register`, {
       method: 'POST',
