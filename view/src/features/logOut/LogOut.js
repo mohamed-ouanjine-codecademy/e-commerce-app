@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setDefault } from "./logOutSlice";
 import { setIsAuthenticated } from "../signIn/signInSlice";
 import { clearCartData } from "../cart/cartSlice";
+import { clearProfileData } from "../profile/profileSlice";
 
 export function LogOut({ className, children }) {
   const {
@@ -26,6 +27,8 @@ export function LogOut({ className, children }) {
       dispatch(setIsAuthenticated(false));
       // set log out to default
       dispatch(setDefault());
+      // clear profile data
+      dispatch(clearProfileData());
       // clear cart data
       dispatch(clearCartData());
       navigate('/user/sign-in');

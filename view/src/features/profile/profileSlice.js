@@ -70,6 +70,14 @@ const profileSlice = createSlice({
     setAddress: (state, action) => {
       state.user.address = action.payload;
     },
+    clearProfileData: (state) => {
+      state.user = {
+        id: null,
+        firstName: null,
+        lastName: null,
+        address: null,
+      };
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -113,6 +121,12 @@ const profileSlice = createSlice({
   }
 });
 
-export const { setUserInfo, setFirstName, setLastName, setAddress } = profileSlice.actions;
+export const {
+  setUserInfo,
+  setFirstName,
+  setLastName,
+  setAddress,
+  clearProfileData
+} = profileSlice.actions;
 
 export default profileSlice.reducer;
