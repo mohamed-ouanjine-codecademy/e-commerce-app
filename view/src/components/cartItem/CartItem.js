@@ -1,6 +1,6 @@
 import React from "react";
 import styles from './CartItem.module.css';
-import { Trash } from "../Trash";
+import { Trash } from "../icons/Trash";
 
 export function CartItem({ className, item, onRemove, removeItemPending }) {
   const product = item.productInfo;

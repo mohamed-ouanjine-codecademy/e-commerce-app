@@ -29,15 +29,13 @@ export function Profile() {
   return (
     <>
       <div className="container py-5">
-        <div className="row flex-column">
+        <div className="row">
           <h3 className="col">Profile</h3>
-          {
-            loadProfileInfoPending ? (
-              <p>Pending...</p>
-            ) : (
-              <UserProfile user={user} />
-            )
-          }
+        </div>
+        <div className="row">
+          <div className="col">
+            <UserProfile user={user} isPending={loadProfileInfoPending} />
+          </div>
         </div>
       </div>
     </>
