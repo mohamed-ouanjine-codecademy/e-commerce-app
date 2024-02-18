@@ -11,3 +11,13 @@ export const getProducts = async () => {
     throw error;
   }
 }
+
+export const loadProductAPI = async (productId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${productId}`);
+
+    return await handleResponse(response);
+  } catch (error) {
+    throw error;
+  }
+}

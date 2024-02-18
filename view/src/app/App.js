@@ -3,6 +3,7 @@ import { RouterProvider, createBrowserRouter, createRoutesFromElements, Route } 
 // components
 import { Root } from '../components/Root';
 import { ProductList } from '../features/products/ProductList';
+import { Product } from '../features/product/Product';
 import { SignUp } from '../features/signUp/SignUp';
 import { SignIn } from '../features/signIn/SignIn';
 import { Profile } from '../features/profile/Profile';
@@ -14,6 +15,7 @@ import { checkAuthentication } from '../features/signIn/signInSlice';
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<Root />}>
     <Route index element={<ProductList />} />
+    <Route path='product' element={<Product />} />
     <Route path='cart' element={<Cart />} />
     <Route path='user/profile' element={<Profile />} />
     <Route path='user/profile/edit' element={<EditProfile />} />

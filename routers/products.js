@@ -42,7 +42,11 @@ router.get('/:id', async (req, res, next) => {
 
     const product = await db.products.getProductById(productId);
 
-    res.json(product);
+    res.json({
+      status: 'success',
+      message: 'product retrieved successfully',
+      data: product
+    });
   } catch (err) {
     next(err);
   }
