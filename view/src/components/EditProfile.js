@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { setFirstName, setLastName, setAddress, updateUserInfo, loadProfileInfo } from "../features/profile/profileSlice";
+import { setFirstName, setLastName, setAddress, updateUserInfo, loadProfileInfo, resetUpdateUserInfo } from "../features/profile/profileSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import { UserInfoForm } from "./UserInfoForm";
@@ -48,8 +48,13 @@ export function EditProfile() {
 
   // Redirect user after a successful modefication
   useEffect(() => {
-    if (updateUserInfoFulfilled) navigate('/user/profile');
-  });
+    if (updateUserInfoFulfilled) {
+      // reset updateUserInfo to default
+      dispatch(resetUpdateUserInfo());
+      // redirect user
+      navigate('/user/profile')
+    };
+  }, [dispatch, navigate, updateUserInfoFulfilled]);
 
   // Redirect user to sign in page if not authenticated
   if (!isAuthenticated) {

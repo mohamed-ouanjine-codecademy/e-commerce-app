@@ -41,12 +41,12 @@ const profileSlice = createSlice({
       lastName: null,
       address: null,
     },
-    loadProfileInfo: {
+    updateUserInfo: {
       isPending: false,
       isFulfilled: false,
       isRejected: false
     },
-    updateUserInfo: {
+    loadProfileInfo: {
       isPending: false,
       isFulfilled: false,
       isRejected: false
@@ -77,6 +77,13 @@ const profileSlice = createSlice({
         lastName: null,
         address: null,
       };
+    },
+    resetUpdateUserInfo: (state) => {
+      state.updateUserInfo = {
+        isPending: false,
+        isFulfilled: false,
+        isRejected: false
+      }
     }
   },
   extraReducers: (builder) => {
@@ -126,7 +133,8 @@ export const {
   setFirstName,
   setLastName,
   setAddress,
-  clearProfileData
+  clearProfileData,
+  resetUpdateUserInfo
 } = profileSlice.actions;
 
 export default profileSlice.reducer;
