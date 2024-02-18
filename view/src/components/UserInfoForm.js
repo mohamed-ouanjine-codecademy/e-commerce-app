@@ -2,7 +2,6 @@ import React from "react";
 import { useDispatch } from "react-redux";
 
 export function UserInfoForm({
-  className,
   firstName,
   setFirstName,
   lastName,
@@ -16,7 +15,7 @@ export function UserInfoForm({
 
   return (
     <>
-      <form className={`${className} container p-4`} onSubmit={onSubmit}>
+      <form className={`container-fluid p-4`} onSubmit={onSubmit}>
         <div className="row mb-3">
           <label htmlFor="firstName" className="form-label">First Name:</label>
           <input

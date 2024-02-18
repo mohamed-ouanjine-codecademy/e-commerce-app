@@ -1,74 +1,104 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import { setEmail, setPassword, checkEmailAvailability, registerUser } from "./signUpSlice";
+import {
+  setEmail,
+  setPassword,
+  checkEmailAvailability,
+  registerUser,
+  resetUser,
+  resetCheckEmailAvailability,
+  resetRegisterUser
+} from "./signUpSlice";
 import { signInUser } from "../signIn/signInSlice";
+import { setUserInfo } from "../profile/profileSlice";
 import { SignForm } from "../../components/SignForm";
 import { useNavigate } from "react-router-dom";
 
 export function SignUp() {
+  const newUser = useSelector(state => state.signUp.user);
   const { email, password } = useSelector(state => state.signUp.user);
   const isEmailAvailable = useSelector(state => state.signUp.isEmailAvailable);
-  const { 
-    isPending : checkEmailAvailabilityPending,
+  const {
+    isPending: checkEmailAvailabilityPending,
     isFulfilled: checkEmailAvailabilityFulfilled,
   } = useSelector(state => state.signUp.checkEmailAvailability);
-  const { 
-    isPending : registerUserPending,
+  const {
+    isPending: registerUserPending,
     isFulfilled: registerUserFulfilled,
   } = useSelector(state => state.signUp.registerUser);
-  const { 
-    isPending : signInUserPending,
+  const {
+    isPending: signInUserPending,
     isFulfilled: signInUserFulfilled,
   } = useSelector(state => state.signIn.signInUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Check email availability after a submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check email availability
     await dispatch(checkEmailAvailability({ email }));
   };
 
-  // Register User
+  // Register User (after checking email availability)
   useEffect(() => {
-    const registerUserFunc = async () => {
+    const func = async () => {
+      dispatch(resetCheckEmailAvailability());
       // Register User
       await dispatch(registerUser({ email, password }));
-      // dispatch(setCheckEmailDefault());
     }
-    if (isEmailAvailable && checkEmailAvailabilityFulfilled) registerUserFunc();
-  }, [email ,password, isEmailAvailable, checkEmailAvailabilityFulfilled, dispatch]);
+    if (isEmailAvailable && checkEmailAvailabilityFulfilled) func();
+  }, [email, password, isEmailAvailable, checkEmailAvailabilityFulfilled, dispatch]);
 
-  // Sign In user & create cart
+  // Sign In user (after a successful registration)
   useEffect(() => {
-    const signInFunc = async () => {
+    const func = async () => {
       try {
-        // Sign In user auto
+        dispatch(resetRegisterUser());
+        // set user info in profile
+        dispatch(setUserInfo({
+          id: newUser.id,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          address: newUser.address
+        }));
+        // Sign In user
         await dispatch(signInUser({ email, password }));
       } catch (error) {
         throw error;
       }
     }
-    if (registerUserFulfilled) signInFunc();
-  }, [email, password, registerUserFulfilled, dispatch]);
+    if (registerUserFulfilled) func();
+  }, [
+    email,
+    password,
+    registerUserFulfilled,
+    dispatch,
+    newUser.id,
+    newUser.firstName,
+    newUser.lastName,
+    newUser.address
+  ]
+  );
 
-  // Redirect user
+  // Redirect user (after a successful sign in)
   useEffect(() => {
     if (signInUserFulfilled) {
+      // reset user info in signUp Slice
+      dispatch(resetUser());
       // Redirect user to /user/info (page to get user info)
-      navigate('/user/info');
+      navigate('/user/profile/edit');
     }
-  }, [navigate, signInUserFulfilled]);
+  }, [navigate, signInUserFulfilled, dispatch]);
 
   // Submit message handler
   const handleSubmitMessage = () => {
-    if (checkEmailAvailabilityPending || registerUserPending || signInUserPending) {
+    if (checkEmailAvailabilityPending || registerUserPending || signInUserPending)
       return 'Pending ...';
-    }
+    
     return 'Sign Up';
   };
-  
+
   return (
     <div className="container py-5">
       <div className="row flex-column">

@@ -36,10 +36,10 @@ const profileSlice = createSlice({
   name: 'profile',
   initialState: {
     user: {
-      id: '',
-      firstName: '',
-      lastName: '',
-      address: '',
+      id: null,
+      firstName: null,
+      lastName: null,
+      address: null,
     },
     loadProfileInfo: {
       isPending: false,
@@ -58,6 +58,7 @@ const profileSlice = createSlice({
   },
   reducers: {
     setUserInfo: (state, action) => {
+      console.log(action.payload);
       state.user = action.payload;
     },
     setFirstName: (state, action) => {

@@ -61,12 +61,15 @@ export const signUpSlice = createSlice({
     clearPassword: (state) => {
       state.user.password = '';
     },
-    setCheckEmailAvailabilityToDefault: (state) => {
+    resetUser: (state) => {
+      state.user = { email: '', password: '' };
+    },
+    resetCheckEmailAvailability: (state) => {
       state.checkEmailAvailability.isPending = false;
       state.checkEmailAvailability.isFulfilled = false;
       state.checkEmailAvailability.isRejected = false;
     },
-    setRegisterUserToDefault: (state) => {
+    resetRegisterUser: (state) => {
       state.registerUser.isPending = false;
       state.registerUser.isFulfilled = false;
       state.registerUser.isRejected = false;
@@ -123,6 +126,9 @@ export const {
   clearEmail,
   setPassword,
   clearPassword,
+  resetUser,
+  resetCheckEmailAvailability,
+  resetRegisterUser
 } = signUpSlice.actions;
 
 export default signUpSlice.reducer;
