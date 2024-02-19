@@ -5,7 +5,7 @@ export function ImageContainer ({ className, imageUrl, alt }) {
   return (
     <>
       <div className={`${className} ${styles.imageContainer}`} style={{ backgroundImage: `url(${imageUrl})`}}>
-          <img src={imageUrl} className={`card-img-top`} alt={alt} />
+          <img src={imageUrl} className={`img-fluid rounded-start card-img-top`} alt={alt} />
         </div>
     </>
   );
