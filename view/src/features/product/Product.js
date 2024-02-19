@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { loadProduct } from "./productSlice";
-import { ImageContainer } from "../../components/ImageContainer/ImageContainer";
 import { AddToCartButton } from "../../components/AddToCartButton";
+import { Carousel } from "../../components/Carousel";
 
 export function Product() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,9 +34,11 @@ export function Product() {
                 <p>{product.price}</p>
               </div>
               <div className="col">
-                <ImageContainer imageUrl={product.imageUrl} alt={product.name} />
+                <Carousel
+                  images={[product.imageUrl, product.imageUrl]}
+                />
               </div>
-              <div className="col">
+              <div className="col-12">
                 <AddToCartButton product={product} />
               </div>
             </div>
