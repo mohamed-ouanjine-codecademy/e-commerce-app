@@ -1,10 +1,9 @@
 import React from 'react';
 import styles from './ProductItem.module.css';
-import { AddToCartButton } from '../AddToCartButton';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 import { ImageContainer } from '../ImageContainer/ImageContainer';
 
-export function ProductItem({ className, product, onAddItemToCart }) {
+export function ProductItem({ className, product }) {
   const navigate = useNavigate();
 
   const handleProductItemClick = (e) => {
@@ -24,7 +23,6 @@ export function ProductItem({ className, product, onAddItemToCart }) {
           <h5 className="card-title">{product.name}</h5>
           <h6 className="card-subtitle mb-2 text-body-secondary">{product.price}</h6>
           <p className="card-text">{product.description}</p>
-          <AddToCartButton product={product} onAddItemToCart={onAddItemToCart}/>
         </div>
       </div>
     </>

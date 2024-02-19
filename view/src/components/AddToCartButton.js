@@ -1,7 +1,8 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { addItemToCartSync, addItemToCartAsync } from "../features/cart/cartSlice";
 
-export function AddToCartButton({ product, onAddItemToCart }) {
+export function AddToCartButton({ product }) {
   const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
   const items = useSelector(state => state.cart.items);
   const { id: productId } = product;
@@ -12,8 +13,8 @@ export function AddToCartButton({ product, onAddItemToCart }) {
 
     const productIndex = items.findIndex(item => item.productId === productId);
     if (productIndex === -1) {
-        if (!isAuthenticated) dispatch(onAddItemToCart.sync({ productId, quantity: 1, productInfo: product }));
-        if (isAuthenticated) await dispatch(onAddItemToCart.async({ productId, quantity: 1, include: true }));
+        if (!isAuthenticated) dispatch(addItemToCartSync({ productId, quantity: 1, productInfo: product }));
+        if (isAuthenticated) await dispatch(addItemToCartAsync({ productId, quantity: 1, include: true }));
     }
   };
 

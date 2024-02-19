@@ -35,7 +35,7 @@ export function ProductList() {
               products.map(product => {
                 return (
                   <div className="col" key={product.id}>
-                    <ProductItem product={product} onAddItemToCart={ { sync: addItemToCartSync, async: addItemToCartAsync } } />
+                    <ProductItem product={product} />
                   </div>
                 )
               })

@@ -111,7 +111,7 @@ const products = {
 
       shouldRelease && await client.query('COMMIT');
 
-      return product;
+      return help.transformKeys(product);
 
     } catch (err) {
       shouldRelease && await client.query('ROLLBACK');
