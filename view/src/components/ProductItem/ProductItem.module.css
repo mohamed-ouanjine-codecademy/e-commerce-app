@@ -1,5 +1,6 @@
 .itemContainer {
   cursor: pointer;
+  overflow: hidden;
 }
 
 .itemContainer:hover {
