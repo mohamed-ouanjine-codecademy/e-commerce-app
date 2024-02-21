@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { RouterProvider, createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
 // components
 import { Root } from '../components/Root';
-import { ProductList } from '../features/products/ProductList';
+import { ProductList } from '../features/productList/ProductList';
 import { Product } from '../features/product/Product';
 import { SignUp } from '../features/signUp/SignUp';
 import { SignIn } from '../features/signIn/SignIn';

@@ -3,7 +3,7 @@ import signUpReducer from '../features/signUp/signUpSlice';
 import signInReducer from '../features/signIn/signInSlice';
 import logOutReducer from '../features/logOut/logOutSlice';
 import profileReducer from '../features/profile/profileSlice';
-import productsReducer from '../features/products/productListSlice';
+import productsReducer from '../features/productList/productListSlice';
 import productReducer from '../features/product/productSlice';
 import cartReducer from '../features/cart/cartSlice';
 
