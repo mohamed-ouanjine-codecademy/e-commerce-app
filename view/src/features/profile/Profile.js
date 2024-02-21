@@ -28,7 +28,7 @@ export function Profile() {
   }
   return (
     <>
-      <div className="container-fluid py-5">
+      <div className="container-fluid">
         <div className="row">
           <h3 className="col">Profile</h3>
         </div>

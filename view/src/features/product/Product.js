@@ -28,7 +28,7 @@ export function Product() {
         loadProductPending ? (
           <p>Pending...</p>
         ) : (
-          <div className="container-fluid py-3">
+          <div className="container-fluid">
             <div className="row g-2 flex-column">
               <div className="col">
                 <h1>{product.name}</h1>

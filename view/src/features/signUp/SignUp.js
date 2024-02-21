@@ -100,7 +100,7 @@ export function SignUp() {
   };
 
   return (
-    <div className="container py-5">
+    <div className="container">
       <div className="row flex-column">
         <h3 className="col">Sign Up</h3>
         <SignForm
