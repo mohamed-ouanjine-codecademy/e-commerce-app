@@ -1,47 +1,33 @@
 import React from "react";
-import { Spinner } from "./sideEffect/Spinner";
+import { useDispatch } from "react-redux";
 
 export function IncreaseDecreaseButtons({
   quantity,
-  onIncrease,
-  increasePending,
-  onDecrease,
-  decreasePending,
+
+  setQuantity,
 }) {
+  const dispatch = useDispatch();
+
   return (
     <>
-        <div className="input-group">
-          <button
-            type="button"
-            className="col btn btn-outline-secondary"
-            onClick={onIncrease}
-          >
-            {
-              increasePending ? (
-                <Spinner />
-              ) : (
-                '+'
-              )
-            }
-          </button>
-          <input
-            type="text" value={quantity}
-            className="col form-control text-center"
-          />
-          <button
-            type="button"
-            className="col btn btn-outline-secondary"
-            onClick={onDecrease}
-          >
-            {
-              decreasePending ? (
-                <Spinner />
-              ) : (
-                '-'
-              )
-            }
-          </button>
-        </div>
+      <div className="input-group flex-nowrap">
+        <button
+          type="button"
+          className="col btn btn-outline-secondary"
+          onClick={() => dispatch(setQuantity(quantity - 1))}
+        >-</button>
+        <input
+          type="text"
+          className="col form-control text-center"
+          value={quantity}
+          onChange={(e) => dispatch(setQuantity(parseInt(e.target.value)))}
+        />
+        <button
+          type="button"
+          className="col btn btn-outline-secondary"
+          onClick={() => dispatch(setQuantity(quantity + 1))}
+        >+</button>
+      </div>
     </>
   );
 };

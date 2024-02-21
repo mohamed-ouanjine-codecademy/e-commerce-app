@@ -6,7 +6,7 @@ export const loadProduct = createAsyncThunk(
   'product/loadProduct',
   async ({ productId }) => {
     try {
-      const { data: product} = await loadProductAPI(productId);
+      const { data: product } = await loadProductAPI(productId);
 
       return product;
     } catch (error) {
@@ -19,11 +19,14 @@ const productSlice = createSlice({
   name: 'product',
   initialState: {
     data: {
-      id: null,
-      name: null,
-      description: null,
-      price: null,
-      categories: [],
+      product: {
+        id: null,
+        name: null,
+        description: null,
+        price: null,
+        categories: [],
+      },
+      quantityToBuy: 1
     },
     loadProduct: {
       isPending: false,
@@ -32,6 +35,13 @@ const productSlice = createSlice({
     },
     error: {
       loadProduct: null
+    }
+  },
+  reducers: {
+    setQuantityToBuy: (state, { payload }) => {
+      if (typeof payload === 'number' && payload > 0) {
+        state.data.quantityToBuy = payload;
+      }
     }
   },
   extraReducers: (builder) => {
@@ -45,7 +55,9 @@ const productSlice = createSlice({
         }
       })
       .addCase(loadProduct.fulfilled, (state, action) => {
-        state.data = action.payload;
+        const product = action.payload;
+        state.data.product = product;
+        state.data.quantityToBuy = 1;
         state.loadProduct = {
           isPending: false,
           isFulfilled: true,
@@ -62,6 +74,11 @@ const productSlice = createSlice({
       })
   }
 });
+
+// Sync actions
+export const {
+  setQuantityToBuy
+} = productSlice.actions;
 
 // Reducer
 export default productSlice.reducer;

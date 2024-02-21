@@ -22,7 +22,7 @@ export function Carousel({ images, activeCarousel = 0 }) {
             key={i}
             className={`carousel-item ${activeCarousel === i ? 'active' : ''}`}
           >
-            <img src={image} className="d-block w-100" alt={`Slide ${i + 1}`} />
+            <img src={image} className="rounded d-block w-100" alt={`Slide ${i + 1}`} />
           </div>
         ))}
       </div>

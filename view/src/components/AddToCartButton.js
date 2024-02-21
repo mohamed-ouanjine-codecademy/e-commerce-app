@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addItemToCartSync, addItemToCartAsync } from "../features/cart/cartSlice";
 
-export function AddToCartButton({ product }) {
+export function AddToCartButton({ product, quantity }) {
   const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
   const { id: productId } = product;
   const items = useSelector(state => state.cart.items);
@@ -16,8 +16,8 @@ export function AddToCartButton({ product }) {
 
     const productIndex = items.findIndex(item => item.productId === productId);
     if (productIndex === -1) {
-      if (!isAuthenticated) dispatch(addItemToCartSync({ productId, quantity: 1, productInfo: product }));
-      if (isAuthenticated) await dispatch(addItemToCartAsync({ productId, quantity: 1, include: true }));
+      if (!isAuthenticated) dispatch(addItemToCartSync({ productId, quantity, productInfo: product }));
+      if (isAuthenticated) await dispatch(addItemToCartAsync({ productId, quantity, include: true }));
     }
   };
 
