@@ -8,7 +8,7 @@ export function Footer() {
 
   return (
     <>
-      <footer className="container-fluid text-center py-3 bg-light">
+      <footer className="container-fluid text-center py-3 my-3 bg-light">
         <div className='row gap-5'>
           <div className='col'>
             <h3>Links</h3>
