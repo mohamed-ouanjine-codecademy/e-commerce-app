@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { loadProduct } from "./productSlice";
 import { AddToCartButton } from "../../components/AddToCartButton";
 import { Carousel } from "../../components/Carousel";
+import { IncreaseDecreaseButtons } from "../../components/IncreaseDecreaseButtons";
 
 export function Product() {
   const [searchParams, setSearchParams] = useSearchParams();
