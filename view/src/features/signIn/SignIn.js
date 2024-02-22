@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { SignForm } from "../../components/SignForm";
 import { useDispatch, useSelector } from "react-redux";
 import { setEmail, clearEmail, setPassword, clearPassword, signInUser, setDefaultSignInUser } from './signInSlice';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { clearIntendedDestination } from "../intendedDestination/intendedDestinationSlice";
 // import { setUserInfo } from "../userInfo/userInfoSlice";
 
 export function SignIn() {
@@ -24,25 +25,26 @@ export function SignIn() {
   }
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (signInFulfilled) {
       // Clear email & password
       dispatch(clearEmail());
       dispatch(clearPassword());
-      dispatch(setDefaultSignInUser())
-      pathname ? (
-        navigate({
-          pathname,
-          search
-        })
-      ) : (
-        navigate('/user/profile')
-      )
+      dispatch(setDefaultSignInUser());
     }
-  }, [isAuthenticated, dispatch, navigate]);
+  }, [signInFulfilled, dispatch, navigate]);
 
-  // if (isAuthenticated) {
-  //   return <Navigate to='/user/profile' />
-  // }
+  // Redirect user
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (pathname) {
+        navigate({ pathname, search: `?${search}` });
+        dispatch(clearIntendedDestination());
+      } else {
+        navigate('/user/profile');
+      }
+    }
+  }, [isAuthenticated, pathname, search, navigate, dispatch]);
+
   return (
     <>
       <div className="container">

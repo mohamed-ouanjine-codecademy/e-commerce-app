@@ -9,7 +9,8 @@ const intendedDestinationSlice = createSlice({
   reducers: {
     setIntendedDestination: (state, action) => {
       const { pathname, search } = action.payload;
-      state = { pathname, search };
+      state.pathname = pathname;
+      state.search = search;
     },
     clearIntendedDestination: (state) => {
       state = {
