@@ -3,14 +3,18 @@ import { createSlice } from "@reduxjs/toolkit";
 const intendedDestinationSlice = createSlice({
   name: 'intendedDestinationSlice',
   initialState: {
-    intendedDestination: null
+    pathname: null,
+    search: null
   },
   reducers: {
     setIntendedDestination: (state, action) => {
-      state.intendedDestination = action.payload;
+      state = action.payload;
     },
     clearIntendedDestination: (state) => {
-      state.intendedDestination = null;
+      state = {
+        pathname: null,
+        search: null
+      };
     }
   }
 });
