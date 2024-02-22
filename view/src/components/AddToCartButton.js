@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addItemToCartSync, addItemToCartAsync } from "../features/cart/cartSlice";
+import { useNavigate } from "react-router-dom";
 
 export function AddToCartButton({ product, quantity }) {
   const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
@@ -10,13 +11,14 @@ export function AddToCartButton({ product, quantity }) {
     isPending: addItemToCartAsyncPending
   } = useSelector(state => state.cart.addItemToCartAsync);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
 
     const productIndex = items.findIndex(item => item.productId === productId);
     if (productIndex === -1) {
-      if (!isAuthenticated) dispatch(addItemToCartSync({ productId, quantity, productInfo: product }));
+      if (!isAuthenticated) navigate('/user/sign-in');
       if (isAuthenticated) await dispatch(addItemToCartAsync({ productId, quantity, include: true }));
     }
   };
