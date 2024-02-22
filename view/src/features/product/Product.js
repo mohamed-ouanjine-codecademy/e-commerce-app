@@ -19,7 +19,7 @@ export function Product() {
     const func = async () => {
       await dispatch(loadProduct({ productId }))
     }
-    if (productId) func();
+    if (productId && productId != product.id) func();
   }, [dispatch, productId]);
 
   return (
