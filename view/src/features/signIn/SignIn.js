@@ -9,6 +9,7 @@ export function SignIn() {
   const email = useSelector(state => state.signIn.email);
   const password = useSelector(state => state.signIn.password);
   const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
+  const { pathname, search } = useSelector(state => state.intendedDestination);
   const {
     isPending: signInPending,
     isFulfilled: signInFulfilled,
@@ -23,18 +24,25 @@ export function SignIn() {
   }
 
   useEffect(() => {
-    if (signInFulfilled) {
+    if (isAuthenticated) {
       // Clear email & password
       dispatch(clearEmail());
       dispatch(clearPassword());
       dispatch(setDefaultSignInUser())
-      navigate('/user/profile');
+      pathname ? (
+        navigate({
+          pathname,
+          search
+        })
+      ) : (
+        navigate('/user/profile')
+      )
     }
-  }, [signInFulfilled, dispatch, navigate]);
+  }, [isAuthenticated, dispatch, navigate]);
 
-  if (isAuthenticated) {
-    return <Navigate to='/user/profile' />
-  }
+  // if (isAuthenticated) {
+  //   return <Navigate to='/user/profile' />
+  // }
   return (
     <>
       <div className="container">
