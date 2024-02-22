@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCartByUserId, removeItemFromCartSync, removeItemFromCartAsync } from './cartSlice';
+import { getCartByUserId, removeItemFromCartSync, removeItemFromCartAsync, updateItemQuantityAsync } from './cartSlice';
 import { CartItem } from '../../components/cartItem/CartItem';
 import { PrototypeCartItem } from '../../components/cartItem/PrototypeCartItem';
 
@@ -12,6 +12,9 @@ export function Cart() {
     isPending: getCartByUserIdPending,
     isRejected: getCartByUserIdRejected
   } = useSelector(state => state.cart.getCartByUserId);
+  const {
+    isPending: updateItemQuantityAsyncPending
+  } = useSelector(state => state.cart.updateItemQuantityAsync);
   const {
     isPending: removeItemFromCartAsyncPending
   } = useSelector(state => state.cart.removeItemFromCartAsync);
@@ -35,14 +38,22 @@ export function Cart() {
           item={item}
           onRemove={async () => {
             isAuthenticated ? (
-                // if there is a true cart
-                await dispatch(removeItemFromCartAsync({ cartId, productId: item.productId }))
-              ) : (
-                // if there is a false cart
-                dispatch(removeItemFromCartSync({ productId: item.productId }))
-              )
+              // if there is a true cart
+              await dispatch(removeItemFromCartAsync({ cartId, productId: item.productId }))
+            ) : (
+              // if there is a false cart
+              dispatch(removeItemFromCartSync({ productId: item.productId }))
+            )
           }}
           removeItemPending={item.isRemoving}
+          onQuantityChange={async (quantity) => {
+            if (quantity > 0) {
+              if (isAuthenticated) {
+                await dispatch(updateItemQuantityAsync({ cartId, productId: item.productId, quantity }))
+              }
+            }
+          }}
+          changeQuantityPending={item.changeQuantityPending}
         />
       </div >
     ));
@@ -54,10 +65,10 @@ export function Cart() {
         <div className='row'>
           <h1 className='col'>My Cart</h1>
         </div>
-        <div className='row row-cols-1 g-3'>
+        <div className='row row-cols-1 g-2'>
           {(getCartByUserIdPending) && (
             Array.from({ length: 6 }, (_, i) =>
-              <div key={i} className='col' style={{ height: '160px'}}>
+              <div key={i} className='col' style={{ height: '160px' }}>
                 <PrototypeCartItem />
               </div>
             )

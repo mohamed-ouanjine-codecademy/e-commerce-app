@@ -45,7 +45,7 @@ export function Product() {
               <div className="col-5">
                 <IncreaseDecreaseButtons
                   quantity={quantityToBuy}
-                  setQuantity={setQuantityToBuy}
+                  setQuantity={(quantity) => dispatch(setQuantityToBuy(quantity))}
                 />
               </div>
               <div className="col-12">

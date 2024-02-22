@@ -61,6 +61,20 @@ export const AddItemToCartAPI = async (productId, quantity, include) => {
   }
 };
 
+export const updateItemQuantityAPI = async (cartId, productId, quantity) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${cartId}/items/${productId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quantity })
+    });
+
+    return await handleResponse(response);
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const removeItemFromCartAPI = async (cartId, productId) => {
   try {
     const response = await fetch(`${BASE_URL}/${cartId}/items/${productId}`, {

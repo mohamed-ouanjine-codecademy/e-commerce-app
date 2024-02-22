@@ -97,8 +97,12 @@ router.put('/:cartId/items/:productId', async (req, res, next) => {
 
     const cartsProduct = await db.carts.updateCartProductQuantity(cartId, productId, quantity);
 
-    res.json(cartsProduct);
-
+    res.json({
+      status: 'success',
+      message: 'Item Quantity Updated.',
+      data: cartsProduct
+    });
+    
   } catch (err) {
     next(err);
   }

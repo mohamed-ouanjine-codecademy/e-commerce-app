@@ -1,12 +1,29 @@
-import React from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { Spinner } from "./sideEffect/Spinner";
 
 export function IncreaseDecreaseButtons({
   quantity,
-
   setQuantity,
+  setQuantityPending
 }) {
-  const dispatch = useDispatch();
+  const [increasePending, setIncreasePending] = useState(false);
+  const [decreasePending, setDecreasePending] = useState(false);
+
+  const handleDecrease = () => {
+    setQuantity(quantity - 1);
+    setDecreasePending(true);
+  }
+  const handleIncrease = () => {
+    setQuantity(quantity + 1);
+    setIncreasePending(true);
+  }
+
+  useEffect(() => {
+    if (!setQuantityPending) {
+      if (increasePending) setIncreasePending(false);
+      if (decreasePending) setDecreasePending(false);
+    }
+  }, [setQuantityPending]);
 
   return (
     <>
@@ -14,19 +31,35 @@ export function IncreaseDecreaseButtons({
         <button
           type="button"
           className="col btn btn-outline-secondary"
-          onClick={() => dispatch(setQuantity(quantity - 1))}
-        >-</button>
+          onClick={handleDecrease}
+        >
+          {
+            (decreasePending && setQuantityPending) ? (
+              <Spinner />
+            ) : (
+              '-'
+            )
+          }
+        </button>
         <input
           type="text"
           className="col form-control text-center"
           value={quantity}
-          onChange={(e) => dispatch(setQuantity(parseInt(e.target.value)))}
+          onChange={(e) => setQuantity(parseInt(e.target.value))}
         />
         <button
           type="button"
           className="col btn btn-outline-secondary"
-          onClick={() => dispatch(setQuantity(quantity + 1))}
-        >+</button>
+          onClick={handleIncrease}
+        >
+          {
+            (increasePending && setQuantityPending) ? (
+              <Spinner />
+            ) : (
+              '+'
+            )
+          }
+        </button>
       </div>
     </>
   );

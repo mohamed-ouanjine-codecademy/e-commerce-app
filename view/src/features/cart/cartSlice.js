@@ -4,6 +4,7 @@ import {
   getCartByUserIdAPI,
   getCartByIdAPI,
   AddItemToCartAPI,
+  updateItemQuantityAPI,
   removeItemFromCartAPI
 } from "../../api/cartAPI";
 
@@ -62,8 +63,19 @@ export const addItemToCartAsync = createAsyncThunk(
   }
 );
 
-// // Update item quantity
-// export const UpdateItemQuantity
+// Update item quantity
+export const updateItemQuantityAsync = createAsyncThunk(
+  'cart/updateItemQuantityAsync',
+  async ({ cartId, productId, quantity }) => {
+    try {
+      const { data } = await updateItemQuantityAPI(cartId, productId, quantity);
+
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+)
 
 // remove item from cart
 export const removeItemFromCartAsync = createAsyncThunk(
@@ -119,6 +131,11 @@ const cartSlice = createSlice({
       isFulfilled: false,
       isRejected: false
     },
+    updateItemQuantityAsync: {
+      isPending: false,
+      isFulfilled: false,
+      isRejected: false
+    },
     removeItemFromCartAsync: {
       isPending: false,
       isFulfilled: false,
@@ -129,6 +146,7 @@ const cartSlice = createSlice({
       getCartByUserId: null,
       getCartById: null,
       addItemToCartAsync: null,
+      updateItemQuantityAsync: null,
       removeItemFromCartAsync: null,
     }
   },
@@ -229,6 +247,36 @@ const cartSlice = createSlice({
         state.addItemToCartAsync.isPending = false;
         state.addItemToCartAsync.isFulfilled = false;
         state.addItemToCartAsync.isRejected = true;
+      })
+      // updated item quantity (updateItemQuantity)
+      .addCase(updateItemQuantityAsync.pending, (state, action) => {
+        const productId = action.meta.arg.productId;
+        state.items = state.items.map((item) =>
+          item.productId === productId ? { ...item, changeQuantityPending: true } : item
+        );
+
+        state.updateItemQuantityAsync.isPending = true;
+        state.updateItemQuantityAsync.isFulfilled = false;
+        state.updateItemQuantityAsync.isRejected = false;
+      })
+      .addCase(updateItemQuantityAsync.fulfilled, (state, action) => {
+        const { productId, quantity } = action.payload;
+        state.items = state.items.map(
+          item => (item.productId === productId) ? { ...item, quantity, changeQuantityPending: false } : item
+        );
+        state.updateItemQuantityAsync.isPending = false;
+        state.updateItemQuantityAsync.isFulfilled = true;
+        state.updateItemQuantityAsync.isRejected = false;
+      })
+      .addCase(updateItemQuantityAsync.rejected, (state, action) => {
+        const productId = action.meta.arg.productId;
+        state.items = state.items.map((item) =>
+          item.productId === productId ? { ...item, changeQuantityPending: false } : item
+        );
+        state.error.updateItemQuantityAsync = action.error.message;
+        state.updateItemQuantityAsync.isPending = false;
+        state.updateItemQuantityAsync.isFulfilled = false;
+        state.updateItemQuantityAsync.isRejected = true;
       })
       // remove item from cart (addItemToCartAsync)
       .addCase(removeItemFromCartAsync.pending, (state, action) => {

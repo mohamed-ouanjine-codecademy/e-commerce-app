@@ -207,12 +207,8 @@ const carts = {
         [quantity, cartId, productId]
       );
 
-      const success = results.rows.length > 0;
-      const updatedProduct = success ? help.transformKeys(results.rows[0]) : null;
-      return {
-        success,
-        updatedProduct
-      };
+      const updatedProduct = help.transformKeys(results.rows[0]);
+      return updatedProduct;
 
     } catch (err) {
       throw err;
