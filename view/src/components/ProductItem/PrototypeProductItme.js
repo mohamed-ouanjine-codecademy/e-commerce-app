@@ -32,9 +32,7 @@ export function PrototypeProductItem({ className }) {
             <span className="placeholder col-4 placeholder-sm"></span>
             <span className="placeholder col-4 placeholder-sm"></span>
             <span className="placeholder col-6 placeholder-sm"></span>
-            <span className="placeholder col-8 placeholder-sm"></span>
           </p>
-          <a className="btn btn-primary disabled placeholder col-10" aria-disabled="true"></a>
         </div>
       </div>
     </>
