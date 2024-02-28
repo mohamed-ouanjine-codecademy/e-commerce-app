@@ -54,9 +54,9 @@ export const addItemToCartAsync = createAsyncThunk(
   'cart/addItemToCartAsync',
   async ({ productId, quantity, include }) => {
     try {
-      const cart = await AddItemToCartAPI(productId, quantity, include);
+      const { items } = await AddItemToCartAPI(productId, quantity, include);
 
-      return cart
+      return items
     } catch (error) {
       throw error;
     }
@@ -249,6 +249,8 @@ const cartSlice = createSlice({
         state.addItemToCartAsync.isRejected = false;
       })
       .addCase(addItemToCartAsync.fulfilled, (state, action) => {
+        state.items = action.payload;
+
         state.addItemToCartAsync.isPending = false;
         state.addItemToCartAsync.isFulfilled = true;
         state.addItemToCartAsync.isRejected = false;

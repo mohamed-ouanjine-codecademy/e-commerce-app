@@ -15,12 +15,6 @@ export function Cart() {
     isRejected: getCartByUserIdRejected
   } = useSelector(state => state.cart.getCartByUserId);
   const {
-    isPending: updateItemQuantityAsyncPending
-  } = useSelector(state => state.cart.updateItemQuantityAsync);
-  const {
-    isPending: removeItemFromCartAsyncPending
-  } = useSelector(state => state.cart.removeItemFromCartAsync);
-  const {
     getCartByUserId: getCartByUserIdError
   } = useSelector(state => state.cart.error);
   const dispatch = useDispatch();
