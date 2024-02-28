@@ -176,7 +176,7 @@ const cartSlice = createSlice({
         const price = parseFloat(item.productInfo.price.replace(/[$,]/g, ''));
         return total + (quantity * price);
       }, 0);
-      state.totalAmount = Math.floor((totalAmount * 100)) / 100;
+      state.totalAmount = totalAmount.toFixed(2);
     }
   },
   extraReducers: (builder) => {

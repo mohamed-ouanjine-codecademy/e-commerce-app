@@ -3,7 +3,7 @@ import React from "react";
 export function PrototypeCartItem({ className }) {
   return (
     <>
-      <div className={`${className} card mb-3 bg-light placeholder-glow w-100 h-100`} aria-hidden='true'>
+      <div className={`${className} card bg-light placeholder-glow w-100 h-100 overflow-hidden`} aria-hidden='true'>
         <div className="row g-0 w-100 h-100">
           <div className="col-4 placeholder bg-primary">
           </div>

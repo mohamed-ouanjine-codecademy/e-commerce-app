@@ -7,11 +7,11 @@ export function Button({ value, onClick, isPending }) {
       <button
         type="button"
         className="btn btn-primary w-100"
-        aria-label="Add to Cart"
+        aria-label={value}
         onClick={onClick}
       >
         {
-          isPending ? 'Pending...' : 'Add to Cart'
+          isPending ? 'Pending...' : value
         }
       </button>
     </>

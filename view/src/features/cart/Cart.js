@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getCartByUserId, removeItemFromCartSync, removeItemFromCartAsync, updateItemQuantityAsync, calcTotalAmount } from './cartSlice';
 import { CartItem } from '../../components/cartItem/CartItem';
 import { PrototypeCartItem } from '../../components/cartItem/PrototypeCartItem';
+import { Button } from '../../components/Button';
 
 export function Cart() {
   const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
@@ -68,20 +69,30 @@ export function Cart() {
   return (
     <>
       <div className='container-fluid'>
-        <div className='row'>
+        <div className='row flex-column g-2'>
           <h1 className='col'>My Cart</h1>
-        </div>
-        <div className='row row-cols-1 g-2'>
-          {(getCartByUserIdPending) && (
-            Array.from({ length: 6 }, (_, i) =>
-              <div key={i} className='col' style={{ height: '160px' }}>
-                <PrototypeCartItem />
-              </div>
-            )
-          )}
-          {renderItems()}
-          <h3>Total is ${totalAmount}</h3>
-          {getCartByUserIdRejected && <p>Error: {getCartByUserIdError}</p>}
+          <div className='col row row-cols-1 g-2'>
+            {
+              getCartByUserIdPending ? (
+                Array.from({ length: 6 }, (_, i) =>
+                  <div key={i} className='col' style={{ height: '160px' }}>
+                    <PrototypeCartItem />
+                  </div>
+                )
+              ) : (
+                renderItems()
+              )
+            }
+          </div>
+          <h3 className='col'>Total is ${totalAmount}</h3>
+          <div className='col'>
+            <Button
+              value={'Checkout'}
+            />
+          </div>
+          <div className='col'>
+            {getCartByUserIdRejected && <p>Error: {getCartByUserIdError}</p>}
+          </div>
         </div>
       </div>
     </>

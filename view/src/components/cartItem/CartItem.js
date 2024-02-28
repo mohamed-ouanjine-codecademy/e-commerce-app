@@ -15,9 +15,9 @@ export function CartItem({
   const product = item.productInfo;
   return (
     <>
-      <div className={`${className} ${styles.itemContainer} card mb-3 bg-light `}>
+      <div className={`${className} ${styles.itemContainer} card bg-light m-0`}>
         <div className="row g-0">
-          <div className="col-4">
+          <div className="col-4 overflow-hidden">
             <ImageContainer imageUrl={product.imageUrl} alt={product.name} />
           </div>
           <div className="col-6">
