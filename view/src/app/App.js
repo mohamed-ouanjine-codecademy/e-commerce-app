@@ -9,8 +9,9 @@ import { SignIn } from '../features/signIn/SignIn';
 import { Profile } from '../features/profile/Profile';
 import { EditProfile } from '../components/EditProfile';
 import { Cart } from '../features/cart/Cart';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { checkAuthentication } from '../features/signIn/signInSlice';
+import { getCartByUserId } from '../features/cart/cartSlice';
 
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<Root />}>
@@ -25,13 +26,24 @@ const router = createBrowserRouter(createRoutesFromElements(
 ));
 
 function App() {
+  const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
+  const cartItems = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
   useEffect(() => {
     const checkAuthenticationFunc = async () => {
       await dispatch(checkAuthentication());
     }
     checkAuthenticationFunc()
-  }, [dispatch])
+  }, [dispatch]);
+
+  // load  cart's items at first when user is authenticated
+  useEffect(() => {
+    const loadCartFunc = async () => {
+      await dispatch(getCartByUserId({ include: true }));
+    }
+    (isAuthenticated && cartItems.length === 0) && loadCartFunc();
+  });
+
   return (
     <RouterProvider router={router} />
   );
