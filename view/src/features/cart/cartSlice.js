@@ -173,7 +173,7 @@ const cartSlice = createSlice({
     calcTotalAmount: (state) => {
       const totalAmount = state.items.reduce((total, item) => {
         const quantity = item.quantity;
-        const price = parseFloat(item.productInfo.price.slice(1));
+        const price = parseFloat(item.productInfo.price.replace(/[$,]/g, ''));
         return total + (quantity * price);
       }, 0);
       state.totalAmount = Math.floor((totalAmount * 100)) / 100;
