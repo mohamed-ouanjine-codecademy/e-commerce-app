@@ -111,6 +111,7 @@ const cartSlice = createSlice({
       //   }
       // }
     ],
+    totalAmount: 0,
     createCart: {
       isPending: false,
       isFulfilled: false,
@@ -167,6 +168,15 @@ const cartSlice = createSlice({
     clearCartData: (state) => {
       state.cartId = 0;
       state.items = [];
+      state.totalAmount = 0;
+    },
+    calcTotalAmount: (state) => {
+      const totalAmount = state.items.reduce((total, item) => {
+        const quantity = item.quantity;
+        const price = parseFloat(item.productInfo.price.slice(1));
+        return total + (quantity * price);
+      }, 0);
+      state.totalAmount = Math.floor((totalAmount * 100)) / 100;
     }
   },
   extraReducers: (builder) => {
@@ -313,6 +323,7 @@ const cartSlice = createSlice({
 export const {
   addItemToCartSync,
   removeItemFromCartSync,
-  clearCartData
+  clearCartData,
+  calcTotalAmount
 } = cartSlice.actions;
 export default cartSlice.reducer;

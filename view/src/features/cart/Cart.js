@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCartByUserId, removeItemFromCartSync, removeItemFromCartAsync, updateItemQuantityAsync } from './cartSlice';
+import { getCartByUserId, removeItemFromCartSync, removeItemFromCartAsync, updateItemQuantityAsync, calcTotalAmount } from './cartSlice';
 import { CartItem } from '../../components/cartItem/CartItem';
 import { PrototypeCartItem } from '../../components/cartItem/PrototypeCartItem';
 
@@ -8,6 +8,7 @@ export function Cart() {
   const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
   const cartId = useSelector(state => state.cart.cartId);
   const items = useSelector(state => state.cart.items);
+  const totalAmount = useSelector(state => state.cart.totalAmount);
   const {
     isPending: getCartByUserIdPending,
     isRejected: getCartByUserIdRejected
@@ -22,6 +23,11 @@ export function Cart() {
     getCartByUserId: getCartByUserIdError
   } = useSelector(state => state.cart.error);
   const dispatch = useDispatch();
+
+  // Calc cart's total amount whenever the items change.
+  useEffect(() => {
+    dispatch(calcTotalAmount());
+  }, [dispatch, items]);
 
   // Retrieve cart
   useEffect(() => {
@@ -74,6 +80,7 @@ export function Cart() {
             )
           )}
           {renderItems()}
+          <h3>Total is ${totalAmount}</h3>
           {getCartByUserIdRejected && <p>Error: {getCartByUserIdError}</p>}
         </div>
       </div>
