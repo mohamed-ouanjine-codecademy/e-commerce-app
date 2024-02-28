@@ -29,7 +29,7 @@ export function Cart() {
     const getCartByUserIdFunc = async () => {
       await dispatch(getCartByUserId({ include: true }));
     };
-    getCartByUserIdFunc();
+    (items.length === 0) && getCartByUserIdFunc();
   }, [dispatch]);
 
   const renderItems = () => {

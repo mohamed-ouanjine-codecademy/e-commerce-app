@@ -29,20 +29,23 @@ function App() {
   const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
   const cartItems = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
+
   useEffect(() => {
     const checkAuthenticationFunc = async () => {
       await dispatch(checkAuthentication());
     }
-    checkAuthenticationFunc()
+    checkAuthenticationFunc();
   }, [dispatch]);
 
-  // load  cart's items at first when user is authenticated
+  // Load cart's items when user is authenticated and cart is empty
   useEffect(() => {
     const loadCartFunc = async () => {
       await dispatch(getCartByUserId({ include: true }));
     }
-    (isAuthenticated && cartItems.length === 0) && loadCartFunc();
-  });
+    if (isAuthenticated && cartItems.length === 0) {
+      loadCartFunc();
+    }
+  }, [dispatch, isAuthenticated, cartItems.length]);
 
   return (
     <RouterProvider router={router} />
