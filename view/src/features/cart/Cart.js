@@ -4,6 +4,7 @@ import { getCartByUserId, removeItemFromCartSync, removeItemFromCartAsync, updat
 import { CartItem } from '../../components/cartItem/CartItem';
 import { PrototypeCartItem } from '../../components/cartItem/PrototypeCartItem';
 import { Button } from '../../components/Button';
+import { useNavigate } from 'react-router-dom';
 
 export function Cart() {
   const isAuthenticated = useSelector(state => state.signIn.isAuthenticated);
@@ -18,6 +19,7 @@ export function Cart() {
     getCartByUserId: getCartByUserIdError
   } = useSelector(state => state.cart.error);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Calc cart's total amount whenever the items change.
   useEffect(() => {
@@ -60,6 +62,13 @@ export function Cart() {
     ));
   };
 
+  // handle checkout click
+  const handleCheckout = () => {
+    if (isAuthenticated && items.length > 0) {
+      navigate('/checkout');
+    }
+  }
+
   return (
     <>
       <div className='container-fluid'>
@@ -82,6 +91,7 @@ export function Cart() {
           <div className='col'>
             <Button
               value={'Checkout'}
+              onClick={handleCheckout}
             />
           </div>
           <div className='col'>
