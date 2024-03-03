@@ -9,6 +9,7 @@ import { SignIn } from '../features/signIn/SignIn';
 import { Profile } from '../features/profile/Profile';
 import { EditProfile } from '../components/EditProfile';
 import { Cart } from '../features/cart/Cart';
+import Checkout from '../features/checkout/Checkout';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAuthentication } from '../features/signIn/signInSlice';
 import { getCartByUserId } from '../features/cart/cartSlice';
@@ -18,6 +19,7 @@ const router = createBrowserRouter(createRoutesFromElements(
     <Route index element={<ProductList />} />
     <Route path='product' element={<Product />} />
     <Route path='cart' element={<Cart />} />
+    <Route path='checkout' element={<Checkout />} />
     <Route path='user/profile' element={<Profile />} />
     <Route path='user/profile/edit' element={<EditProfile />} />
     <Route path='user/sign-up' element={<SignUp />} />
