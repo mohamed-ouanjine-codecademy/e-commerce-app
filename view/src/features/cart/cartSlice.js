@@ -89,7 +89,17 @@ export const removeItemFromCartAsync = createAsyncThunk(
       throw error;
     }
   }
-)
+);
+
+// clac total amount 
+const calcTotalAmount = (items) => {
+  const totalAmount = items.reduce((total, item) => {
+    const quantity = item.quantity;
+    const price = parseFloat(item.productInfo.price.replace(/[$,]/g, ''));
+    return total + (quantity * price);
+  }, 0);
+  return totalAmount.toFixed(2);
+}
 
 const cartSlice = createSlice({
   name: 'cart',
@@ -170,14 +180,6 @@ const cartSlice = createSlice({
       state.items = [];
       state.totalAmount = 0;
     },
-    calcTotalAmount: (state) => {
-      const totalAmount = state.items.reduce((total, item) => {
-        const quantity = item.quantity;
-        const price = parseFloat(item.productInfo.price.replace(/[$,]/g, ''));
-        return total + (quantity * price);
-      }, 0);
-      state.totalAmount = totalAmount.toFixed(2);
-    }
   },
   extraReducers: (builder) => {
     builder
@@ -191,6 +193,8 @@ const cartSlice = createSlice({
         const cart = action.payload;
         state.id = cart.id;
         state.items = cart.items;
+        // clac total amount
+        state.totalAmount = calcTotalAmount(state.items);
 
         state.createCart.isPending = false;
         state.createCart.isFulfilled = true;
@@ -210,6 +214,9 @@ const cartSlice = createSlice({
       .addCase(getCartById.fulfilled, (state, action) => {
         const cart = action.payload;
         state.items = cart.items;
+        state.cartId = cart.id;
+        // clac total amount
+        state.totalAmount = calcTotalAmount(state.items);
 
         state.getCartById.isPending = false;
         state.getCartById.isFulfilled = true;
@@ -230,6 +237,8 @@ const cartSlice = createSlice({
         const cart = action.payload;
         state.cartId = cart.id;
         state.items = cart.items;
+        // clac total amount
+        state.totalAmount = calcTotalAmount(state.items);
 
         state.getCartByUserId.isPending = false;
         state.getCartByUserId.isFulfilled = true;
@@ -250,6 +259,8 @@ const cartSlice = createSlice({
       })
       .addCase(addItemToCartAsync.fulfilled, (state, action) => {
         state.items = action.payload;
+        // clac total amount
+        state.totalAmount = calcTotalAmount(state.items);
 
         state.addItemToCartAsync.isPending = false;
         state.addItemToCartAsync.isFulfilled = true;
@@ -276,6 +287,9 @@ const cartSlice = createSlice({
         state.items = state.items.map(
           item => (item.productId === productId) ? { ...item, quantity, changeQuantityPending: false } : item
         );
+        // clac total amount
+        state.totalAmount = calcTotalAmount(state.items);
+
         state.updateItemQuantityAsync.isPending = false;
         state.updateItemQuantityAsync.isFulfilled = true;
         state.updateItemQuantityAsync.isRejected = false;
@@ -304,6 +318,8 @@ const cartSlice = createSlice({
       .addCase(removeItemFromCartAsync.fulfilled, (state, action) => {
         const product = action.payload.product;
         state.items = state.items.filter(item => item.productId !== product.id);
+        // clac total amount
+        state.totalAmount = calcTotalAmount(state.items);
 
         state.removeItemFromCartAsync.isPending = false;
         state.removeItemFromCartAsync.isFulfilled = true;
@@ -326,6 +342,5 @@ export const {
   addItemToCartSync,
   removeItemFromCartSync,
   clearCartData,
-  calcTotalAmount
 } = cartSlice.actions;
 export default cartSlice.reducer;

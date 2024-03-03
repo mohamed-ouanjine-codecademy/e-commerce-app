@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCartByUserId, removeItemFromCartSync, removeItemFromCartAsync, updateItemQuantityAsync, calcTotalAmount } from './cartSlice';
+import { getCartByUserId, removeItemFromCartSync, removeItemFromCartAsync, updateItemQuantityAsync } from './cartSlice';
 import { CartItem } from '../../components/cartItem/CartItem';
 import { PrototypeCartItem } from '../../components/cartItem/PrototypeCartItem';
 import { Button } from '../../components/Button';
@@ -20,11 +20,6 @@ export function Cart() {
   } = useSelector(state => state.cart.error);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // Calc cart's total amount whenever the items change.
-  useEffect(() => {
-    dispatch(calcTotalAmount());
-  }, [dispatch, items]);
 
   // Retrieve cart
   useEffect(() => {
