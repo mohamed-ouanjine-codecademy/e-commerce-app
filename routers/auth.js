@@ -3,7 +3,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local');
 const pool = require('../models/database.js');
 // -- utils
-const db = require('../controllers');
+const users = require('../models/users');
 const help = require('../helperFunctions.js');
 
 const router = express.Router();
@@ -51,7 +51,7 @@ passport.serializeUser(function (user, cb) {
 
 passport.deserializeUser(function (id, cb) {
   process.nextTick(async function () {
-    await db.users.findUserById(id, function (err, user) {
+    await users.findUserById(id, function (err, user) {
       if (err) return cb(err);
       cb(null, user);
     });
@@ -76,7 +76,7 @@ router.post('/register', hashPassword, async (req, res, next) => {
     const { email } = req.body;
     const password = req.hashedPassword;
 
-    const response = await db.users.createUserAndCart(email, password);
+    const response = await users.createUserAndCart(email, password);
     const newUser = response.user;
 
     res.status(201).json({
@@ -143,7 +143,7 @@ router.get('/is-authenticated', (req, res, next) => {
 router.get('/check-email', async (req, res, next) => {
   try {
     const { email } = req.query;
-    const isEmailAvailable = await db.users.checkEmailAvailability(email);
+    const isEmailAvailable = await users.checkEmailAvailability(email);
 
     res.json({ isEmailAvailable });
   } catch (err) {

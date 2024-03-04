@@ -1,4 +1,4 @@
-const pool = require('../models/database.js');
+const pool = require('./database.js');
 const help = require('./helperFunctions.js');
 
 const products = {

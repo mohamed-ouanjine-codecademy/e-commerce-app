@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const db = require('../controllers');
+const carts = require('../models/carts');
 
 // get authenticated user cart
 router.get('/cart', async (req, res, next) => {
@@ -9,7 +9,7 @@ router.get('/cart', async (req, res, next) => {
       userId = req.user.id;
       include = req.query.include;
 
-      const cart  = await db.carts.getCartByUserId(userId, include);
+      const cart  = await carts.getCartByUserId(userId, include);
 
       return res.json({  status: 'success', data: { ...cart } })
     }
@@ -27,7 +27,7 @@ router.get('/:cartId', async (req, res, next) => {
     const { cartId } = req.params;
     const { include } = req.query;
 
-    const cart = await db.carts.getCartById(cartId, include);
+    const cart = await carts.getCartById(cartId, include);
 
     res.json(cart);
 
@@ -42,7 +42,7 @@ router.get('/users/:userId', async (req, res, next) => {
     const { userId } = req.params;
     const { include } = req.query;
 
-    const cart = await db.carts.getCartByUserId(userId, include);
+    const cart = await carts.getCartByUserId(userId, include);
 
     res.json(cart);
 
@@ -58,7 +58,7 @@ router.post('/', async (req, res, next) => {
     const { userId, items } = req.body;
 
     // Create a new cart with the user's ID
-    const newCart = await db.carts.createCart(parseInt(userId), items);
+    const newCart = await carts.createCart(parseInt(userId), items);
 
     res.status(201).json(newCart);
   } catch (error) {
@@ -75,7 +75,7 @@ router.post('/items', async (req, res, next) => {
       const item = req.body;
       const include = req.query.include;
 
-      const updatedCart = await db.carts.addItemToCart(userId, item, include);
+      const updatedCart = await carts.addItemToCart(userId, item, include);
 
       return res.status(201).json(updatedCart);
     }
@@ -95,7 +95,7 @@ router.put('/:cartId/items/:productId', async (req, res, next) => {
     const productId = parseInt(req.params.productId);
     const quantity = parseInt(req.body.quantity);
 
-    const cartsProduct = await db.carts.updateCartProductQuantity(cartId, productId, quantity);
+    const cartsProduct = await carts.updateCartProductQuantity(cartId, productId, quantity);
 
     res.json({
       status: 'success',
@@ -114,7 +114,7 @@ router.delete('/:cartId/items/:productId', async (req, res, next) => {
     const cartId = parseInt(req.params.cartId);
     const productId = parseInt(req.params.productId);
 
-    const result = await db.carts.deleteItemFromCart(cartId, productId);
+    const result = await carts.deleteItemFromCart(cartId, productId);
 
     res.json(result);
 
@@ -128,7 +128,7 @@ router.delete('/:cartId/items', async (req, res, next) => {
   try {
     const cartId = parseInt(req.params.cartId);
 
-    await db.carts.clearCart(cartId);
+    await carts.clearCart(cartId);
 
     res.status(204).send();
 
@@ -142,7 +142,7 @@ router.delete('/:cartId', async (req, res, next) => {
   try {
     const cartId = parseInt(req.params.cartId);
 
-    await db.carts.deleteCart(cartId);
+    await carts.deleteCart(cartId);
 
     res.status(204).send();
 
@@ -157,7 +157,7 @@ router.post('/:cartId/checkout', async (req, res, next) => {
     const cartId = parseInt(req.params.cartId);
     const userId = req.user.id;
 
-    const order = await db.carts.createOrder(cartId, userId);
+    const order = await carts.createOrder(cartId, userId);
 
     res.status(201).json(order);
 

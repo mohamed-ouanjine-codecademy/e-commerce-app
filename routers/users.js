@@ -3,15 +3,15 @@ const express = require('express');
 const router = express.Router();
 
 // -- utils
-const db = require('../controllers');
+const users = require('../models/users');
 const help = require('../helperFunctions.js');
 
 // get all users '/users'
 router.get('/', async (req, res, next) => {
   try {
-    const users = await db.users.getUsers();
+    const result = await users.getUsers();
 
-    res.json(users);
+    res.json(result);
 
   } catch (err) {
     next(err);
@@ -22,7 +22,7 @@ router.get('/', async (req, res, next) => {
 router.get('/:userId', async (req, res, next) => {
   try {
     const userId = parseInt(req.params.userId);
-    const user = await db.users.getUserById(userId);
+    const user = await users.getUserById(userId);
 
     res.json(user);
 
@@ -45,7 +45,7 @@ router.put('/:userId', async (req, res, next) => {
       userNewInfo.password = hashedPassword;
     }
 
-    const updatedUser = await db.users.updateUserById(userId, userNewInfo);
+    const updatedUser = await users.updateUserById(userId, userNewInfo);
 
     res.json(updatedUser);
 
@@ -58,7 +58,7 @@ router.delete('/:userId', async (req, res, next) => {
   try {
     const userId = parseInt(req.params.userId);
 
-    await db.users.deleteUserById(userId);
+    await users.deleteUserById(userId);
 
     res.status(204).send();
 

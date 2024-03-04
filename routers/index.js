@@ -10,10 +10,6 @@ const productsRouter = require('./products.js');
 const cartsRouter = require('./carts.js');
 const ordersRouter = require('./orders.js');
 
-// -- utils
-const db = require('../controllers');
-const help = require('../helperFunctions.js');
-
 // Define Swagger JSdoc options
 const options = {
   definition: {
