@@ -9,6 +9,7 @@ const usersRouter = require('./users.js');
 const productsRouter = require('./products.js');
 const cartsRouter = require('./carts.js');
 const ordersRouter = require('./orders.js');
+const shippingAddressesRouter = require('./shippingAddresses.js');
 
 // Define Swagger JSdoc options
 const options = {
@@ -33,6 +34,7 @@ router.use('/products', productsRouter);
 router.use('/carts', cartsRouter);
 router.use('/orders', ordersRouter);
 router.use('/auth', authRouter);
+router.use('/shipping-addresses', shippingAddressesRouter);
 
 // root path
 router.get('/', (req, res) => {

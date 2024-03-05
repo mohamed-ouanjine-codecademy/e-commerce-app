@@ -36,7 +36,10 @@ app.use((err, req, res, next) => {
   console.error(err);
   const status = err.status || 500;
   const message = err.message;
-  res.status(status).send(message);
+  res.status(status).json({
+    status: 'error',
+    message
+  });
 });
 
 app.listen(PORT, () => {
