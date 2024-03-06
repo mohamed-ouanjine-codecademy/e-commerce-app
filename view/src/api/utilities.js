@@ -11,6 +11,9 @@ export const handleResponse = async (response) => {
       throw new Error(errorMessage);
     }
   }
+  if (response.status === 204) {
+    return
+  }
   
   return await response.json();
 };

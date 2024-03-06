@@ -7,6 +7,7 @@ import productsReducer from '../features/productList/productListSlice';
 import productReducer from '../features/product/productSlice';
 import cartReducer from '../features/cart/cartSlice';
 import intendedDestinationReducer from '../features/intendedDestination/intendedDestinationSlice';
+import shippingAddressesReducer from '../features/shippingAddresses/shippingAddressesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     productList: productsReducer,
     product: productReducer,
     cart: cartReducer,
+    shippingAddresses: shippingAddressesReducer,
     intendedDestination: intendedDestinationReducer,
   },
   middleware: (getDefaultMiddleware) =>

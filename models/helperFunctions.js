@@ -35,8 +35,20 @@ const error = (message, status) => {
   throw error;
 }
 
+const convertKeysToSnakeCase = (obj) => {
+  const snakeCaseObj = {};
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const snakeCaseKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+      snakeCaseObj[snakeCaseKey] = obj[key];
+    }
+  }
+  return snakeCaseObj;
+}
+
 module.exports = {
   checkExistence,
   transformKeys,
-  error
+  error,
+  convertKeysToSnakeCase
 }

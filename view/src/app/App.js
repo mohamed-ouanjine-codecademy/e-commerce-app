@@ -13,12 +13,16 @@ import Checkout from '../features/checkout/Checkout';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAuthentication } from '../features/signIn/signInSlice';
 import { getCartByUserId } from '../features/cart/cartSlice';
+import AddShippingAddressForm from '../features/shippingAddresses/components/shippingAddressForm/AddShippingAddressForm';
+import EditShippingAddressForm from '../features/shippingAddresses/components/shippingAddressForm/EditShippingAddressForm';
 
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<Root />}>
     <Route index element={<ProductList />} />
     <Route path='product' element={<Product />} />
     <Route path='cart' element={<Cart />} />
+    <Route path='add-shipping-address' element={<AddShippingAddressForm />} />
+    <Route path='edit-shipping-address/:shippingAddressId' element={<EditShippingAddressForm />} />
     <Route path='checkout' element={<Checkout />} />
     <Route path='user/profile' element={<Profile />} />
     <Route path='user/profile/edit' element={<EditProfile />} />

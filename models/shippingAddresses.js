@@ -69,6 +69,7 @@ const shippingAddresses = {
       ) help.error('Invalid Input Data!', 400);
 
       // Build update query dynamically
+      newShippingAddressInfo = help.convertKeysToSnakeCase(newShippingAddressInfo);
       const updateQuery = [];
       const values = [];
       let placeholderIndex = 1;

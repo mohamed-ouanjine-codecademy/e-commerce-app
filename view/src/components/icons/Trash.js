@@ -1,4 +1,5 @@
 import React from "react";
+import { Spinner } from "../sideEffect/Spinner";
 
 export function Trash({ onRemove, removeItemPending }) {
   return (
@@ -7,9 +8,7 @@ export function Trash({ onRemove, removeItemPending }) {
         !removeItemPending ? (
           <span className="btn bi bi-trash" style={{ fontSize: '1.2rem' }} onClick={onRemove}></span>
         ) : (
-          <div className="spinner-grow spinner-grow-sm text-info" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
+          <Spinner />
         )
       }
     </>
