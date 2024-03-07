@@ -235,6 +235,8 @@ const shippingAddressesSlice = createSlice({
       .addCase(deleteShippingAddress.fulfilled, (state, action) => {
         state.sideEffect.addressOnRemoval = null;
         const shippingAddressId = action.meta.arg.shippingAddressId;
+        // if deleted address was selected i'll reset it
+        if (shippingAddressId === state.sideEffect.selectedAddressId) state.sideEffect.selectedAddressId = null;
         state.shippingAddresses = state.shippingAddresses.filter(shippingAddress =>
           shippingAddress.id !== shippingAddressId
         );

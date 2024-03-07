@@ -21,41 +21,43 @@ function ShippingAddress({
 
   return (
     <>
-      <label className="w-100">
-        <div className={`card ${selected && 'border border-primary'}`}>
-          <div className="card-body">
-            <div className="row align-items-center">
-              <div className="col-2">
-                <input
-                  type="radio"
-                  name="shippingAddress"
-                  checked={selected}
-                  onChange={onSelectAddress}
-                />
-              </div>
-              <div className="col-8">
-                <h5 className="card-title">{name}</h5>
-                <p className="card-text text-body-secondary">{`${street}, ${city}, ${state}`}</p>
-              </div>
-              <div className="col-2">
-                <div className="row row-cols-1">
-                  <div className="col text-center">
-                    <Pencil 
-                      onClick={() => navigate(`/edit-shipping-address/${shippingAddressId}`)}
-                    />
-                  </div>
-                  <div className="col text-center">
-                    <Trash
-                      onRemove={onAddressRemoval}
-                      removeItemPending={removeAddressPending}
-                    />
-                  </div>
+      <div className={`card ${selected && 'border border-primary'}`}>
+        <div className="card-body">
+          <div className="row align-items-center">
+            <div className="col-10">
+              <label className="row align-items-center">
+                <div className="col-2">
+                  <input
+                    type="radio"
+                    name="shippingAddress"
+                    checked={selected}
+                    onChange={onSelectAddress}
+                  />
+                </div>
+                <div className="col-10">
+                  <h5 className="card-title">{name}</h5>
+                  <p className="card-text text-body-secondary">{`${street}, ${city}, ${state}`}</p>
+                </div>
+              </label>
+            </div>
+            <div className="col-2">
+              <div className="row align-items-center justify-content-end">
+                <div className="col-12">
+                  <Pencil
+                    onClick={() => navigate(`/edit-shipping-address/${shippingAddressId}`)}
+                  />
+                </div>
+                <div className="col-12">
+                  <Trash
+                    onRemove={onAddressRemoval}
+                    removeItemPending={removeAddressPending}
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </label>
+      </div>
     </>
   );
 };

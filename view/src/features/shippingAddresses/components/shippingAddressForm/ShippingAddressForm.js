@@ -1,5 +1,6 @@
 import React from "react";
 import { Spinner } from "../../../../components/sideEffect/Spinner";
+import { useNavigate } from "react-router-dom";
 
 function ShippingAddressForm({
   onSubmit,
@@ -9,6 +10,11 @@ function ShippingAddressForm({
   actionPending
 }) {
   const { name, street, city, state, postalCode, country } = shippingAddress;
+  const navigate = useNavigate();
+
+  const handleCanceling = () => {
+    navigate(-1);
+  }
 
   return (
     <>
@@ -86,7 +92,17 @@ function ShippingAddressForm({
               required
             />
           </div>
-          <div className="col-12">
+          <div className="col-6">
+            <button
+              className="btn btn-secondary w-100"
+              type="button"
+              onClick={handleCanceling}
+              disabled={actionPending}
+            >
+              Cancel
+            </button>
+          </div>
+          <div className="col-6">
             <button
               className="btn btn-primary w-100"
               type="submit"

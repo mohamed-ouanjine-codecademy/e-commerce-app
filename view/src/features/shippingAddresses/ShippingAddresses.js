@@ -42,7 +42,7 @@ function ShippingAddresses() {
   return (
     <div className="container">
       <div className="row">
-        <h2 className="col">Shipping Addresses</h2>
+        <h2 className="col">Shipping Address</h2>
       </div>
       <div className="row g-2">
         {

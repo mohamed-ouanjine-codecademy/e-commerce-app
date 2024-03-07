@@ -1,7 +1,7 @@
 import React from "react";
 import { Spinner } from "./sideEffect/Spinner";
 
-export function Button({ value, onClick, isPending }) {
+export function Button({ value, onClick, actionPending }) {
 
   return (
     <>
@@ -12,11 +12,7 @@ export function Button({ value, onClick, isPending }) {
         onClick={onClick}
       >
         {
-          isPending ? (
-            <Spinner />
-          ) : (
-            value
-          )
+          actionPending ? <Spinner /> : value 
         }
       </button>
     </>
