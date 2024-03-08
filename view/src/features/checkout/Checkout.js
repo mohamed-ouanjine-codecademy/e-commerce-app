@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import ShippingAddresses from "../shippingAddresses/ShippingAddresses";
 import { useDispatch, useSelector } from "react-redux";
 import ShippingMethods from "../shippingMethods/ShippingMethods";
-import { setTotalCost, setCurrentStep, resetNextButtonDisabled } from "./checkoutSlice";
+import { setTotalCost, setCurrentStep, setNextButtonDisabled } from "./checkoutSlice";
 import OrderSummary from "../../components/OrderSummary";
 import { useNavigate } from "react-router-dom";
 
@@ -75,7 +75,7 @@ function Checkout() {
       default:
         nextButtonDisabledStatus = true;
     }
-    dispatch(resetNextButtonDisabled(nextButtonDisabledStatus));
+    dispatch(setNextButtonDisabled(nextButtonDisabledStatus));
   }, [dispatch, selectedAddressId, selectedMethodId, currentStep]);
 
   return (
