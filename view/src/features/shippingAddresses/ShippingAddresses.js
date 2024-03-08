@@ -40,7 +40,7 @@ function ShippingAddresses() {
   }, [dispatch, shippingAddresses]);
 
   return (
-    <div className="container">
+    <div className="container-fluid">
       <div className="row">
         <h2 className="col">Shipping Address</h2>
       </div>
