@@ -98,7 +98,7 @@ const calcTotalAmount = (items) => {
     const price = parseFloat(item.productInfo.price.replace(/[$,]/g, ''));
     return total + (quantity * price);
   }, 0);
-  return totalAmount.toFixed(2);
+  return parseFloat(totalAmount.toFixed(2));
 }
 
 const cartSlice = createSlice({

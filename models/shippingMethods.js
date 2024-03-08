@@ -6,7 +6,10 @@ const shippingMethodsModel = {
     try {
       const results = await pool.query(`SELECT * FROM shipping_methods;`);
       const shippingMethods = help.transformKeys(results.rows);
-
+      shippingMethods.forEach(method => {
+        method.price = parseFloat(method.price);
+      });
+      
       return shippingMethods;
     } catch (error) {
       throw error;
