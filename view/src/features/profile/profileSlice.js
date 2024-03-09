@@ -58,7 +58,6 @@ const profileSlice = createSlice({
   },
   reducers: {
     setUserInfo: (state, action) => {
-      console.log(action.payload);
       state.user = action.payload;
     },
     setFirstName: (state, action) => {

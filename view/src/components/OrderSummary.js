@@ -25,8 +25,7 @@ function OrderSummary({
       )
     })
   }
-  console.log(typeof deliveryMethod.price);
-  console.log(typeof subTotal);
+  
   return (
     <>
       <div className="container-fluid">

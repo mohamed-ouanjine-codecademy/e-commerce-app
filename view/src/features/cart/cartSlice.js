@@ -83,7 +83,6 @@ export const removeItemFromCartAsync = createAsyncThunk(
   async ({ cartId, productId }) => {
     try {
       const response = await removeItemFromCartAPI(cartId, productId);
-      console.log(response);
       return response.data;
     } catch (error) {
       throw error;
