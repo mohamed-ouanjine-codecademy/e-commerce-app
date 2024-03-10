@@ -5,7 +5,7 @@ const checkoutSlice = createSlice({
   initialState: {
     totalCost: 0,
     currentStep: 1,
-    nextButtonDisabled: true
+    continueButtonDisabled: true
   },
   reducers: {
     setTotalCost: (state, action) => {
@@ -14,8 +14,8 @@ const checkoutSlice = createSlice({
     setCurrentStep: (state, action) => {
       state.currentStep = action.payload;
     },
-    setNextButtonDisabled: (state, action) => {
-      state.nextButtonDisabled = action.payload;
+    setContinueButtonDisabled: (state, action) => {
+      state.continueButtonDisabled = action.payload;
     }
   }
 });
@@ -23,6 +23,6 @@ const checkoutSlice = createSlice({
 export const {
   setTotalCost,
   setCurrentStep,
-  setNextButtonDisabled
+  setContinueButtonDisabled
 } = checkoutSlice.actions;
 export default checkoutSlice.reducer;

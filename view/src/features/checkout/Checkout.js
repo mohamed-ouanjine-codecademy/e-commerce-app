@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import ShippingAddresses from "../shippingAddresses/ShippingAddresses";
 import { useDispatch, useSelector } from "react-redux";
 import DeliveryMethods from "../deliveryMethods/DeliveryMethods";
-import { setTotalCost, setCurrentStep, setNextButtonDisabled } from "./checkoutSlice";
+import { setTotalCost, setCurrentStep, setContinueButtonDisabled } from "./checkoutSlice";
 import OrderSummary from "../../components/OrderSummary";
 import { useNavigate } from "react-router-dom";
 
@@ -29,10 +29,12 @@ function Checkout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Set total cost by adding items's total cost and delivery method cost
   useEffect(() => {
     dispatch(setTotalCost(subTotal + deliveryMethod?.price));
   }, [dispatch, subTotal, deliveryMethod])
 
+  // TODO: complete the 5 steps (shipping addresses,...,Payment, thank you page)
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
@@ -57,25 +59,25 @@ function Checkout() {
     }
   };
 
-
+  // This is basically to set the "Continue" button disabled state
   useEffect(() => {
-    let nextButtonDisabledStatus;
+    let continueButtonDisabledStatus;
     switch (currentStep) {
       case 1:
-        if (selectedAddressId === null) nextButtonDisabledStatus = true;
-        else nextButtonDisabledStatus = false
+        if (selectedAddressId === null) continueButtonDisabledStatus = true;
+        else continueButtonDisabledStatus = false
         break;
       case 2:
-        if (selectedMethodId === null) nextButtonDisabledStatus = true;
-        else nextButtonDisabledStatus = false
+        if (selectedMethodId === null) continueButtonDisabledStatus = true;
+        else continueButtonDisabledStatus = false
         break;
       case 3:
-        nextButtonDisabledStatus = false;
+        continueButtonDisabledStatus = false;
         break;
       default:
-        nextButtonDisabledStatus = true;
+        continueButtonDisabledStatus = true;
     }
-    dispatch(setNextButtonDisabled(nextButtonDisabledStatus));
+    dispatch(setContinueButtonDisabled(continueButtonDisabledStatus));
   }, [dispatch, selectedAddressId, selectedMethodId, currentStep]);
 
   return (
