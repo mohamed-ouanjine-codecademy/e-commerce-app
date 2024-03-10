@@ -1,11 +1,11 @@
 import React from "react";
 
-function ShippingMethod({
-  shippingMethod,
+function DeliveryMethod({
+  deliveryMethod,
   isSelected,
   onSelectMethod
 }) {
-  const { name, price, description } = shippingMethod;
+  const { name, price, description } = deliveryMethod;
 
   return (
     <>
@@ -15,7 +15,7 @@ function ShippingMethod({
             <div className="col-2">
               <input
                 type="radio"
-                name="shippingMethod"
+                name="deliveryMethod"
                 checked={isSelected}
                 onChange={onSelectMethod}
               />
@@ -32,4 +32,4 @@ function ShippingMethod({
   );
 };
 
-export default ShippingMethod;
+export default DeliveryMethod;

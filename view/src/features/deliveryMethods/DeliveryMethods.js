@@ -1,26 +1,26 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import ShippingMethod from "./components/ShippingMethod";
-import { getShippingMethods, setSelectedMethodId } from "./shippingMethodsSlice";
+import DeliveryMethod from "./components/DeliveryMethod";
+import { getDeliveryMethods, setSelectedMethodId } from "./deliveryMethodsSlice";
 import MonoChoiceCardPrototype from "../../components/MonoChoiceCardPrototype";
 
-function ShippingMethods() {
-  const shippingMethods = useSelector(state => state.shippingMethods.shippingMethods);
-  const selectedMethodId = useSelector(state => state.shippingMethods.sideEffects.selectedMethodId);
+function DeliveryMethods() {
+  const deliveryMethods = useSelector(state => state.deliveryMethods.deliveryMethods);
+  const selectedMethodId = useSelector(state => state.deliveryMethods.sideEffects.selectedMethodId);
   const {
-    isPending: getShippingMethodsPending,
-    isFulfilled: getShippingMethodsFulfilled
-  } = useSelector(state => state.shippingMethods.getShippingMethods);
+    isPending: getDeliveryMethodsPending,
+    isFulfilled: getDeliveryMethodsFulfilled
+  } = useSelector(state => state.deliveryMethods.getDeliveryMethods);
 
   const dispatch = useDispatch();
 
   // Load shipping methods on first render.
   useEffect(() => {
-    const getShippingMethodsFunc = async () => {
-      await dispatch(getShippingMethods());
+    const getDeliveryMethodsFunc = async () => {
+      await dispatch(getDeliveryMethods());
     }
-    if (!getShippingMethodsFulfilled) getShippingMethodsFunc();
-  }, [dispatch, getShippingMethodsFulfilled]);
+    if (!getDeliveryMethodsFulfilled) getDeliveryMethodsFunc();
+  }, [dispatch, getDeliveryMethodsFulfilled]);
 
   return (
     <>
@@ -30,19 +30,19 @@ function ShippingMethods() {
         </div>
         <div className="row g-2">
           {
-            getShippingMethodsPending ? (
+            getDeliveryMethodsPending ? (
               Array.from({ length: 3 }, ((_, index) =>
                 <div className="col-12" key={index}>
                   <MonoChoiceCardPrototype />
                 </div>
               ))
             ) : (
-              shippingMethods.map(shippingMethod => {
-                const shippingMethodId = shippingMethod.id;
+              deliveryMethods.map(deliveryMethod => {
+                const shippingMethodId = deliveryMethod.id;
                 return (
                   <div className="col-12" key={shippingMethodId}>
-                    <ShippingMethod
-                      shippingMethod={shippingMethod}
+                    <DeliveryMethod
+                      deliveryMethod={deliveryMethod}
                       isSelected={selectedMethodId === shippingMethodId}
                       onSelectMethod={() => dispatch(setSelectedMethodId(shippingMethodId))}
                     />
@@ -57,4 +57,4 @@ function ShippingMethods() {
   );
 };
 
-export default ShippingMethods;
+export default DeliveryMethods;

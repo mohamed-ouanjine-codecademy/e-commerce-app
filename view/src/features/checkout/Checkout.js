@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import ShippingAddresses from "../shippingAddresses/ShippingAddresses";
 import { useDispatch, useSelector } from "react-redux";
-import ShippingMethods from "../shippingMethods/ShippingMethods";
+import DeliveryMethods from "../deliveryMethods/DeliveryMethods";
 import { setTotalCost, setCurrentStep, setNextButtonDisabled } from "./checkoutSlice";
 import OrderSummary from "../../components/OrderSummary";
 import { useNavigate } from "react-router-dom";
@@ -21,8 +21,8 @@ function Checkout() {
     )
   );
   // Delivery Method
-  const selectedMethodId = useSelector(state => state.shippingMethods.sideEffects.selectedMethodId);
-  const deliveryMethod = useSelector(state => state.shippingMethods.shippingMethods.find(method =>
+  const selectedMethodId = useSelector(state => state.deliveryMethods.sideEffects.selectedMethodId);
+  const deliveryMethod = useSelector(state => state.deliveryMethods.deliveryMethods.find(method =>
     method.id === selectedMethodId
   ));
 
@@ -38,7 +38,7 @@ function Checkout() {
       case 1:
         return <ShippingAddresses />;
       case 2:
-        return <ShippingMethods />;
+        return <DeliveryMethods />;
       case 3:
         return (
           <OrderSummary

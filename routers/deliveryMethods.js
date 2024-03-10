@@ -1,10 +1,10 @@
 const router = require("express").Router();
 
 const {
-  getShippingMethods
-} = require('../controllers/shippingMethods');
+  getDeliveryMethods
+} = require('../controllers/deliveryMethods');
 
 // Get all shipping methods.
-router.get('/', getShippingMethods);
+router.get('/', getDeliveryMethods);
 
 module.exports = router;

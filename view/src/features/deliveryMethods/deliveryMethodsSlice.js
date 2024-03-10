@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getShippingMethodsAPI } from "../../api/shippingMethodsAPI";
+import { getDeliveryMethodsAPI } from "../../api/deliveryMethodsAPI";
 
-export const getShippingMethods = createAsyncThunk(
-  'shippingMethods/getShippingMethods',
+export const getDeliveryMethods = createAsyncThunk(
+  'deliveryMethods/getDeliveryMethods',
   async () => {
     try {
-      const { data } = await getShippingMethodsAPI();
+      const { data } = await getDeliveryMethodsAPI();
 
       return data;
     } catch (error) {
@@ -14,20 +14,20 @@ export const getShippingMethods = createAsyncThunk(
   }
 );
 
-const shippingMethodsSlice = createSlice({
-  name: 'shippingMethods',
+const deliveryMethodsSlice = createSlice({
+  name: 'deliveryMethods',
   initialState: {
-    shippingMethods: [],
+    deliveryMethods: [],
     sideEffects: {
       selectedMethodId: null
     },
-    getShippingMethods: {
+    getDeliveryMethods: {
       isPending: false,
       isFulfilled: false,
       isRejected: false
     },
     error: {
-      getShippingMethods: null
+      getDeliveryMethods: null
     }
   },
   reducers: {
@@ -37,24 +37,24 @@ const shippingMethodsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getShippingMethods.pending, (state, action) => {
-        state.getShippingMethods = {
+      .addCase(getDeliveryMethods.pending, (state, action) => {
+        state.getDeliveryMethods = {
           isPending: true,
           isFulfilled: false,
           isRejected: false
         };
       })
-      .addCase(getShippingMethods.fulfilled, (state, action) => {
-        state.shippingMethods = action.payload;
-        state.getShippingMethods = {
+      .addCase(getDeliveryMethods.fulfilled, (state, action) => {
+        state.deliveryMethods = action.payload;
+        state.getDeliveryMethods = {
           isPending: false,
           isFulfilled: true,
           isRejected: false
         };
       })
-      .addCase(getShippingMethods.rejected, (state, action) => {
-        state.error.getShippingMethods = action.error.message;
-        state.getShippingMethods = {
+      .addCase(getDeliveryMethods.rejected, (state, action) => {
+        state.error.getDeliveryMethods = action.error.message;
+        state.getDeliveryMethods = {
           isPending: false,
           isFulfilled: false,
           isRejected: true
@@ -65,5 +65,5 @@ const shippingMethodsSlice = createSlice({
 
 export const {
   setSelectedMethodId
-} = shippingMethodsSlice.actions;
-export default shippingMethodsSlice.reducer;
+} = deliveryMethodsSlice.actions;
+export default deliveryMethodsSlice.reducer;

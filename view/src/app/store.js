@@ -8,7 +8,7 @@ import productReducer from '../features/product/productSlice';
 import cartReducer from '../features/cart/cartSlice';
 import currentStep from '../features/checkout/checkoutSlice';
 import shippingAddressesReducer from '../features/shippingAddresses/shippingAddressesSlice';
-import shippingMethodsReducer from '../features/shippingMethods/shippingMethodsSlice';
+import deliveryMethodsReducer from '../features/deliveryMethods/deliveryMethodsSlice';
 import intendedDestinationReducer from '../features/intendedDestination/intendedDestinationSlice';
 
 export const store = configureStore({
@@ -22,7 +22,7 @@ export const store = configureStore({
     cart: cartReducer,
     checkout: currentStep,
     shippingAddresses: shippingAddressesReducer,
-    shippingMethods: shippingMethodsReducer,
+    deliveryMethods: deliveryMethodsReducer,
     intendedDestination: intendedDestinationReducer,
   },
   middleware: (getDefaultMiddleware) =>

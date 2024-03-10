@@ -2,7 +2,7 @@ import { handleResponse } from "./utilities";
 
 const BASE_URL = '/api/shipping-methods';
 
-export const getShippingMethodsAPI = async () => {
+export const getDeliveryMethodsAPI = async () => {
   try {
     const response = await fetch(`${BASE_URL}`);
 

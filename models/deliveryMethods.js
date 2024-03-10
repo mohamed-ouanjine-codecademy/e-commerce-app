@@ -1,20 +1,20 @@
 const pool = require('./database.js');
 const help = require('./helperFunctions.js');
 
-const shippingMethodsModel = {
-  getShippingMethods: async () => {
+const deliveryMethodsModel = {
+  getDeliveryMethods: async () => {
     try {
       const results = await pool.query(`SELECT * FROM shipping_methods;`);
-      const shippingMethods = help.transformKeys(results.rows);
-      shippingMethods.forEach(method => {
+      const deliveryMethods = help.transformKeys(results.rows);
+      deliveryMethods.forEach(method => {
         method.price = parseFloat(method.price);
       });
       
-      return shippingMethods;
+      return deliveryMethods;
     } catch (error) {
       throw error;
     }
   }
 }
 
-module.exports = shippingMethodsModel;
+module.exports = deliveryMethodsModel;
