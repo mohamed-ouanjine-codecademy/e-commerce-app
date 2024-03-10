@@ -14,7 +14,7 @@ function DeliveryMethods() {
 
   const dispatch = useDispatch();
 
-  // Load shipping methods on first render.
+  // Load delivery methods on first render.
   useEffect(() => {
     const getDeliveryMethodsFunc = async () => {
       await dispatch(getDeliveryMethods());
@@ -26,7 +26,7 @@ function DeliveryMethods() {
     <>
       <div className="container-fluid">
         <div className="row">
-          <h2 className="col">Shipping Methods</h2>
+          <h2 className="col">Delivery Methods</h2>
         </div>
         <div className="row g-2">
           {

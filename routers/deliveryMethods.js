@@ -4,7 +4,7 @@ const {
   getDeliveryMethods
 } = require('../controllers/deliveryMethods');
 
-// Get all shipping methods.
+// Get all delivery methods.
 router.get('/', getDeliveryMethods);
 
 module.exports = router;

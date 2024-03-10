@@ -7,7 +7,7 @@ const deliveryMethodsController = {
 
       res.json({
         status: 'success',
-        message: 'Shipping Methods Loaded',
+        message: 'Delivery Methods Loaded',
         data: deliveryMethods
       });
     } catch (error) {
