@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const passport = require('passport');
 const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
@@ -12,6 +13,16 @@ const apiRouter = require('./routers');
 // Start app
 const app = express();
 const PORT = process.env.PORT || 8000;
+
+// cors
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // allow session cookie from browser to pass through
+};
+
+app.use(cors(corsOptions));
 
 // bodyParser
 app.use(bodyParser.json());
@@ -26,7 +37,8 @@ app.use(session({
   }),
   cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
 }));
-app.use(passport.authenticate('session'));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // mount Routers
 app.use('/api', apiRouter);
@@ -35,9 +47,9 @@ app.use('/api', apiRouter);
 app.use((err, req, res, next) => {
   console.error(err);
   const status = err.status || 500;
-  const message = err.message;
+  const message = err.message || 'Server Error';
   res.status(status).json({
-    status: 'error',
+    success: false,
     message
   });
 });

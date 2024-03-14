@@ -42,6 +42,28 @@ const users = {
     }
   },
 
+  async createUserFromGoogleProfile(profile) {
+    try {
+      const email = profile.emails[0].value;
+      const { givenName: firstName, familyName: lastName } = profile.name;
+      const authSource = profile.provider;
+
+      const results = await pool.query(
+        `
+        INSERT INTO users (email, first_name, last_name, auth_source) 
+        VALUES ($1, $2, $3, $4)
+        RETURNING *;
+        `,
+        [email, firstName, lastName, authSource]
+      );
+      const newUser = help.transformKeys(results.rows[0]);
+
+      return newUser;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   createUserAndCart: async function (userEmail, userPassword) {
     const client = await pool.connect();
     try {
@@ -91,7 +113,7 @@ const users = {
     }
   },
 
-  findUserByEmail: async function (email, callback) {
+  findUserByEmail: async function (email) {
     try {
       if (!email) {
         throw new Error('Invalid input data');
@@ -101,18 +123,17 @@ const users = {
         SELECT *
         FROM users
         WHERE email = $1;`,
-        [email]);
+        [email]
+      );
+      const user = help.transformKeys(results.rows[0]);
 
-      const user = help.checkExistence(results, 'User');
-      callback(null, help.transformKeys(user));
-
+      return user;
     } catch (err) {
-      callback(err)
       throw err;
     }
   },
 
-  findUserById: async function (id, callback) {
+  findUserById: async function (id) {
     try {
       if (!id) {
         throw new Error('Invalid input data');
@@ -124,10 +145,9 @@ const users = {
         WHERE id = $1;`,
         [id]);
 
-      return callback(null, help.transformKeys(results.rows[0]));
+      return help.transformKeys(results.rows[0]);
 
     } catch (err) {
-      callback(err);
       throw err;
     }
   },

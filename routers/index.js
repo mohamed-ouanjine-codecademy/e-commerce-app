@@ -1,7 +1,8 @@
 // imports
+const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
-const router = require('express').Router();
+const router = express.Router();
 
 // -- Routers
 const authRouter = require('./auth');
@@ -41,7 +42,7 @@ router.use('/shipping-methods', deliveryMethodsRouter);
 // root path
 router.get('/', (req, res) => {
   if (req.isAuthenticated()) {
-    return res.json({user: req.user});
+    return res.json({ user: req.user });
   }
   return res.json({
     status: 'success',
