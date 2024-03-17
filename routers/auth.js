@@ -1,10 +1,9 @@
 const express = require('express');
 const passport = require('passport');
-const LocalStrategy = require('passport-local');
+const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const pool = require('../models/database.js');
 const Users = require('../models/users');
-const help = require('../helperFunctions.js');
+const help = require('../helperFunctions');
 
 const router = express.Router();
 
@@ -13,20 +12,10 @@ passport.use(new LocalStrategy({
   usernameField: 'email'
 }, async (email, password, cb) => {
   try {
-    const client = await pool.connect();
-    const { rows } = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-
-    if (!rows.length) {
+    const user = await Users.findUserByEmail(email);
+    if (!user || !(await help.comparePassword(password, user.password))) {
       return cb(null, false, { message: 'Incorrect email or password.' });
     }
-
-    const user = rows[0];
-    const hashedPassword = await help.comparePassword(password, user.password);
-
-    if (!hashedPassword) {
-      return cb(null, false, { message: 'Incorrect email or password.' });
-    }
-
     return cb(null, user);
   } catch (err) {
     return cb(err);
@@ -37,21 +26,18 @@ passport.use(new LocalStrategy({
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/api/auth/google/redirect',
+  callbackURL: '/api/auth/google/callback',
   scope: ['profile', 'email']
 }, async (accessToken, refreshToken, profile, cb) => {
   try {
-      const email = profile.emails[0].value;
-      const currentUser = await Users.findUserByEmail(email);
-
-      if (!currentUser) {
-          const newUser = await Users.createUserFromGoogleProfile(profile);
-          return cb(null, newUser);
-      } else {
-          return cb(null, currentUser);
-      }
+    const email = profile.emails[0].value;
+    let user = await Users.findUserByEmail(email);
+    if (!user) {
+      user = await Users.createUserFromGoogleProfile(profile);
+    }
+    return cb(null, user);
   } catch (err) {
-      return cb(err);
+    return cb(err);
   }
 }));
 
@@ -68,24 +54,22 @@ passport.deserializeUser(async (id, cb) => {
   }
 });
 
-// hashPassword middleware:
+// Middleware for hashing password
 const hashPassword = async (req, res, next) => {
   try {
     const { password } = req.body;
-    const hashedPassword = await help.hashPassword(password);
-    req.hashedPassword = hashedPassword;
+    req.hashedPassword = await help.hashPassword(password);
     next();
   } catch (error) {
     next(new Error('Server Error'));
   }
 };
 
+// Register route
 router.post('/register', hashPassword, async (req, res, next) => {
   try {
-    const { email } = req.body;
-    const password = req.hashedPassword;
-    const response = await Users.createUserAndCart(email, password);
-    const newUser = response.user;
+    const { email, hashedPassword } = req;
+    const newUser = await Users.createUserAndCart(email, hashedPassword);
     res.status(201).json({
       id: newUser.id,
       firstName: newUser.firstName,
@@ -97,65 +81,34 @@ router.post('/register', hashPassword, async (req, res, next) => {
   }
 });
 
-router.get('/profile', (req, res, next) => {
+// Profile route
+router.get('/profile', (req, res) => {
   if (req.isAuthenticated()) {
-    const user = req.user;
-    return res.json({
+    const { id, firstName, lastName, address } = req.user;
+    res.json({
       status: 'success',
-      data: {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        address: user.address
-      }
+      data: { id, firstName, lastName, address }
     });
   } else {
-    return res.status(401).json({
-      status: 'error',
-      message: "Unauthorized"
-    });
+    res.status(401).json({ status: 'error', message: 'Unauthorized' });
   }
 });
 
-router.post('/login/password', passport.authenticate('local', {
-  successRedirect: '/api/auth/profile',
-  failureRedirect: '/user/login'
-}));
-
-// Google endpoints
-// when login is successful, retrieve user info
-router.get("/login/success", (req, res) => {
-  if (req.user) {
-    res.json({
-      success: true,
-      message: "user has successfully authenticated",
-      user: req.user,
-      cookies: req.cookies
-    });
-  }
+// Login with password route
+router.post('/login/password', passport.authenticate('local'), (req, res) => {
+  res.redirect('/api/auth/profile');
 });
 
-// when login failed, send failed msg
-router.get("/login/failed", (req, res) => {
-  res.status(401).json({
-    success: false,
-    message: "user failed to authenticate."
-  });
+// Google authentication routes
+router.get('/google', passport.authenticate('google'));
+
+router.get('/google/callback', passport.authenticate('google', {
+  failureRedirect: '/api/auth/login/failed'
+}), (req, res) => {
+  res.redirect('http://localhost:3000');
 });
 
-
-// auth with twitter
-router.get("/google", passport.authenticate("google", { scope: ['profile', 'email'] }));
-
-// redirect to home page after successfully login via twitter
-router.get(
-  "/google/redirect",
-  passport.authenticate("google", {
-    successRedirect: process.env.CLIENT_HOME_PAGE_URL,
-    failureRedirect: "login/failed"
-  })
-);
-
+// Logout route
 router.post('/logout', (req, res, next) => {
   req.logout(err => {
     if (err) {
@@ -163,30 +116,20 @@ router.post('/logout', (req, res, next) => {
       err.message = 'Logout failed';
       next(err);
     }
-    res.json({
-      success: true,
-      message: 'user loged out successfully'
-    });
   });
+  res.json({ success: true, message: 'User logged out successfully' });
 });
 
-
+// Check if user is authenticated route
 router.get('/is-authenticated', (req, res) => {
   if (req.isAuthenticated()) {
-    res.json({
-      status: 'success',
-      data: {
-        isAuthenticated: true
-      }
-    });
+    res.json({ status: 'success', data: { isAuthenticated: true } });
   } else {
-    res.status(401).json({
-      status: 'error',
-      message: 'Unauthorized'
-    });
+    res.status(401).json({ status: 'error', message: 'Unauthorized' });
   }
 });
 
+// Check email availability route
 router.get('/check-email', async (req, res, next) => {
   try {
     const { email } = req.query;
