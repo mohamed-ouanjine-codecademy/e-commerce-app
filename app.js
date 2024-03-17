@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
 const session = require('express-session');
+const helmet = require('helmet');
 const PgSession = require('connect-pg-simple')(session);
 const pool = require('./models/database');
 require('dotenv').config(); // Load environment variables from .env file
@@ -39,6 +40,9 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// helmet
+app.use(helmet());
 
 // mount Routers
 app.use('/api', apiRouter);
