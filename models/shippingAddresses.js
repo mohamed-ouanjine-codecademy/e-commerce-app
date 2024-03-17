@@ -1,5 +1,5 @@
 const pool = require('./database.js');
-const help = require('./helperFunctions.js');
+const help = require('./utils.js');
 
 const shippingAddresses = {
   // Create new shipping address
@@ -26,7 +26,7 @@ const shippingAddresses = {
         `,
         [name, street, city, state, postalCode, country, userId]
       );
-      const shippingAddress = help.transformKeys(results.rows[0]);
+      const shippingAddress = help.convertKeysFromSnakeCaseToCamelCase(results.rows[0]);
       return shippingAddress;
     } catch (error) {
       throw error;
@@ -51,7 +51,7 @@ const shippingAddresses = {
 
       if (results.rows.length === 0) help.error('No shipping addresses found for the user', 404);
 
-      const shippingAddresses = help.transformKeys(results.rows);
+      const shippingAddresses = help.convertKeysFromSnakeCaseToCamelCase(results.rows);
       return shippingAddresses;
     } catch (error) {
       throw error;
@@ -92,9 +92,9 @@ const shippingAddresses = {
         values
       );
 
-      if (results.rowCount === 0) help.error('Shipping address not found for the user', 404);
+      if (results.rowCount === 0) throw new help.MyError('Shipping address not found for the user', 404);
 
-      const newShippingAddress = help.transformKeys(results.rows[0]);
+      const newShippingAddress = help.convertKeysFromSnakeCaseToCamelCase(results.rows[0]);
       return newShippingAddress;
     } catch (error) {
       throw error;

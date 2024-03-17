@@ -1,5 +1,5 @@
 const pool = require('./database.js');
-const help = require('./helperFunctions.js');
+const help = require('./utils.js');
 
 const products = {
 
@@ -61,7 +61,7 @@ const products = {
   getProducts: async function () {
     try {
       const results = await pool.query('SELECT * FROM products');
-      const products  = help.transformKeys(results.rows);
+      const products  = help.convertKeysFromSnakeCaseToCamelCase(results.rows);
       
       return products;
     } catch (err) {
@@ -87,7 +87,7 @@ const products = {
     }
   },
 
-  getProductById: async function (productId, client = null) {
+  getProductById: async function (productId, client) {
     let shouldRelease = false;
     if (!client) {
       client = await pool.connect();
@@ -111,7 +111,7 @@ const products = {
 
       shouldRelease && await client.query('COMMIT');
 
-      return help.transformKeys(product);
+      return help.convertKeysFromSnakeCaseToCamelCase(product);
 
     } catch (err) {
       shouldRelease && await client.query('ROLLBACK');

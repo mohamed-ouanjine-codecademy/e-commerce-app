@@ -1,8 +1,48 @@
 const pool = require('./database.js');
-const help = require('./helperFunctions.js');
+const help = require('./utils.js');
 const products = require('./products.js');
 
-const orders = {
+const orderModel = {
+  createOrder: async function (userId, cartId, client) {
+    if (!client) client = pool;
+    try {
+
+      // create new order
+      const results1 = await client.query(`
+        INSERT INTO orders (user_id) VALUES
+          ($1)
+        RETURNING id, created_at, status;`,
+        [userId]
+      );
+      const order = results1.rows[0];
+
+      // related order with products based on the cartId
+      const results2 = await client.query(`
+        INSERT INTO orders_products
+        SELECT
+        	orders.id AS id,
+          carts_products.product_id as product_id,
+          carts_products.quantity as quantity
+        FROM orders
+        INNER JOIN carts
+        	ON orders.user_id = carts.user_id
+        INNER JOIN carts_products
+        	ON carts.id = carts_products.cart_id
+        WHERE orders.id = $1;`,
+        [order.id]
+      );
+
+      const newOrder = {
+        ...order,
+        created_at: `${order.created_at}`,
+      }
+
+      return help.convertKeysFromSnakeCaseToCamelCase(newOrder);
+    } catch (error) {
+      throw error;
+    }
+  },
+
   getOrdersByUserId: async function (userId) {
     const client = await pool.connect();
     try {
@@ -35,11 +75,10 @@ const orders = {
         const items = await this.helpers.getItemsByOrderId(orderId, client);
         // change product_id key to productId
 
-        return help.transformKeys({ ...order, items });
+        return help.convertKeysFromSnakeCaseToCamelCase({ ...order, items });
       }));
 
       await client.query('COMMIT');
-
       return ordersItems;
 
     } catch (err) {
@@ -79,7 +118,7 @@ const orders = {
 
       await client.query('COMMIT');
 
-      return help.transformKeys({
+      return help.convertKeysFromSnakeCaseToCamelCase({
         ...order,
         created_at: `${order.created_at}`,
         items
@@ -114,7 +153,7 @@ const orders = {
       // Check exisitence
       const order = help.checkExistence(results, 'Order');
 
-      return help.transformKeys({
+      return help.convertKeysFromSnakeCaseToCamelCase({
         ...order,
         created_at: `${order.created_at}`
       });
@@ -152,7 +191,7 @@ const orders = {
       // Get order items
       const items = await this.helpers.getItemsByOrderId(orderId);
 
-      return help.transformKeys({
+      return help.convertKeysFromSnakeCaseToCamelCase({
         success: true,
         message: 'Item successfully added to the order.',
         updatedOrder: {
@@ -285,7 +324,7 @@ const orders = {
 
       await client.query('COMMIT');
 
-      return help.transformKeys({
+      return help.convertKeysFromSnakeCaseToCamelCase({
         id: orderId,
         created_at: order.created_at,
         status: order.status,
@@ -378,4 +417,4 @@ const orders = {
   }
 }
 
-module.exports = orders;
+module.exports = orderModel;

@@ -1,53 +1,57 @@
 const pool = require('./database.js');
-const help = require('./helperFunctions.js');
+const help = require('./utils.js');
 const carts = require('./carts.js');
 
-const users = {
-  createUser: async function (client, userInfo) {
-    const shouldRelease = client ? false : true;
+const userModel = {
+  // create new user with the given info
+  createUser: async function (userInfo, client) {
+    const isClientDefined = client ? true : false;
     try {
-      if (shouldRelease) {
-        client = await pool.connect();
+      if (!isClientDefined) client = await pool.connect();
+
+      if (typeof userInfo !== 'object') {
+        throw new help.MyError('Invalid input data', 400);
       }
 
-      if (!userInfo.email || !userInfo.password) {
-        throw new Error('Invalid input data');
-      }
-
-      shouldRelease && await client.query('BEGIN');
+      !isClientDefined && await client.query('BEGIN');
 
       // Check email availability
-      const isEmailAvailable = await this.checkEmailAvailability(userInfo.email);
-      if (isEmailAvailable === false) {
-        throw new Error('Email is not available');
-      }
+      const isEmailAvailable = await this.checkEmailAvailability(userInfo.email, client);
+      if (isEmailAvailable === false) throw new Error('Email is not available');
 
+      const { columns, insertQuery, values } = help.buildInsertQuery(userInfo);
       // Register user
       const results = await client.query(`
-        INSERT INTO users (email, password) VALUES
-          ($1, $2)
-        RETURNING *`,
-        [userInfo.email, userInfo.password]);
+        INSERT INTO users ${columns} VALUES
+          ${insertQuery}
+        RETURNING first_name, last_name, email, address`,
+        values
+      );
 
-      shouldRelease && await client.query('COMMIT');
+      !isClientDefined && await client.query('COMMIT');
 
-      const newUser = results.rows[0];
-      return help.transformKeys(newUser);
+      const newUser = help.convertKeysFromSnakeCaseToCamelCase(results.rows[0]);
+      return newUser;
 
-    } catch (err) {
-      shouldRelease && await client.query('ROLLBACK');
-      throw err;
+    } catch (error) {
+      !isClientDefined && await client.query('ROLLBACK');
+      throw error;
+
     } finally {
-      shouldRelease && client.release();
+      !isClientDefined && client.release();
     }
   },
 
-  async createUserFromGoogleProfile(profile) {
+  async createUserFromGoogleProfile(profile, client) {
+    const isClientDefined = client ? true : false;
+
     try {
+      if (!isClientDefined) client = await pool.connect();
       const email = profile.emails[0].value;
       const { givenName: firstName, familyName: lastName } = profile.name;
       const authSource = profile.provider;
 
+      !isClientDefined && await client.query('BEGIN');
       const results = await pool.query(
         `
         INSERT INTO users (email, first_name, last_name, auth_source) 
@@ -56,217 +60,185 @@ const users = {
         `,
         [email, firstName, lastName, authSource]
       );
-      const newUser = help.transformKeys(results.rows[0]);
+      !isClientDefined && await client.query('COMMIT');
+      const newUser = help.convertKeysFromSnakeCaseToCamelCase(results.rows[0]);
 
       return newUser;
     } catch (error) {
+      !isClientDefined && await client.query('ROLLBACK');
       throw error;
-    }
-  },
-
-  createUserAndCart: async function (userEmail, userPassword) {
-    const client = await pool.connect();
-    try {
-
-      await client.query('BEGIN');
-      // Create user.
-      const newUser = await this.createUser(client, {
-        email: userEmail, password: userPassword
-      });
-      // Create a cart for the user.
-      const newCart = await carts.createCart(client, newUser.id);
-
-      await client.query('COMMIT');
-
-      const response = help.transformKeys({
-        user: newUser,
-        cart: newCart
-      });
-
-      return response;
-
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-
     } finally {
-      client.release();
+      !isClientDefined && client.release();
     }
   },
 
-  checkEmailAvailability: async function (email) {
+  checkEmailAvailability: async function (email, client) {
+    const isClientDefined = client ? true : false;
     try {
-      if (!email) {
-        throw new Error('Invalid input data');
-      }
+      if (!isClientDefined) client = await pool.connect();
 
-      const results = await pool.query(`
+      // check input data.
+      if (!email) throw new help.MyError('Invalid input data', 400);
+
+      !isClientDefined && await client.query('BEGIN');
+
+      const results = await client.query(`
         SELECT *
         FROM users
         WHERE email = $1;`,
         [email]);
 
+      !isClientDefined && await client.query('COMMIT');
+
+      // see if there is no matching email.
       return results.rows.length === 0;
 
-    } catch (err) {
-      throw err;
+    } catch (error) {
+      !isClientDefined && await client.query('ROLLBACK');
+      throw error;
+
+    } finally {
+      !isClientDefined && client.release();
     }
   },
 
-  findUserByEmail: async function (email) {
+  findUserByEmail: async function (email, client) {
+    const isClientDefined = client ? true : false;
     try {
-      if (!email) {
-        throw new Error('Invalid input data');
-      }
+      if (!isClientDefined) client = await pool.connect();
 
+      // check input data.
+      if (!email) throw new help.MyError('Invalid input data', 400);
+
+      !isClientDefined && await client.query('BEGIN');
       const results = await pool.query(`
         SELECT *
         FROM users
         WHERE email = $1;`,
         [email]
       );
-      const user = help.transformKeys(results.rows[0]);
+      !isClientDefined && await client.query('COMMIT');
 
+      const user = help.convertKeysFromSnakeCaseToCamelCase(results.rows[0]);
       return user;
-    } catch (err) {
-      throw err;
+
+    } catch (error) {
+      !isClientDefined && await client.query('ROLLBACK');
+      throw error;
+
+    } finally {
+      !isClientDefined && client.release();
     }
   },
 
-  findUserById: async function (id) {
+  getUsers: async function (client) {
+    const isClientDefined = client ? true : false;
     try {
-      if (!id) {
-        throw new Error('Invalid input data');
-      }
+      if (!isClientDefined) client = await pool.connect();
 
-      const results = await pool.query(`
-        SELECT *
-        FROM users
-        WHERE id = $1;`,
-        [id]);
-
-      return help.transformKeys(results.rows[0]);
-
-    } catch (err) {
-      throw err;
-    }
-  },
-
-  getUsers: async function () {
-    try {
+      !isClientDefined && await client.query('BEGIN');
       const results = await pool.query(`
       SELECT *
       FROM users;`);
+      !isClientDefined && await client.query('COMMIT');
 
-      const users = results.rows;
+      const users = help.convertKeysFromSnakeCaseToCamelCase(results.rows);
+      return users;
 
-      return help.transformKeys(users);
-
-    } catch (err) {
-      throw err;
+    } catch (error) {
+      !isClientDefined && await client.query('ROLLBACK');
+      throw error;
     }
   },
 
-  getUserById: async function (userId) {
+  getUserById: async function (userId, client) {
+    const isClientDefined = client ? true : false;
     try {
+      if (!isClientDefined) client = await pool.connect();
       if (!(typeof userId === 'number')) {
         throw new Error('Invalid input data');
       }
-
+      !isClientDefined && await client.query('BEGIN');
       const results = await pool.query(`
-        SELECT *
+        SELECT first_name, last_name, email, address
         FROM users
         WHERE id = $1;`,
         [userId]
       );
+      !isClientDefined && await client.query('COMMIT');
+      const user = help.convertKeysFromSnakeCaseToCamelCase(results.rows[0]);
 
-      const user = help.checkExistence(results, 'User');
-
-      return help.transformKeys(user);
-
-    } catch (err) {
-      throw err;
+      return user;
+    } catch (error) {
+      !isClientDefined && await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      !isClientDefined && client.release();
     }
   },
 
-  updateUserById: async function (userId, userNewInfo) {
+  updateUserById: async function (userId, userNewInfo, client) {
+    const isClientDefined = client ? true : false;
     try {
+      if (!isClientDefined) client = await pool.connect();
+
       // check if the user exist
-      await this.getUserById(userId);
+      await this.getUserById(userId, client);
 
       if (!(typeof userId === 'number') || !userNewInfo) {
         throw new Error('Invalid input data');
       }
 
-      // set up.
-      const updateFields = [];
-      const values = [];
-      const keys = ['firstName', 'lastName', 'email', 'address', 'password'];
-      const databaseKeys = ['first_name', 'last_name', 'email', 'address', 'password'];
-      let fieldsCount = 1;
 
-      // check if the users's keys that will be updated (e.g. first_name, last_name...)
-      for (let i = 0; i < keys.length; i++) {
-        if (userNewInfo[keys[i]]) {
-          updateFields.push(`${databaseKeys[i]} = $${fieldsCount}`);
-          values.push(userNewInfo[keys[i]]);
-          fieldsCount++;
-        }
-      }
+      const { updateFields, values, fieldsCount } = help.prepareUpdateFields(userNewInfo);
       values.push(userId);
 
       // check if there something to updated and updated it in database
-      if (updateFields.length > 0) {
-        const results = await pool.query(`
-          UPDATE users
-          SET ${updateFields.join(', ')}
-          WHERE id = $${fieldsCount}
-          RETURNING *;`,
-          values
-        );
+      !isClientDefined && await client.query('BEGIN');
+      const results = await pool.query(`
+        UPDATE users
+        SET ${updateFields}
+        WHERE id = $${fieldsCount}
+        RETURNING *;`,
+        values
+      );
+      !isClientDefined && await client.query('COMMIT');
 
-        const updatedUser = results.rows[0];
+      const updatedUser = help.convertKeysFromSnakeCaseToCamelCase(results.rows[0]);
+      return updatedUser;
 
-        return help.transformKeys(updatedUser);
-      }
-
-    } catch (err) {
-      throw err;
+    } catch (error) {
+      !isClientDefined && await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      !isClientDefined && client.release();
     }
   },
 
-  deleteUserById: async function (userId) {
+  deleteUserById: async function (userId, client) {
+    const isClientDefined = client ? true : false;
     try {
-      // check if the user exist
-      await this.getUserById(userId);
+      if (!isClientDefined) client = await pool.connect();
 
       // check the input data
-      if (!(typeof userId === 'number')) {
-        throw new Error('Invalid input data');
-      }
+      if (!(typeof userId === 'number')) throw new help.MyError('Invalid input data');
 
-      // delete user from database
+      !isClientDefined && await client.query('BEGIN');
       const results = await pool.query(`
         DELETE FROM users
-        WHERE id = $1
-        RETURNING *;`,
+        WHERE id = $1;`,
         [userId]
       );
-      const deletedUser = results.rows[0];
+      if (results.rowCount === 0) throw new help.NotFound('user');
+      !isClientDefined && await client.query('COMMIT');
 
-      return help.transformKeys(deletedUser);
-
-    } catch (err) {
-      throw err;
-    }
-  },
-
-  helpers: {
-    changeUserKeys: function (user) {
-      help.changeKeys(user, 'first_name', 'firstName');
-      help.changeKeys(user, 'last_name', 'lastName');
+    } catch (error) {
+      !isClientDefined && await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      !isClientDefined && client.release();
     }
   }
 }
 
-module.exports = users;
+module.exports = userModel;

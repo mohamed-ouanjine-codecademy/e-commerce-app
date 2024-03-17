@@ -1,11 +1,11 @@
 const pool = require('./database.js');
-const help = require('./helperFunctions.js');
+const help = require('./utils.js');
 
 const deliveryMethodsModel = {
   getDeliveryMethods: async () => {
     try {
       const results = await pool.query(`SELECT * FROM shipping_methods;`);
-      const deliveryMethods = help.transformKeys(results.rows);
+      const deliveryMethods = help.convertKeysFromSnakeCaseToCamelCase(results.rows);
       deliveryMethods.forEach(method => {
         method.price = parseFloat(method.price);
       });

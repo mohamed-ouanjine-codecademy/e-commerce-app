@@ -1,1145 +1,1764 @@
-openapi: 3.1.0
+openapi: 3.1.1
 
 info:
   title: e-commerce API
   version: 1.0.0
   description: A basic API for an e-commerce app
 
-paths:
-  auth/register:
-    post:
-      tags:
-        - Users
-      summary: Create new user
-      description: Create a new user to the database
-      operationId: register
-      requestBody:
-        description: User information
-        content:
-          application/json:
-            example: |-
-              {
-                "email": "example@gmail.com",
-                "password": "my-password"
-              }
-        required: true
-      responses:
-        "201":
-          description: New user Object
-          content:
-            application/json:
-              example: |-
-                {
-                  "id": 1111,
-                  "firstName": null,
-                  "lastName": null,
-                  "email": "example@gmail.com",
-                  "address": null,
-                  "password": "hashed password"
-                }
-
-  auth/login/password:
-    post:
-      tags:
-        - Users
-      summary: Login a user
-      description: login an existing user to the app
-      operationId: signin
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              examples:
-                User:
-                  value: |-
-                    {
-                      "id": 1,
-                      "firstName": "Mohamed",
-                      "lastName": "Ouanjine",
-                      "email": "email.for.tv.elhajji@gmail.com",
-                      "address": "Temara",
-                      "password": "hashed_password"
-                    }
-        default:
-          description: Default error sample response
-      requestBody:
-        description: User registration inforamations
-        content:
-          application/json:
-            schema:
-              required:
-                - email
-                - password
-              type: object
-              properties:
-                email:
-                  type: string
-                  example: example@gmail.com
-                password:
-                  type: string
-                  example: my-password
-                  format: password
-
-  /users:
-    get:
-      tags:
-        - Users
-      summary: Get all users
-      description: Get all users from database
-      operationId: users
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              examples:
-                Users:
-                  value: |-
-                    [
-                      {
-                        "id": 41,
-                        "firstName": "Riyan",
-                        "lastName": "Alwane",
-                        "email": "riyan@gmail.com",
-                        "address": "tamasna",
-                        "password": "hashed_password"
-                      },
-                      {
-                        "id": 42,
-                        "firstName": "Rayan",
-                        "lastName": "***",
-                        "email": "rayan@gmail.com",
-                        "address": "City",
-                        "password": "hashed_password"
-                      },
-                      {
-                        "id": 1,
-                        "firstName": "Mohamed",
-                        "lastName": "Ouanjine",
-                        "email": "email.for.tv.elhajji@gmail.com",
-                        "address": "Temara",
-                        "password": "hashed_password"
-                      }
-                    ]
-        default:
-          description: Default error sample response
-
-  /users/{userId}:
-    get:
-      tags:
-        - Users
-      summary: Get a users by ID
-      description: Get all users from database
-      operationId: get_user
-      parameters:
-        - name: userId
-          in: path
-          description: ID of the user to retrive.
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              examples:
-                User:
-                  value: |-
-                    {
-                      "id": 1,
-                      "firstName": "Mohamed",
-                      "lastName": "Ouanjine",
-                      "email": "email.for.tv.elhajji@gmail.com",
-                      "address": "Temara",
-                      "password": "hashed_password"
-                    }
-        default:
-          description: Default error sample response
-
-    put:
-      tags:
-        - Users
-      summary: Update a user by ID.
-      description: Update a user by their ID.
-      operationId: put_user
-      parameters:
-        - name: userId
-          in: path
-          description: ID of the user to retrive.
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              examples:
-                UpdatedUser:
-                  value: |-
-                    {
-                      "id": 1,
-                      "firstName": "Mohamed",
-                      "lastName": "Ouanjine",
-                      "email": "email.for.tv.elhajji@gmail.com",
-                      "address": "NYC USA",
-                      "password": "hashed_password"
-                    }
-      requestBody:
-        description: A new order object
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-
-    delete:
-      tags:
-        - Users
-      summary: Delete a user by ID.
-      description: Delete a user by their ID.
-      operationId: deleteUserById
-      parameters:
-        - name: userId
-          in: path
-          description: ID of the user to deleted.
-          required: true
-          schema:
-            type: integer
-      responses:
-        "204":
-          description: seccessful deletion
-        "404":
-          description: Not found
-          content:
-            text/plain; charset=utf-8:
-              example: No such User has been founded.
-
-  /products:
-    post:
-      tags:
-        - Products
-      summary: Create new product
-      description: >-
-        Ceate new product in the database using product's name, description and
-        price
-      operationId: postProducts
-      responses:
-        "201":
-          description: New product created
-          content:
-            application/json:
-              examples:
-                New product:
-                  value: |-
-                    {
-                        "id": 31,
-                        "name": "foo",
-                        "description": "baz baz",
-                        "price": "$1,000,000.00",
-                        "categoriesId": [
-                            1
-                        ]
-                    }
-      requestBody:
-        description: New product
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Product"
-
-    get:
-      tags:
-        - Products
-      summary: Get all products
-      description: Retrieve a list of all products
-      operationId: products
-      parameters:
-        - name: categoryId
-          in: query
-          description: ID of the product to retrieve.
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              examples:
-                Products:
-                  value: |-
-                    [
-                        {
-                            "id": 2,
-                            "name": "Laptop",
-                            "description": "Powerful laptop for productivity",
-                            "price": "$1,299.99"
-                        },
-                        {
-                            "id": 3,
-                            "name": "T-shirt",
-                            "description": "Comfortable cotton T-shirt",
-                            "price": "$19.99"
-                        },
-                        {
-                            "id": 4,
-                            "name": "Sofa",
-                            "description": "Modern and comfortable sofa",
-                            "price": "$499.99"
-                        },
-                        {
-                            "id": 1,
-                            "name": "SmartPhone",
-                            "description": "High-performance smartphone",
-                            "price": "$399.99"
-                        }
-                    ]
-
-      x-codeSamples:
-        - lang: http
-          source: >
-            # Try out with category parameter
-
-            curl -X GET "http://localhost:4000/products?category=1" -H "accept:
-            application/json"
-  /products/{productId}:
-    get:
-      tags:
-        - Products
-      summary: Get product by ID
-      description: Retrieve a specific product by its ID
-      parameters:
-        - $ref: "#/components/parameters/productId"
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              examples:
-                get_product_by_id:
-                  value: |-
-                    {
-                      "id": 1,
-                      "name": "SmartPhone",
-                      "description": "High-performance smartphone",
-                      "price": "$399.99",
-                      "categoriesId": [
-                          1
-                      ]
-                    }
-        "404":
-          description: Not found
-          content:
-            text/plain; charset=utf-8:
-              example: No such Product has been founded.
-
-    put:
-      tags:
-        - Products
-      summary: Update a product
-      description: Update a product in the database using product's ID
-      operationId: putProducts
-      parameters:
-        - $ref: "#/components/parameters/productId"
-      responses:
-        "200":
-          description: successful operation
-          content:
-            applicatoin/json:
-              examples:
-                updated name:
-                  value: |-
-                    {
-                      "id": 1,
-                      "name": "New name",
-                      "description": "High-performance smartphone",
-                      "price": "$399.99",
-                      "categoriesId": [
-                        1
-                      ]
-                    }
-
-                updated price:
-                  value: |-
-                    {
-                      "id": 1,
-                      "name": "New name",
-                      "description": "High-performance smartphone",
-                      "price": "$1,000,000",
-                      "categoriesId": [
-                        1
-                      ]
-                    }
-        "404":
-          description: Not found
-          content:
-            text/plain; charset=utf-8:
-              example: No such Product has been founded.
-      requestBody:
-        description: New iformations
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Product"
-
-    delete:
-      tags:
-        - Products
-      summary: Delete a product
-      description: Delete a product in the database using product's ID
-      operationId: deleteProducts
-      parameters:
-        - $ref: "#/components/parameters/productId"
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              examples:
-                delete product whose id is 31:
-                  value: |-
-                    {
-                      "id": 31,
-                      "name": "T-short",
-                      "description": "white t-short for summer",
-                      "price": "$1.00",
-                      "categoriesId": [
-                        2
-                      ]
-                    }
-        "404":
-          description: Not found
-          content:
-            text/plain; charset=utf-8:
-              example: No such Product has been founded.
-
-  /carts:
-    post:
-      tags:
-        - Carts
-      summary: Create a cart
-      description: Create new cart
-      operationId: postCart
-      requestBody:
-        description: Cart object
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                items:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/ProductCart"
-      responses:
-        "201":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Cart"
-
-  /carts/{cartId}:
-    # Done
-    get:
-      tags:
-        - Carts
-      summary: Get a specific cart.
-      description: Get a cart by its ID (cartId). Optionally include item details with `?include=items`.
-      operationId: getCart
-      parameters:
-        - $ref: "#/components/parameters/cartId"
-        - name: include
-          in: query
-          description: Include details of cart items in the response (e.g., product information).
-          required: false
-          schema:
-            type: boolean
-            default: false
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Cart"
-                allOf:
-                  - if:
-                      properties:
-                        include:
-                          const: true
-                    then:
-                      properties:
-                        items:
-                          items:
-                            properties:
-                              product:
-                                $ref: "#/components/schemas/Product"
-        "404":
-          $ref: "#/components/responses/NotFoundCart"
-
-    # done
-    delete:
-      tags:
-        - Carts
-      summary: Delete a cart.
-      description: Delete a cart by its ID.
-      operationId: deleteCart
-      parameters:
-        - $ref: "#/components/parameters/cartId"
-      responses:
-        "204":
-          description: successful deletion
-        "404":
-          $ref: "#/components/responses/NotFoundCart"
-
-  /carts/users/{userId}:
-    # Done
-    get:
-      tags:
-        - Carts
-      summary: Get a specific cart by user ID.
-      description: get a cart by its user ID (user must be signed in).
-      operationId: getCartByUserId
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Cart"
-        "404":
-          $ref: "#/components/responses/NotFoundCart"
-
-  /carts/{cartId}/items:
-    # done
-    post:
-      tags:
-        - Carts
-      summary: Add a new product to the specified cart.
-      description: Add a new product to the specified cart, by providing productId and quantity.
-      parameters:
-        - $ref: "#/components/parameters/cartId"
-      requestBody:
-        description: New items
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ProductCart2"
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              example: |-
-                {
-                  "id": 1,
-                  "items": [
-                    {
-                      "productId": 1111,
-                      "quantity": 5
-                    },
-                    {
-                      "productId": 2222,
-                      "quantity": 3
-                    }
-                  ]
-                }
-    # done
-    delete:
-      tags:
-        - Carts
-      summary: Remove all products from the cart.
-      parameters:
-        - $ref: "#/components/parameters/cartId"
-      responses:
-        "204":
-          description: successful deletion
-        "404":
-          $ref: "#/components/responses/NotFoundCart"
-
-  /carts/{cartId}/items/{productId}:
-    # done
-    put:
-      tags:
-        - Carts
-      summary: Update the quantity of a specific product in the cart.
-      description: Update cart's product quantity by cartId and producId
-      parameters:
-        - $ref: "#/components/parameters/cartId"
-        - $ref: "#/components/parameters/productId"
-      requestBody:
-        description: Update quantity of product whose ID is 2222.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                quantity:
-                  type: integer
-                  example: 7
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              example: |-
-                {
-                  "success": true,
-                  "updatedProduct": {
-                      "cartId": 1,
-                      "productId": 2222,
-                      "quantity": 7
-                  }
-                }
-
-        "404":
-          $ref: "#/components/responses/NotFoundCart"
-    # done
-    delete:
-      tags:
-        - Carts
-      summary: Remove a specific product from the cart.
-      parameters:
-        - $ref: "#/components/parameters/cartId"
-        - $ref: "#/components/parameters/productId"
-      responses:
-        "200":
-          description: successful deletion
-          content:
-            application/json:
-              example: |-
-                {
-                  "data": {
-                    "product": {
-                      "id": 1
-                    },
-                    "cart": {
-                      "id": 1
-                    }
-                  },
-                  "message": "product deleted successfully"
-                }
-        "404":
-          $ref: "#/components/responses/NotFoundCart"
-
-  /orders:
-    get:
-      tags:
-        - Orders
-      summary: Get all orders.
-      description: Retrieve all orders a user have.
-      operationId: getOrders
-      responses:
-        "200":
-          description: successful operation.
-          content:
-            application/json:
-              examples:
-                all orders for an authenticated user:
-                  value: |-
-                    [
-                      {
-                        "id": 1,
-                        "createdAt": "Sun Dec 02 2023 09:28:55 GMT+0100 (Central European Standard Time)",
-                        "items": [
-                          {
-                            "productId": 1111,
-                            "quantity": 5
-                          },
-                          {
-                            "productId": 2222,
-                            "quantity": 3
-                          }
-                        ]
-                      },
-                      {
-                        "id": 2,
-                        "createdAt": "Sun Dec 03 2023 09:28:55 GMT+0100 (Central European Standard Time)",
-                        "items": [
-                          {
-                            "productId": 3333,
-                            "quantity": 5
-                          },
-                          {
-                            "productId": 4444,
-                            "quantity": 3
-                          }
-                        ]
-                      }
-                    ]
-
-  /orders/{orderId}:
-    get:
-      tags:
-        - Orders
-      summary: Get an order
-      description: Retrieve an order by its Id
-      operationId: getOrder
-      parameters:
-        - name: orderId
-          in: path
-          description: The order id you want to retrive.
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              examples:
-                order whose id is 1:
-                  value: |-
-                    {
-                      "id": 1,
-                      "createdAt": "Sun Dec 03 2023 14:51:59 GMT+0100 (Central European Standard Time)",
-                      "status": "shipped",
-                      "items": [
-                          {
-                              "productId": 1111,
-                              "quantity": 5
-                          },
-                          {
-                              "productId": 2222,
-                              "quantity": 7
-                          }
-                      ]
-                    }
-
-    delete:
-      tags:
-        - Orders
-      summary: Delete an order
-      description: Delete an order by its Id
-      operationId: deleteOrder
-      parameters:
-        - name: orderId
-          in: path
-          description: The order id you want to delete.
-          required: true
-          schema:
-            type: integer
-      responses:
-        "204":
-          description: successful deletion.
-
-  /orders/{orderId}/status:
-    put:
-      tags:
-        - Orders
-      summary: Update the status of a specific order.
-      description: Updae the status of a specific order by its ID (e.g. placed, processing, shipped, delivered, cancelled or returned).
-      parameters:
-        - name: orderId
-          in: path
-          description: The order's id you want to Update.
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        description: status property
-        required: true
-        content:
-          application/json:
-            examples:
-              placed:
-                value: |-
-                  {
-                    "status": "placed"
-                  }
-              processing:
-                value: |-
-                  {
-                    "status": "processing"
-                  }
-              shipped:
-                value: |-
-                  {
-                    "status": "shipped"
-                  }
-              delivered:
-                value: |-
-                  {
-                    "status": "delivered"
-                  }
-              cancelled:
-                value: |-
-                  {
-                    "status": "cancelled"
-                  }
-              returned:
-                value: |-
-                  {
-                    "status": "returned"
-                  }
-      responses:
-        "200":
-          description: successful updated.
-          content:
-            application/json:
-              examples:
-                placed:
-                  value: |-
-                    {
-                      "id": 1,
-                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
-                      "status": "placed"
-                    }
-                processing:
-                  value: |-
-                    {
-                      "id": 1,
-                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
-                      "status": "processing"
-                    }
-                shipped:
-                  value: |-
-                    {
-                      "id": 1,
-                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
-                      "status": "shipped"
-                    }
-                delivered:
-                  value: |-
-                    {
-                      "id": 1,
-                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
-                      "status": "delivered"
-                    }
-                cancelled:
-                  value: |-
-                    {
-                      "id": 1,
-                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
-                      "status": "cancelled"
-                    }
-                returned:
-                  value: |-
-                    {
-                      "id": 1,
-                      "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
-                      "status": "returned"
-                    }
-
-  /orders/{orderId}/items:
-    post:
-      tags:
-        - Orders
-      summary: Add new items
-      description: add new items to an existing order
-      parameters:
-        - name: orderId
-          in: path
-          description: The order's id you want to add items to.
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        description: New Product to add
-        required: true
-        content:
-          application/json:
-            example: |-
-              {
-                "productId": 3333,
-                "quantity": 1
-              }
-      responses:
-        "201":
-          description: seccesful addition
-          content:
-            application/json:
-              example: |-
-                {
-                  "success": true,
-                  "message": "Item successfully added to the order.",
-                  "updatedOrder": {
-                      "id": 1,
-                      "items": [
-                        {
-                          "productId": 1111,
-                          "quantity": 5
-                        },
-                        {
-                          "productId": 2222,
-                          "quantity": 7
-                        },
-                        {
-                          "productId": 3333,
-                          "quantity": 1
-                        }
-                      ]
-                  }
-                }
-
-        "400":
-          description: Invalid input data
-          content:
-            text/plain; charset=utf-8:
-              example: |-
-                Invalid request payload. Please check the data format.
-
-        "404":
-          description: Not found
-          content:
-            text/plain; charset=utf-8:
-              examples:
-                order not found:
-                  value: No such Order has been founded.
-                product not found:
-                  value: No such Product has been founded.
-
-  /orders/{orderId}/items/{productId}:
-    delete:
-      tags:
-        - Orders
-      summary: Romove specific item from an order
-      description: Romove specific item from the order by order's ID and product's ID
-      parameters:
-        - name: orderId
-          in: path
-          description: The order's ID you want to romove product from.
-          required: true
-          schema:
-            type: integer
-        - name: productId
-          in: path
-          description: The product's ID to delete.
-          required: true
-          schema:
-            type: integer
-      responses:
-        "204":
-          description: seccessful deletion
-        "404":
-          description: Not found
-          content:
-            text/plain; charset=utf-8:
-              examples:
-                order not found:
-                  value: No such Order has been founded
-                product not found:
-                  value: No such Product has been founded
-                order doesn't contain product:
-                  value: The specified product does not exist in the order
-
-    put:
-      tags:
-        - Orders
-      summary: Update the quantity of a specific item in an order
-      description: Updated the quantity of a specific item in an order by orderId and productId
-      parameters:
-        - name: orderId
-          in: path
-          description: The order's ID you want to updated.
-          required: true
-          schema:
-            type: integer
-            example: 1
-        - name: productId
-          in: path
-          description: The product's ID to updated its quantity.
-          required: true
-          schema:
-            type: integer
-            example: 1111
-      requestBody:
-        description: The new quantity
-        content:
-          application/json:
-            example: |-
-              {
-                "quantity": 3
-              }
-      responses:
-        "200":
-          description: successful update
-          content:
-            application/json:
-              example: |-
-                {
-                  "success": true,
-                  "message": "Item quantity updated successfully",
-                  "updatedItem": {
-                    "id": 1111,
-                    "quantity": 3
-                  }
-                }
-        "400":
-          description: Invalid input data
-          content:
-            text/plain; charset=utf-8:
-              example: |-
-                Invalid request payload. Please check the data format.
-        "404":
-          description: Not found
-          content:
-            text/plain; charset=utf-8:
-              examples:
-                order not found:
-                  value: No such Order has been founded
-                product not found:
-                  value: No such Product has been founded
-                order doesn't contain product:
-                  value: The specified product does not exist in the order
-
-  /carts/{cartId}/checkout:
-    # done
-    post:
-      tags:
-        - Carts
-      summary: Create an order
-      description: Create new order base on the given cart
-      operationId: postOrder
-      parameters:
-        - $ref: "#/components/parameters/cartId"
-      responses:
-        "201":
-          description: successful creation.
-          content:
-            application/json:
-              example: |-
-                {
-                  "orderId": 1,
-                  "items": [
-                      {
-                          "productId": 1111,
-                          "quantity": 5
-                      },
-                      {
-                          "productId": 2222,
-                          "quantity": 7
-                      }
-                  ]
-                }
-
-        "404":
-          $ref: "#/components/responses/NotFoundCart"
-
 components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      name: Authorization
+      in: header
   schemas:
-    User:
-      required:
-        - email
-        - password
+    # carts
+    CartResponse:
       type: object
       properties:
-        firstName:
+        success:
+          type: boolean
+          description: Indicates whether the request was successful
+        message:
           type: string
-          example: Elon
-        lastName:
-          type: string
-          example: Musk
-        email:
-          type: string
-          example: example@gmail.com
-        address:
-          type: string
-          example: NYC USA
-        password:
-          type: string
-          example: hashed_password
-          format: password
-      xml:
-        name: User
-
-    Product:
-      type: object
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-        price:
-          type: integer
-        imageUrl:
-          type: string
-        categoriesId:
-          type: array
-          items:
-            type: integer
-    ProductCart:
-      type: object
-      properties:
-        productId:
-          type: integer
-          example: 1111
-        quantity:
-          type: integer
-          example: 5
-    ProductCart2:
-      type: object
-      properties:
-        productId:
-          type: integer
-          example: 2222
-        quantity:
-          type: integer
-          example: 3
+          description: Descriptive message about the request status
+        data:
+          type: object
+          properties:
+            cart:
+              $ref: "#/components/schemas/Cart"
+      example:
+        success: true
+        message: "User retrieved successfully."
+        data:
+          cart:
+            id: 1
+            createdAt: "2024-03-17T12:00:00Z"
+            items:
+              - id: 1
+                quantity: 2
+                name: "Product 1"
+                description: "Description of Product 1"
+                price: "10.00"
+                imageUrl: "https://example.com/product1.jpg"
+                categoriesId: [1, 2]
     Cart:
       type: object
       properties:
         id:
           type: integer
-          example: 1
-        userId:
-          type: integer
-          example: 1
+          description: The ID of the cart
         createdAt:
           type: string
-          example: Sat Dec 02 2023 12:54:56 GMT+0100 (Central European Standard Time)
+          format: date-time
+          description: The date and time when the cart was created
         items:
           type: array
           items:
-            $ref: "#/components/schemas/ProductCart"
-    Cart2:
+            $ref: "#/components/schemas/CartItem"
+    CartItem:
       type: object
       properties:
-        cartId:
+        id:
           type: integer
-          example: 1
-        items:
+          description: The ID of the product
+        quantity:
+          type: integer
+          description: The quantity of the product in the cart
+        name:
+          type: string
+          description: The name of the product
+        description:
+          type: string
+          description: The description of the product
+        price:
+          type: string
+          description: The price of the product
+        imageUrl:
+          type: string
+          format: uri
+          description: The URL of the product image
+        categoriesId:
           type: array
           items:
-            $ref: "#/components/schemas/ProductCart2"
-
-  parameters:
-    productId:
-      name: productId
-      in: path
-      description: The product's ID to fetch
-      required: true
-      schema:
-        type: integer
-    cartId:
-      name: cartId
-      in: path
-      description: The cart's ID to fetch
-      required: true
-      schema:
-        type: integer
-
-  requestBodies:
-    Cart:
-      description: Cart object
-      required: true
+            type: integer
+          description: The IDs of the categories the product belongs to
+    CartCreateResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates whether the request was successful
+        message:
+          type: string
+          description: Descriptive message about the request status
+        data:
+          type: object
+          properties:
+            cart:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: The ID of the created cart
+                userId:
+                  type: integer
+                  description: The ID of the user associated with the cart
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: The date and time when the cart was created
+      required:
+        - success
+        - message
+        - data
+    AddCartItemRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ID of the product to add to the cart
+        quantity:
+          type: integer
+          description: The quantity of the product to add
+      required:
+        - id
+        - quantity
+    AddCartItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates whether the request was successful
+        message:
+          type: string
+          description: Descriptive message about the request status
+        data:
+          type: object
+          properties:
+            item:
+              type: object
+              properties:
+                cartId:
+                  type: integer
+                  description: The ID of the cart the item was added to
+                productId:
+                  type: integer
+                  description: The ID of the product added to the cart
+                quantity:
+                  type: integer
+                  description: The quantity of the product added to the cart
+    UpdateCartItemQuantityRequest:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          description: The new quantity of the product in the cart
+      required:
+        - quantity
+    UpdateCartItemQuantityResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates whether the request was successful
+        message:
+          type: string
+          description: Descriptive message about the request status
+        data:
+          type: object
+          properties:
+            item:
+              type: object
+              properties:
+                cartId:
+                  type: integer
+                  description: The ID of the cart containing the item
+                productId:
+                  type: integer
+                  description: The ID of the product
+                quantity:
+                  type: integer
+                  description: The updated quantity of the product in the cart
+    CheckoutResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates whether the request was successful
+        message:
+          type: string
+          description: Descriptive message about the request status
+    # users
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 205
+          description: The unique identifier for the user.
+        firstName:
+          type: string
+          example: Mohamed
+          description: The first name of the user.
+        lastName:
+          type: string
+          example: Ouanjine
+          description: The last name of the user.
+        email:
+          type: string
+          example: dimamarta7in.shop@gmail.com
+          description: The email address of the user.
+        address:
+          type: string
+          example: null
+          description: The address of the user.
+        password:
+          type: string
+          example: null
+          description: The password of the user (if applicable).
+        authSource:
+          type: string
+          example: google
+          description: The authentication source of the user (e.g., google, local).
+  responses:
+    UnauthorizedError:
+      description: Unauthorized access error
       content:
         application/json:
           schema:
             type: object
             properties:
-              items:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ProductCart"
-
-  responses:
-    NotFoundCart:
-      description: Not found
+              error:
+                type: boolean
+                description: Indicates whether an error occurred
+              message:
+                type: string
+                description: Error message describing the reason for unauthorized access
+    InternalServerError:
+      description: Internal server error
       content:
-        text/plain; charset=utf-8:
-          example: No such Cart has been founded.
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: boolean
+                description: Indicates whether an error occurred
+              message:
+                type: string
+                description: Error message describing the internal server error
+    NotFoundError:
+      description: Cart not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: boolean
+                description: Indicates whether an error occurred
+              message:
+                type: string
+                description: Error message indicating that the cart was not found
+    BadRequestError:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: boolean
+                description: Indicates whether an error occurred
+              message:
+                type: string
+                description: Error message indicating a bad request
+
+paths:
+  /api/carts/cart:
+    get:
+      tags:
+        - Carts
+      summary: Retrieve authenticated user's cart
+      description: Retrieves the cart associated with the authenticated user. Requires authentication.
+      security:
+        - apiKeyAuth: []
+      responses:
+        "200":
+          description: Successful retrieval of the user's cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+          
+  /api/carts/{cartId}:
+    parameters:
+      - in: path
+        name: cartId
+        required: true
+        description: The ID of the cart
+        schema:
+          type: integer
+    get:
+      tags:
+        - Carts
+      summary: Get a cart by its ID
+      description: Retrieves a cart by its ID.
+      responses:
+        '200':
+          description: Successful retrieval of the cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+        '404':
+          $ref: "#/components/responses/NotFoundError"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+    delete:
+      tags:
+        - Carts
+      summary: Delete a cart
+      description: Deletes a cart by its ID.
+      responses:
+        '204':
+          description: Cart deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/carts:
+    post:
+      tags:
+        - Carts
+      summary: Create a new cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  description: The ID of the user for whom the cart is created
+      responses:
+        "201":
+          description: Cart created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartCreateResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/carts/items:
+    post:
+      tags:
+        - Carts
+      summary: Add a new product to the specified cart
+      description: Adds a new product to the specified cart by providing the product ID and quantity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCartItemRequest'
+      responses:
+        '201':
+          description: Item inserted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddCartItemResponse'
+
+  /api/carts/{cartId}/items/{productId}:
+    parameters:
+      - in: path
+        name: cartId
+        required: true
+        description: The ID of the cart containing the item
+        schema:
+          type: integer
+      - in: path
+        name: productId
+        required: true
+        description: The ID of the product to update or delete
+        schema:
+          type: integer
+    put:
+      tags:
+        - Carts
+      summary: Update the quantity of a specific product in the cart
+      description: Updates the quantity of a specific product in the cart.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCartItemQuantityRequest'
+      responses:
+        '200':
+          description: Item quantity updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateCartItemQuantityResponse'
+    delete:
+      tags:
+        - Carts
+      summary: Remove a specific product from the cart
+      description: Removes a specific product from the cart.
+      responses:
+        '204':
+          description: Product removed successfully
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/carts/{cartId}/clear:
+    parameters:
+      - in: path
+        name: cartId
+        required: true
+        description: The ID of the cart to clear
+        schema:
+          type: integer
+    delete:
+      tags:
+        - Carts
+      summary: Clear the cart
+      description: Removes all items from the specified cart, effectively clearing it.
+      responses:
+        '204':
+          description: Cart cleared successfully
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/carts/{cartId}/checkout:
+    parameters:
+      - in: path
+        name: cartId
+        required: true
+        description: The ID of the cart to checkout
+        schema:
+          type: integer
+    post:
+      tags:
+        - Carts
+      summary: Checkout the cart
+      description: Creates an order from the items in the specified cart.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cartId:
+                  type: integer
+      responses:
+        '200':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutResponse"
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Retrieve all users
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Users retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Retrieve a user by ID
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: ID of the user to retrieve
+          schema:
+            type: integer
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: User retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found
+    put:
+      tags:
+        - Users
+      summary: Update a user by ID
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: ID of the user to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: User updated successfully.
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found
+    delete:
+      tags:
+        - Users
+      summary: Delete a user by ID
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: ID of the user to delete
+          schema:
+            type: integer
+      security:
+        - apiKeyAuth: []
+      responses:
+        '204':
+          description: User deleted successfully
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+# paths:
+#   auth/register:
+#     post:
+#       tags:
+#         - Users
+#       summary: Create new user
+#       description: Create a new user to the database
+#       operationId: register
+#       requestBody:
+#         description: User information
+#         content:
+#           application/json:
+#             example: |-
+#               {
+#                 "email": "example@gmail.com",
+#                 "password": "my-password"
+#               }
+#         required: true
+#       responses:
+#         "201":
+#           description: New user Object
+#           content:
+#             application/json:
+#               example: |-
+#                 {
+#                   "id": 1111,
+#                   "firstName": null,
+#                   "lastName": null,
+#                   "email": "example@gmail.com",
+#                   "address": null,
+#                   "password": "hashed password"
+#                 }
+
+#   auth/login/password:
+#     post:
+#       tags:
+#         - Users
+#       summary: Login a user
+#       description: login an existing user to the app
+#       operationId: signin
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               examples:
+#                 User:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "firstName": "Mohamed",
+#                       "lastName": "Ouanjine",
+#                       "email": "email.for.tv.elhajji@gmail.com",
+#                       "address": "Temara",
+#                       "password": "hashed_password"
+#                     }
+#         default:
+#           description: Default error sample response
+#       requestBody:
+#         description: User registration inforamations
+#         content:
+#           application/json:
+#             schema:
+#               required:
+#                 - email
+#                 - password
+#               type: object
+#               properties:
+#                 email:
+#                   type: string
+#                   example: example@gmail.com
+#                 password:
+#                   type: string
+#                   example: my-password
+#                   format: password
+
+#   /users:
+#     get:
+#       tags:
+#         - Users
+#       summary: Get all users
+#       description: Get all users from database
+#       operationId: users
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               examples:
+#                 Users:
+#                   value: |-
+#                     [
+#                       {
+#                         "id": 41,
+#                         "firstName": "Riyan",
+#                         "lastName": "Alwane",
+#                         "email": "riyan@gmail.com",
+#                         "address": "tamasna",
+#                         "password": "hashed_password"
+#                       },
+#                       {
+#                         "id": 42,
+#                         "firstName": "Rayan",
+#                         "lastName": "***",
+#                         "email": "rayan@gmail.com",
+#                         "address": "City",
+#                         "password": "hashed_password"
+#                       },
+#                       {
+#                         "id": 1,
+#                         "firstName": "Mohamed",
+#                         "lastName": "Ouanjine",
+#                         "email": "email.for.tv.elhajji@gmail.com",
+#                         "address": "Temara",
+#                         "password": "hashed_password"
+#                       }
+#                     ]
+#         default:
+#           description: Default error sample response
+
+#   /users/{userId}:
+#     get:
+#       tags:
+#         - Users
+#       summary: Get a users by ID
+#       description: Get all users from database
+#       operationId: get_user
+#       parameters:
+#         - name: userId
+#           in: path
+#           description: ID of the user to retrive.
+#           required: true
+#           schema:
+#             type: integer
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               examples:
+#                 User:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "firstName": "Mohamed",
+#                       "lastName": "Ouanjine",
+#                       "email": "email.for.tv.elhajji@gmail.com",
+#                       "address": "Temara",
+#                       "password": "hashed_password"
+#                     }
+#         default:
+#           description: Default error sample response
+
+#     put:
+#       tags:
+#         - Users
+#       summary: Update a user by ID.
+#       description: Update a user by their ID.
+#       operationId: put_user
+#       parameters:
+#         - name: userId
+#           in: path
+#           description: ID of the user to retrive.
+#           required: true
+#           schema:
+#             type: integer
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               examples:
+#                 UpdatedUser:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "firstName": "Mohamed",
+#                       "lastName": "Ouanjine",
+#                       "email": "email.for.tv.elhajji@gmail.com",
+#                       "address": "NYC USA",
+#                       "password": "hashed_password"
+#                     }
+#       requestBody:
+#         description: A new order object
+#         content:
+#           application/json:
+#             schema:
+#               $ref: "#/components/schemas/User"
+
+#     delete:
+#       tags:
+#         - Users
+#       summary: Delete a user by ID.
+#       description: Delete a user by their ID.
+#       operationId: deleteUserById
+#       parameters:
+#         - name: userId
+#           in: path
+#           description: ID of the user to deleted.
+#           required: true
+#           schema:
+#             type: integer
+#       responses:
+#         "204":
+#           description: seccessful deletion
+#         "404":
+#           description: Not found
+#           content:
+#             text/plain; charset=utf-8:
+#               example: No such User has been founded.
+
+#   /products:
+#     post:
+#       tags:
+#         - Products
+#       summary: Create new product
+#       description: >-
+#         Ceate new product in the database using product's name, description and
+#         price
+#       operationId: postProducts
+#       responses:
+#         "201":
+#           description: New product created
+#           content:
+#             application/json:
+#               examples:
+#                 New product:
+#                   value: |-
+#                     {
+#                         "id": 31,
+#                         "name": "foo",
+#                         "description": "baz baz",
+#                         "price": "$1,000,000.00",
+#                         "categoriesId": [
+#                             1
+#                         ]
+#                     }
+#       requestBody:
+#         description: New product
+#         content:
+#           application/json:
+#             schema:
+#               $ref: "#/components/schemas/Product"
+
+#     get:
+#       tags:
+#         - Products
+#       summary: Get all products
+#       description: Retrieve a list of all products
+#       operationId: products
+#       parameters:
+#         - name: categoryId
+#           in: query
+#           description: ID of the product to retrieve.
+#           schema:
+#             type: integer
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               examples:
+#                 Products:
+#                   value: |-
+#                     [
+#                         {
+#                             "id": 2,
+#                             "name": "Laptop",
+#                             "description": "Powerful laptop for productivity",
+#                             "price": "$1,299.99"
+#                         },
+#                         {
+#                             "id": 3,
+#                             "name": "T-shirt",
+#                             "description": "Comfortable cotton T-shirt",
+#                             "price": "$19.99"
+#                         },
+#                         {
+#                             "id": 4,
+#                             "name": "Sofa",
+#                             "description": "Modern and comfortable sofa",
+#                             "price": "$499.99"
+#                         },
+#                         {
+#                             "id": 1,
+#                             "name": "SmartPhone",
+#                             "description": "High-performance smartphone",
+#                             "price": "$399.99"
+#                         }
+#                     ]
+
+#       x-codeSamples:
+#         - lang: http
+#           source: >
+#             # Try out with category parameter
+
+#             curl -X GET "http://localhost:4000/products?category=1" -H "accept:
+#             application/json"
+#   /products/{productId}:
+#     get:
+#       tags:
+#         - Products
+#       summary: Get product by ID
+#       description: Retrieve a specific product by its ID
+#       parameters:
+#         - $ref: "#/components/parameters/productId"
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               examples:
+#                 get_product_by_id:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "name": "SmartPhone",
+#                       "description": "High-performance smartphone",
+#                       "price": "$399.99",
+#                       "categoriesId": [
+#                           1
+#                       ]
+#                     }
+#         "404":
+#           description: Not found
+#           content:
+#             text/plain; charset=utf-8:
+#               example: No such Product has been founded.
+
+#     put:
+#       tags:
+#         - Products
+#       summary: Update a product
+#       description: Update a product in the database using product's ID
+#       operationId: putProducts
+#       parameters:
+#         - $ref: "#/components/parameters/productId"
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             applicatoin/json:
+#               examples:
+#                 updated name:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "name": "New name",
+#                       "description": "High-performance smartphone",
+#                       "price": "$399.99",
+#                       "categoriesId": [
+#                         1
+#                       ]
+#                     }
+
+#                 updated price:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "name": "New name",
+#                       "description": "High-performance smartphone",
+#                       "price": "$1,000,000",
+#                       "categoriesId": [
+#                         1
+#                       ]
+#                     }
+#         "404":
+#           description: Not found
+#           content:
+#             text/plain; charset=utf-8:
+#               example: No such Product has been founded.
+#       requestBody:
+#         description: New iformations
+#         content:
+#           application/json:
+#             schema:
+#               $ref: "#/components/schemas/Product"
+
+#     delete:
+#       tags:
+#         - Products
+#       summary: Delete a product
+#       description: Delete a product in the database using product's ID
+#       operationId: deleteProducts
+#       parameters:
+#         - $ref: "#/components/parameters/productId"
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               examples:
+#                 delete product whose id is 31:
+#                   value: |-
+#                     {
+#                       "id": 31,
+#                       "name": "T-short",
+#                       "description": "white t-short for summer",
+#                       "price": "$1.00",
+#                       "categoriesId": [
+#                         2
+#                       ]
+#                     }
+#         "404":
+#           description: Not found
+#           content:
+#             text/plain; charset=utf-8:
+#               example: No such Product has been founded.
+
+#   /carts:
+#     post:
+#       tags:
+#         - Carts
+#       summary: Create a cart
+#       description: Create new cart
+#       operationId: postCart
+#       requestBody:
+#         description: Cart object
+#         content:
+#           application/json:
+#             schema:
+#               type: object
+#               properties:
+#                 items:
+#                   type: array
+#                   items:
+#                     $ref: "#/components/schemas/ProductCart"
+#       responses:
+#         "201":
+#           description: successful operation
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: "#/components/schemas/Cart"
+
+#   /carts/{cartId}:
+#     # Done
+#     get:
+#       tags:
+#         - Carts
+#       summary: Get a specific cart.
+#       description: Get a cart by its ID (cartId). Optionally include item details with `?include=items`.
+#       operationId: getCart
+#       parameters:
+#         - $ref: "#/components/parameters/cartId"
+#         - name: include
+#           in: query
+#           description: Include details of cart items in the response (e.g., product information).
+#           required: false
+#           schema:
+#             type: boolean
+#             default: false
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: "#/components/schemas/Cart"
+#                 allOf:
+#                   - if:
+#                       properties:
+#                         include:
+#                           const: true
+#                     then:
+#                       properties:
+#                         items:
+#                           items:
+#                             properties:
+#                               product:
+#                                 $ref: "#/components/schemas/Product"
+#         "404":
+#           $ref: "#/components/responses/NotFoundCart"
+
+#     # done
+#     delete:
+#       tags:
+#         - Carts
+#       summary: Delete a cart.
+#       description: Delete a cart by its ID.
+#       operationId: deleteCart
+#       parameters:
+#         - $ref: "#/components/parameters/cartId"
+#       responses:
+#         "204":
+#           description: successful deletion
+#         "404":
+#           $ref: "#/components/responses/NotFoundCart"
+
+#   /carts/users/{userId}:
+#     # Done
+#     get:
+#       tags:
+#         - Carts
+#       summary: Get a specific cart by user ID.
+#       description: get a cart by its user ID (user must be signed in).
+#       operationId: getCartByUserId
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: "#/components/schemas/Cart"
+#         "404":
+#           $ref: "#/components/responses/NotFoundCart"
+
+#   /carts/{cartId}/items:
+#     # done
+#     post:
+#       tags:
+#         - Carts
+#       summary: Add a new product to the specified cart.
+#       description: Add a new product to the specified cart, by providing productId and quantity.
+#       parameters:
+#         - $ref: "#/components/parameters/cartId"
+#       requestBody:
+#         description: New items
+#         required: true
+#         content:
+#           application/json:
+#             schema:
+#               $ref: "#/components/schemas/ProductCart2"
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               example: |-
+#                 {
+#                   "id": 1,
+#                   "items": [
+#                     {
+#                       "productId": 1111,
+#                       "quantity": 5
+#                     },
+#                     {
+#                       "productId": 2222,
+#                       "quantity": 3
+#                     }
+#                   ]
+#                 }
+#     # done
+#     delete:
+#       tags:
+#         - Carts
+#       summary: Remove all products from the cart.
+#       parameters:
+#         - $ref: "#/components/parameters/cartId"
+#       responses:
+#         "204":
+#           description: successful deletion
+#         "404":
+#           $ref: "#/components/responses/NotFoundCart"
+
+#   /carts/{cartId}/items/{productId}:
+#     # done
+#     put:
+#       tags:
+#         - Carts
+#       summary: Update the quantity of a specific product in the cart.
+#       description: Update cart's product quantity by cartId and producId
+#       parameters:
+#         - $ref: "#/components/parameters/cartId"
+#         - $ref: "#/components/parameters/productId"
+#       requestBody:
+#         description: Update quantity of product whose ID is 2222.
+#         required: true
+#         content:
+#           application/json:
+#             schema:
+#               type: object
+#               properties:
+#                 quantity:
+#                   type: integer
+#                   example: 7
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               example: |-
+#                 {
+#                   "success": true,
+#                   "updatedProduct": {
+#                       "cartId": 1,
+#                       "productId": 2222,
+#                       "quantity": 7
+#                   }
+#                 }
+
+#         "404":
+#           $ref: "#/components/responses/NotFoundCart"
+#     # done
+#     delete:
+#       tags:
+#         - Carts
+#       summary: Remove a specific product from the cart.
+#       parameters:
+#         - $ref: "#/components/parameters/cartId"
+#         - $ref: "#/components/parameters/productId"
+#       responses:
+#         "200":
+#           description: successful deletion
+#           content:
+#             application/json:
+#               example: |-
+#                 {
+#                   "data": {
+#                     "product": {
+#                       "id": 1
+#                     },
+#                     "cart": {
+#                       "id": 1
+#                     }
+#                   },
+#                   "message": "product deleted successfully"
+#                 }
+#         "404":
+#           $ref: "#/components/responses/NotFoundCart"
+
+#   /orders:
+#     get:
+#       tags:
+#         - Orders
+#       summary: Get all orders.
+#       description: Retrieve all orders a user have.
+#       operationId: getOrders
+#       responses:
+#         "200":
+#           description: successful operation.
+#           content:
+#             application/json:
+#               examples:
+#                 all orders for an authenticated user:
+#                   value: |-
+#                     [
+#                       {
+#                         "id": 1,
+#                         "createdAt": "Sun Dec 02 2023 09:28:55 GMT+0100 (Central European Standard Time)",
+#                         "items": [
+#                           {
+#                             "productId": 1111,
+#                             "quantity": 5
+#                           },
+#                           {
+#                             "productId": 2222,
+#                             "quantity": 3
+#                           }
+#                         ]
+#                       },
+#                       {
+#                         "id": 2,
+#                         "createdAt": "Sun Dec 03 2023 09:28:55 GMT+0100 (Central European Standard Time)",
+#                         "items": [
+#                           {
+#                             "productId": 3333,
+#                             "quantity": 5
+#                           },
+#                           {
+#                             "productId": 4444,
+#                             "quantity": 3
+#                           }
+#                         ]
+#                       }
+#                     ]
+
+#   /orders/{orderId}:
+#     get:
+#       tags:
+#         - Orders
+#       summary: Get an order
+#       description: Retrieve an order by its Id
+#       operationId: getOrder
+#       parameters:
+#         - name: orderId
+#           in: path
+#           description: The order id you want to retrive.
+#           required: true
+#           schema:
+#             type: integer
+#       responses:
+#         "200":
+#           description: successful operation
+#           content:
+#             application/json:
+#               examples:
+#                 order whose id is 1:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "createdAt": "Sun Dec 03 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+#                       "status": "shipped",
+#                       "items": [
+#                           {
+#                               "productId": 1111,
+#                               "quantity": 5
+#                           },
+#                           {
+#                               "productId": 2222,
+#                               "quantity": 7
+#                           }
+#                       ]
+#                     }
+
+#     delete:
+#       tags:
+#         - Orders
+#       summary: Delete an order
+#       description: Delete an order by its Id
+#       operationId: deleteOrder
+#       parameters:
+#         - name: orderId
+#           in: path
+#           description: The order id you want to delete.
+#           required: true
+#           schema:
+#             type: integer
+#       responses:
+#         "204":
+#           description: successful deletion.
+
+#   /orders/{orderId}/status:
+#     put:
+#       tags:
+#         - Orders
+#       summary: Update the status of a specific order.
+#       description: Updae the status of a specific order by its ID (e.g. placed, processing, shipped, delivered, cancelled or returned).
+#       parameters:
+#         - name: orderId
+#           in: path
+#           description: The order's id you want to Update.
+#           required: true
+#           schema:
+#             type: integer
+#       requestBody:
+#         description: status property
+#         required: true
+#         content:
+#           application/json:
+#             examples:
+#               placed:
+#                 value: |-
+#                   {
+#                     "status": "placed"
+#                   }
+#               processing:
+#                 value: |-
+#                   {
+#                     "status": "processing"
+#                   }
+#               shipped:
+#                 value: |-
+#                   {
+#                     "status": "shipped"
+#                   }
+#               delivered:
+#                 value: |-
+#                   {
+#                     "status": "delivered"
+#                   }
+#               cancelled:
+#                 value: |-
+#                   {
+#                     "status": "cancelled"
+#                   }
+#               returned:
+#                 value: |-
+#                   {
+#                     "status": "returned"
+#                   }
+#       responses:
+#         "200":
+#           description: successful updated.
+#           content:
+#             application/json:
+#               examples:
+#                 placed:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+#                       "status": "placed"
+#                     }
+#                 processing:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+#                       "status": "processing"
+#                     }
+#                 shipped:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+#                       "status": "shipped"
+#                     }
+#                 delivered:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+#                       "status": "delivered"
+#                     }
+#                 cancelled:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+#                       "status": "cancelled"
+#                     }
+#                 returned:
+#                   value: |-
+#                     {
+#                       "id": 1,
+#                       "createdAt": "Sun Dec 02 2023 14:51:59 GMT+0100 (Central European Standard Time)",
+#                       "status": "returned"
+#                     }
+
+#   /orders/{orderId}/items:
+#     post:
+#       tags:
+#         - Orders
+#       summary: Add new items
+#       description: add new items to an existing order
+#       parameters:
+#         - name: orderId
+#           in: path
+#           description: The order's id you want to add items to.
+#           required: true
+#           schema:
+#             type: integer
+#       requestBody:
+#         description: New Product to add
+#         required: true
+#         content:
+#           application/json:
+#             example: |-
+#               {
+#                 "productId": 3333,
+#                 "quantity": 1
+#               }
+#       responses:
+#         "201":
+#           description: seccesful addition
+#           content:
+#             application/json:
+#               example: |-
+#                 {
+#                   "success": true,
+#                   "message": "Item successfully added to the order.",
+#                   "updatedOrder": {
+#                       "id": 1,
+#                       "items": [
+#                         {
+#                           "productId": 1111,
+#                           "quantity": 5
+#                         },
+#                         {
+#                           "productId": 2222,
+#                           "quantity": 7
+#                         },
+#                         {
+#                           "productId": 3333,
+#                           "quantity": 1
+#                         }
+#                       ]
+#                   }
+#                 }
+
+#         "400":
+#           description: Invalid input data
+#           content:
+#             text/plain; charset=utf-8:
+#               example: |-
+#                 Invalid request payload. Please check the data format.
+
+#         "404":
+#           description: Not found
+#           content:
+#             text/plain; charset=utf-8:
+#               examples:
+#                 order not found:
+#                   value: No such Order has been founded.
+#                 product not found:
+#                   value: No such Product has been founded.
+
+#   /orders/{orderId}/items/{productId}:
+#     delete:
+#       tags:
+#         - Orders
+#       summary: Romove specific item from an order
+#       description: Romove specific item from the order by order's ID and product's ID
+#       parameters:
+#         - name: orderId
+#           in: path
+#           description: The order's ID you want to romove product from.
+#           required: true
+#           schema:
+#             type: integer
+#         - name: productId
+#           in: path
+#           description: The product's ID to delete.
+#           required: true
+#           schema:
+#             type: integer
+#       responses:
+#         "204":
+#           description: seccessful deletion
+#         "404":
+#           description: Not found
+#           content:
+#             text/plain; charset=utf-8:
+#               examples:
+#                 order not found:
+#                   value: No such Order has been founded
+#                 product not found:
+#                   value: No such Product has been founded
+#                 order doesn't contain product:
+#                   value: The specified product does not exist in the order
+
+#     put:
+#       tags:
+#         - Orders
+#       summary: Update the quantity of a specific item in an order
+#       description: Updated the quantity of a specific item in an order by orderId and productId
+#       parameters:
+#         - name: orderId
+#           in: path
+#           description: The order's ID you want to updated.
+#           required: true
+#           schema:
+#             type: integer
+#             example: 1
+#         - name: productId
+#           in: path
+#           description: The product's ID to updated its quantity.
+#           required: true
+#           schema:
+#             type: integer
+#             example: 1111
+#       requestBody:
+#         description: The new quantity
+#         content:
+#           application/json:
+#             example: |-
+#               {
+#                 "quantity": 3
+#               }
+#       responses:
+#         "200":
+#           description: successful update
+#           content:
+#             application/json:
+#               example: |-
+#                 {
+#                   "success": true,
+#                   "message": "Item quantity updated successfully",
+#                   "updatedItem": {
+#                     "id": 1111,
+#                     "quantity": 3
+#                   }
+#                 }
+#         "400":
+#           description: Invalid input data
+#           content:
+#             text/plain; charset=utf-8:
+#               example: |-
+#                 Invalid request payload. Please check the data format.
+#         "404":
+#           description: Not found
+#           content:
+#             text/plain; charset=utf-8:
+#               examples:
+#                 order not found:
+#                   value: No such Order has been founded
+#                 product not found:
+#                   value: No such Product has been founded
+#                 order doesn't contain product:
+#                   value: The specified product does not exist in the order
+
+#   /carts/{cartId}/checkout:
+#     # done
+#     post:
+#       tags:
+#         - Carts
+#       summary: Create an order
+#       description: Create new order base on the given cart
+#       operationId: postOrder
+#       parameters:
+#         - $ref: "#/components/parameters/cartId"
+#       responses:
+#         "201":
+#           description: successful creation.
+#           content:
+#             application/json:
+#               example: |-
+#                 {
+#                   "orderId": 1,
+#                   "items": [
+#                       {
+#                           "productId": 1111,
+#                           "quantity": 5
+#                       },
+#                       {
+#                           "productId": 2222,
+#                           "quantity": 7
+#                       }
+#                   ]
+#                 }
+
+#         "404":
+#           $ref: "#/components/responses/NotFoundCart"
+
+# components:
+#   schemas:
+#     User:
+#       required:
+#         - email
+#         - password
+#       type: object
+#       properties:
+#         firstName:
+#           type: string
+#           example: Elon
+#         lastName:
+#           type: string
+#           example: Musk
+#         email:
+#           type: string
+#           example: example@gmail.com
+#         address:
+#           type: string
+#           example: NYC USA
+#         password:
+#           type: string
+#           example: hashed_password
+#           format: password
+#       xml:
+#         name: User
+
+#     Product:
+#       type: object
+#       properties:
+#         name:
+#           type: string
+#         description:
+#           type: string
+#         price:
+#           type: integer
+#         imageUrl:
+#           type: string
+#         categoriesId:
+#           type: array
+#           items:
+#             type: integer
+#     ProductCart:
+#       type: object
+#       properties:
+#         productId:
+#           type: integer
+#           example: 1111
+#         quantity:
+#           type: integer
+#           example: 5
+#     ProductCart2:
+#       type: object
+#       properties:
+#         productId:
+#           type: integer
+#           example: 2222
+#         quantity:
+#           type: integer
+#           example: 3
+#     Cart:
+#       type: object
+#       properties:
+#         id:
+#           type: integer
+#           example: 1
+#         userId:
+#           type: integer
+#           example: 1
+#         createdAt:
+#           type: string
+#           example: Sat Dec 02 2023 12:54:56 GMT+0100 (Central European Standard Time)
+#         items:
+#           type: array
+#           items:
+#             $ref: "#/components/schemas/ProductCart"
+#     Cart2:
+#       type: object
+#       properties:
+#         cartId:
+#           type: integer
+#           example: 1
+#         items:
+#           type: array
+#           items:
+#             $ref: "#/components/schemas/ProductCart2"
+
+#   parameters:
+#     productId:
+#       name: productId
+#       in: path
+#       description: The product's ID to fetch
+#       required: true
+#       schema:
+#         type: integer
+#     cartId:
+#       name: cartId
+#       in: path
+#       description: The cart's ID to fetch
+#       required: true
+#       schema:
+#         type: integer
+
+#   requestBodies:
+#     Cart:
+#       description: Cart object
+#       required: true
+#       content:
+#         application/json:
+#           schema:
+#             type: object
+#             properties:
+#               items:
+#                 type: array
+#                 items:
+#                   $ref: "#/components/schemas/ProductCart"
+
+#   responses:
+#     NotFoundCart:
+#       description: Not found
+#       content:
+#         text/plain; charset=utf-8:
+#           example: No such Cart has been founded.
