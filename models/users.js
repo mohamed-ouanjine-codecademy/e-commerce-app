@@ -138,7 +138,7 @@ const userModel = {
 
       !isClientDefined && await client.query('BEGIN');
       const results = await pool.query(`
-      SELECT *
+      SELECT first_name, last_name, email, address
       FROM users;`);
       !isClientDefined && await client.query('COMMIT');
 
