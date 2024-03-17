@@ -3,7 +3,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const Users = require('../models/users');
-const help = require('../helperFunctions');
+const help = require('../utils');
 
 const router = express.Router();
 
