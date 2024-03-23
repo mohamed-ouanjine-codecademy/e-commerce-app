@@ -1,63 +1,43 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const passport = require('passport');
-const session = require('express-session');
 const helmet = require('helmet');
-const PgSession = require('connect-pg-simple')(session);
-const pool = require('./models/database');
-require('dotenv').config(); // Load environment variables from .env file
+const passport = require('passport');
+require('dotenv').config();
 
-// -- Routers
-const apiRouter = require('./routers');
+// Import JWT strategy
+passport.use(require('./utils/passport-jwt-strategy'));
 
-// Start app
+// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 8000;
 
 // cors
-const corsOptions = {
-  origin: process.env.CLIENT_URL,
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true // allow session cookie from browser to pass through
-};
-
-app.use(cors(corsOptions));
-
-// bodyParser
+// const corsOptions = {
+//   origin: process.env.CLIENT_URL,
+//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+//   credentials: true // allow session cookie from browser to pass through
+// };
+// Apply middleware
+app.use(cors());
 app.use(bodyParser.json());
-
-// Session configuration with Postgres store
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  store: new PgSession({
-    pool,
-  }),
-  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-
-// helmet
+app.use(passport.initialize()); // Initialize Passport middleware
 app.use(helmet());
 
-// mount Routers
+// Mount API routes
+const apiRouter = require('./routers');
 app.use('/api', apiRouter);
 
-// Error middleware
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err);
   const status = err.status || 500;
-  const message = err.message || 'Server Error';
-  res.status(status).json({
-    error: true,
-    message
-  });
+  const message = err.message || 'Internal Server Error.';
+  res.status(status).json({ error: true, message });
 });
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is listening on port: ${PORT}`);
 });

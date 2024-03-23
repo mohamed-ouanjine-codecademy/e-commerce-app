@@ -1,6 +1,6 @@
 const pool = require('./database.js');
 const help = require('./utils.js');
-const carts = require('./carts.js');
+const carts = require('./cart.model.js');
 
 const userModel = {
   // create new user with the given info
@@ -111,12 +111,15 @@ const userModel = {
       if (!email) throw new help.MyError('Invalid input data', 400);
 
       !isClientDefined && await client.query('BEGIN');
+
       const results = await pool.query(`
         SELECT *
         FROM users
         WHERE email = $1;`,
         [email]
       );
+      if (results.rows.length === 0) throw new help.NotFound('user');
+
       !isClientDefined && await client.query('COMMIT');
 
       const user = help.convertKeysFromSnakeCaseToCamelCase(results.rows[0]);
@@ -160,7 +163,7 @@ const userModel = {
       }
       !isClientDefined && await client.query('BEGIN');
       const results = await pool.query(`
-        SELECT first_name, last_name, email, address
+        SELECT id, first_name, last_name, email, address
         FROM users
         WHERE id = $1;`,
         [userId]
@@ -189,8 +192,8 @@ const userModel = {
         throw new Error('Invalid input data');
       }
 
-
-      const { updateFields, values, fieldsCount } = help.prepareUpdateFields(userNewInfo);
+      const columns = ['first_name', 'last_name', 'address']
+      const { updateFields, values, fieldsCount } = help.prepareUpdateFields(userNewInfo, columns);
       values.push(userId);
 
       // check if there something to updated and updated it in database

@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt')
+require('dotenv').config();
 
 // bcrypt
 const hashPassword = async (password, roundtime = 10) => {

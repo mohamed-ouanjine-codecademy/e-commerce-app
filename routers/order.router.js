@@ -1,17 +1,17 @@
 const router = require('express').Router();
 
-const orders = require('../models/orders');
-const help = require('../helperFunctions.js');
+const orderModel = require('../models/order.model.js');
+const help = require('../utils/index.js');
 
 
 router.use(help.middlewares.isAuthenticated);
 
-// get all orders
+// get all orderModel
 router.get('/', async (req, res, next) => {
   try {
     const userId = req.user.id;
 
-    const results = await orders.getOrdersByUserId(userId);
+    const results = await orderModel.getOrdersByUserId(userId);
 
     res.json(results);
     
@@ -26,7 +26,7 @@ router.get('/:orderId', async (req, res, next) => {
     const userId = req.user.id;
     const orderId = parseInt(req.params.orderId);
 
-    const order = await orders.getOrderByIdAndUserId(userId, orderId);
+    const order = await orderModel.getOrderByIdAndUserId(userId, orderId);
 
     res.json(order);
 
@@ -42,7 +42,7 @@ router.put('/:orderId/status', async (req, res, next) => {
     const orderId = parseInt(req.params.orderId);
     const status = req.body.status;
 
-    const UpdatedOrder = await orders.updateStatus(userId, orderId, status);
+    const UpdatedOrder = await orderModel.updateStatus(userId, orderId, status);
 
     res.json(UpdatedOrder);
 
@@ -58,7 +58,7 @@ router.post('/:orderId/items', async (req, res, next) => {
     const orderId = parseInt(req.params.orderId);
     const itemInfo = req.body;
 
-    const updatedOrder = await orders.addItemToOrder(userId, orderId, itemInfo);
+    const updatedOrder = await orderModel.addItemToOrder(userId, orderId, itemInfo);
 
     res.status(201).json(updatedOrder);
 
@@ -75,7 +75,7 @@ router.put('/:orderId/items/:productId', async (req, res, next) => {
     const productId = parseInt(req.params.productId);
     const quantity = req.body.quantity;
 
-    const updatedOrder = await orders.updateOrderProductQuantity(userId, orderId, productId, quantity);
+    const updatedOrder = await orderModel.updateOrderProductQuantity(userId, orderId, productId, quantity);
 
     res.json(updatedOrder);
 
@@ -91,7 +91,7 @@ router.delete('/:orderId/items/:productId', async (req, res, next) => {
     const orderId = parseInt(req.params.orderId);
     const productId = parseInt(req.params.productId);
 
-    await orders.removeItemFromOrderd(userId, orderId, productId);
+    await orderModel.removeItemFromOrderd(userId, orderId, productId);
 
     res.status(204).send();
 
@@ -106,7 +106,7 @@ router.delete('/:orderId', async (req, res, next) => {
     const userId = req.user.id;
     const orderId = parseInt(req.params.orderId);
 
-    await orders.deleteOrderByIdAndUserId(userId, orderId);
+    await orderModel.deleteOrderByIdAndUserId(userId, orderId);
 
     res.status(204).send();
 

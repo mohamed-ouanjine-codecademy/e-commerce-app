@@ -1,6 +1,6 @@
 const pool = require('./database.js');
 const help = require('./utils.js');
-const products = require('./products.js');
+const productModel = require('./product.model.js');
 
 const orderModel = {
   createOrder: async function (userId, cartId, client) {
@@ -183,7 +183,7 @@ const orderModel = {
       await this.getOrderByIdAndUserId(userId, orderId);
 
       // Check if the product exists
-      await products.getProductById(itemInfo.productId);
+      await productModel.getProductById(itemInfo.productId);
 
       // Add item to order
       await this.helpers.insertItemToOrder(orderId, itemInfo.productId, itemInfo.quantity);
@@ -222,7 +222,7 @@ const orderModel = {
       await this.getOrderByIdAndUserId(userId, orderId);
 
       // Check if the product exists
-      await products.getProductById(productId);
+      await productModel.getProductById(productId);
 
       // Check if the product exists in the order
       const item = await this.helpers.getItemByOrderIdAndProductId(orderId, productId);
@@ -260,7 +260,7 @@ const orderModel = {
       await this.getOrderByIdAndUserId(userId, orderId);
 
       // Check if the product exists
-      await products.getProductById(productId);
+      await productModel.getProductById(productId);
 
       // Check if the product exists in the order
       const item = await this.helpers.getItemByOrderIdAndProductId(orderId, productId);

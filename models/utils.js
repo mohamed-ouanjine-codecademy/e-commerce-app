@@ -73,7 +73,7 @@ const convertKeysFromCamelCaseToSnakeCase = (obj) => {
 class MyError extends Error {
   constructor(message, statusCode) {
     super(message);
-    this.status = statusCode;
+    this.status = statusCode || 500;
   }
 }
 
@@ -108,18 +108,18 @@ const buildInsertQuery = (items) => {
   return { columns, insertQuery, values };
 };
 
-const prepareUpdateFields = (obj) => {
+const prepareUpdateFields = (obj, columns) => {
   obj = convertKeysFromCamelCaseToSnakeCase(obj);
   const updateFields = [];
   const values = [];
   let fieldsCount = 1;
 
   // Iterate over the keys of obj
-  for (const key in obj) {
+  for (const column of columns) {
       // Check if the key is not inherited from the prototype chain
-      if (obj.hasOwnProperty(key)) {
-          updateFields.push(`${key} = $${fieldsCount}`);
-          values.push(obj[key]);
+      if (obj.hasOwnProperty(column)) {
+          updateFields.push(`${column} = $${fieldsCount}`);
+          values.push(obj[column]);
           fieldsCount++;
       }
   }
